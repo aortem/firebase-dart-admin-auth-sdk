@@ -1,8 +1,10 @@
 import 'package:firebase_dart_admin_auth_sdk/src/firebase_auth.dart';
 
 void main() async {
-  final auth =
-      FirebaseAuth(apiKey: 'YOUR_API_KEY', projectId: 'YOUR_PROJECT_ID');
+  // Firebase Authentication Example
+  final auth = FirebaseAuth(
+      apiKey: 'AIzaSyBli2c-dmD4w2kLHmZU3UtewETvuruVAN4',
+      projectId: 'fire-base-dart-admin-auth-sdk');
 
   try {
     // Sign up a new user

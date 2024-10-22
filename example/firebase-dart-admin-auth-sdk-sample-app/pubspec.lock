@@ -452,6 +452,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "4.9.0"
+  jwt_generator:
+    dependency: transitive
+    description:
+      name: jwt_generator
+      sha256: "19230c2077efab93e8a7060c2418d10bda4b6b919ae2cb0033eef8837461a3ad"
+      url: "https://pub.dev"
+    source: hosted
+    version: "0.0.3"
   leak_tracker:
     dependency: transitive
     description:
@@ -557,7 +565,7 @@ packages:
     source: hosted
     version: "2.1.0"
   path:
-    dependency: transitive
+    dependency: "direct main"
     description:
       name: path
       sha256: "087ce49c3f0dc39180befefc60fdb4acd8f8620e5682fe2476afd0b3688bb4af"
@@ -636,6 +644,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "3.2.2"
+  rsa_pkcs:
+    dependency: transitive
+    description:
+      name: rsa_pkcs
+      sha256: "6e1e03563d2cbd9758d8a562f738b759763d464fd65d32da132153230a0c0395"
+      url: "https://pub.dev"
+    source: hosted
+    version: "2.1.0"
   rxdart:
     dependency: transitive
     description:

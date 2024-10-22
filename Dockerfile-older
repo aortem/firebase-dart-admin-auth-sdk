@@ -1,0 +1,60 @@
+# Use the latest stable Flutter SDK for building the Flutter web app
+FROM ghcr.io/cirruslabs/flutter:3.24.3 AS build
+
+# Set the working directory inside the container
+WORKDIR /app
+
+# Copy the pubspec.yaml for the Flutter sample app
+COPY example/firebase-dart-admin-auth-sdk-sample-app/pubspec.yaml ./pubspec.yaml
+
+# Copy the entire firebase_dart_admin_auth_sdk folder for dependency resolution
+COPY firebase-dart-admin-auth-sdk ./firebase-dart-admin-auth-sdk/
+
+# Adjust the path in pubspec.yaml to reflect the Docker container's structure
+RUN sed -i 's|../../firebase-dart-admin-auth-sdk|./firebase-dart-admin-auth-sdk|' pubspec.yaml \
+    && cat pubspec.yaml
+
+
+# Run `flutter pub get` to resolve dependencies for the Flutter app
+RUN flutter pub get
+
+# Copy the entire sample app source code (including lib, assets, and bin)
+COPY example/firebase-dart-admin-auth-sdk-sample-app/ ./
+
+# Debugging: List files in /app after copying sample app source code
+RUN ls -la /app
+
+
+# Clean any previous builds
+# RUN flutter clean
+
+# Build the Flutter web app for release
+RUN flutter build web --release
+
+# Use the Dart SDK to compile the Dart server
+FROM dart:stable AS runtime
+
+# Set the working directory for the runtime image
+WORKDIR /app
+
+# Copy the pre-built web app from the build stage
+COPY --from=build /app/build/web /app/build/web
+
+# Copy the firebase_dart_admin_auth_sdk folder for server dependencies
+COPY firebase-dart-admin-auth-sdk/pubspec.yaml ./pubspec.yaml
+COPY firebase-dart-admin-auth-sdk/lib/ ./lib/
+
+# Run `dart pub get` to resolve server dependencies
+RUN dart pub get
+
+# Copy the server Dart code (main.dart from bin)
+COPY firebase-dart-admin-auth-sdk/bin/server.dart bin/server.dart
+
+# Compile the Dart server to a native executable
+RUN dart compile exe bin/server.dart -o bin/server
+
+# Expose the server port
+EXPOSE 8080
+
+# Start the Dart server
+CMD ["/app/bin/server"]
