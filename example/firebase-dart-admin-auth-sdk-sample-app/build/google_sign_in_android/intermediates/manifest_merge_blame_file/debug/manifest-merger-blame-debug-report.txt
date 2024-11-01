@@ -1,0 +1,15 @@
+1<?xml version="1.0" encoding="utf-8"?>
+2<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+3    package="io.flutter.plugins.googlesignin" >
+4
+5    <uses-sdk
+6        android:minSdkVersion="19"
+6-->/home/ini/.pub-cache/hosted/pub.dev/google_sign_in_android-6.1.30/android/src/main/AndroidManifest.xml
+7        android:targetSdkVersion="19" />
+7-->/home/ini/.pub-cache/hosted/pub.dev/google_sign_in_android-6.1.30/android/src/main/AndroidManifest.xml
+8
+9    <uses-permission android:name="android.permission.INTERNET" />
+9-->/home/ini/.pub-cache/hosted/pub.dev/google_sign_in_android-6.1.30/android/src/main/AndroidManifest.xml:4:3-64
+9-->/home/ini/.pub-cache/hosted/pub.dev/google_sign_in_android-6.1.30/android/src/main/AndroidManifest.xml:4:20-62
+10
+11</manifest>

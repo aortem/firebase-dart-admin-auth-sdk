@@ -1,0 +1,1 @@
+ /home/ini/development/aortem/firebase-dart-admin-auth-sdk/example/firebase-dart-admin-auth-sdk-sample-app/.dart_tool/flutter_build/db3ea4106a3f13dc8fdf2cfe9dcb258b/native_assets.yaml: 

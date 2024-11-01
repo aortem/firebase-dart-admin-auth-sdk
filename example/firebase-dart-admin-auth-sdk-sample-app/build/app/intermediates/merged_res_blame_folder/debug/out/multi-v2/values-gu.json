@@ -1,0 +1,77 @@
+{
+    "logs": [
+        {
+            "outputFile": "com.aortem.firebase_dart_admin_auth_sample_app-mergeDebugResources-27:/values-gu/values-gu.xml",
+            "map": [
+                {
+                    "source": "/home/ini/.gradle/caches/transforms-3/05d1435684861c80b7352010f3878dca/transformed/jetified-play-services-base-18.0.1/res/values-gu/values.xml",
+                    "from": {
+                        "startLines": "4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20",
+                        "startColumns": "0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0",
+                        "startOffsets": "193,297,459,580,688,822,940,1047,1143,1287,1391,1551,1672,1811,1957,2014,2076",
+                        "endColumns": "103,161,120,107,133,117,106,95,143,103,159,120,138,145,56,61,77",
+                        "endOffsets": "296,458,579,687,821,939,1046,1142,1286,1390,1550,1671,1810,1956,2013,2075,2153"
+                    },
+                    "to": {
+                        "startLines": "9,10,11,12,13,14,15,16,18,19,20,21,22,23,24,25,26",
+                        "startColumns": "4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4",
+                        "startOffsets": "773,881,1047,1172,1284,1422,1544,1655,1902,2050,2158,2322,2447,2590,2740,2801,2867",
+                        "endColumns": "107,165,124,111,137,121,110,99,147,107,163,124,142,149,60,65,81",
+                        "endOffsets": "876,1042,1167,1279,1417,1539,1650,1750,2045,2153,2317,2442,2585,2735,2796,2862,2944"
+                    }
+                },
+                {
+                    "source": "/home/ini/.gradle/caches/transforms-3/dd525f65788d12cc8b00bb05686903fb/transformed/browser-1.3.0/res/values-gu/values-gu.xml",
+                    "from": {
+                        "startLines": "2,3,4,5",
+                        "startColumns": "4,4,4,4",
+                        "startOffsets": "55,156,257,366",
+                        "endColumns": "100,100,108,100",
+                        "endOffsets": "151,252,361,462"
+                    },
+                    "to": {
+                        "startLines": "27,28,29,30",
+                        "startColumns": "4,4,4,4",
+                        "startOffsets": "2949,3050,3151,3260",
+                        "endColumns": "100,100,108,100",
+                        "endOffsets": "3045,3146,3255,3356"
+                    }
+                },
+                {
+                    "source": "/home/ini/.gradle/caches/transforms-3/54a4cfbaad86b9ab2273ca8263e4a153/transformed/core-1.13.1/res/values-gu/values-gu.xml",
+                    "from": {
+                        "startLines": "2,3,4,5,6,7,8,9",
+                        "startColumns": "4,4,4,4,4,4,4,4",
+                        "startOffsets": "55,149,252,349,451,553,651,773",
+                        "endColumns": "93,102,96,101,101,97,121,100",
+                        "endOffsets": "144,247,344,446,548,646,768,869"
+                    },
+                    "to": {
+                        "startLines": "2,3,4,5,6,7,8,31",
+                        "startColumns": "4,4,4,4,4,4,4,4",
+                        "startOffsets": "55,149,252,349,451,553,651,3361",
+                        "endColumns": "93,102,96,101,101,97,121,100",
+                        "endOffsets": "144,247,344,446,548,646,768,3457"
+                    }
+                },
+                {
+                    "source": "/home/ini/.gradle/caches/transforms-3/5ff4f968c66306cf73935d2197203fc1/transformed/jetified-play-services-basement-18.2.0/res/values-gu/values.xml",
+                    "from": {
+                        "startLines": "4",
+                        "startColumns": "0",
+                        "startOffsets": "195",
+                        "endColumns": "142",
+                        "endOffsets": "337"
+                    },
+                    "to": {
+                        "startLines": "17",
+                        "startColumns": "4",
+                        "startOffsets": "1755",
+                        "endColumns": "146",
+                        "endOffsets": "1897"
+                    }
+                }
+            ]
+        }
+    ]
+}
