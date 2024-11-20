@@ -15,21 +15,28 @@ class Button extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialButton(
       onPressed: onTap,
-      color: Colors.purple,
+      color: const Color(0xFFDA70D6), // Button background color
       shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(10),
+        borderRadius: BorderRadius.circular(12), // Rounded corners
       ),
-      textColor: Colors.white,
-      textTheme: ButtonTextTheme.normal,
+      textColor: Colors.black, // Button text color
+      elevation: 8, // Elevation for shadow effect
       child: loading
           ? const SizedBox(
               height: 15,
               width: 15,
               child: CircularProgressIndicator(
-                color: Colors.white,
+                color: Colors.black, // Spinner color
+                strokeWidth: 2,
               ),
             )
-          : Text(title ?? ''),
+          : Text(
+              title ?? '',
+              style: const TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
     );
   }
 }

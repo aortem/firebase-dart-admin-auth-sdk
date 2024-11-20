@@ -19,8 +19,21 @@ class SignInMethodsBottomSheet extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: 20.all,
+      decoration: const BoxDecoration(
+        gradient: LinearGradient(
+          colors: [Color(0xFF6A0DAD), Color(0xFF4B0082)], // Purple gradient
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+        ),
+        borderRadius: BorderRadius.only(
+          topLeft: Radius.circular(20),
+          topRight: Radius.circular(20),
+        ), // Rounded corners for the top of the bottom sheet
+      ),
+      padding: const EdgeInsets.all(20), // Consistent padding
       child: Column(
+        mainAxisSize: MainAxisSize.min, // Adjusts height to content
+        crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           ActionTile(
             onTap: () => Navigator.push(

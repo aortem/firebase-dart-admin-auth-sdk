@@ -30,14 +30,27 @@ class _SplashScreenState extends State<SplashScreen> {
       body: Container(
         height: MediaQuery.sizeOf(context).height,
         width: MediaQuery.sizeOf(context).width,
-        color: Colors.purple,
+        decoration: const BoxDecoration(
+          gradient: LinearGradient(
+            colors: [Color(0xFF6A0DAD), Color(0xFF4B0082)], // Gradient background
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+          ),
+        ),
         child: Center(
           child: Text(
             'SAMPLE APP',
             style: Theme.of(context).textTheme.bodySmall?.copyWith(
                   color: Colors.white,
                   fontWeight: FontWeight.w900,
-                  fontSize: 20,
+                  fontSize: 42,
+                  shadows: [
+                    Shadow(
+                      offset: const Offset(2.0, 2.0),
+                      blurRadius: 3.0,
+                      color: Colors.black.withOpacity(0.5), // Adds separation
+                    ),
+                  ],
                 ),
           ),
         ),

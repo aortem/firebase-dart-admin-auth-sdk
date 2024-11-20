@@ -1,5 +1,5 @@
-import 'package:dart_admin_auth_sample_app/utils/extensions.dart';
 import 'package:flutter/material.dart';
+import 'package:dart_admin_auth_sample_app/utils/extensions.dart';
 
 class ActionTile extends StatelessWidget {
   final String title;
@@ -17,17 +17,31 @@ class ActionTile extends StatelessWidget {
       child: Container(
         padding: 10.all,
         decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(10),
-            border: Border.all(
-              color: Colors.purple,
-            )),
+          color: Colors.white, // Tile background color
+          borderRadius: BorderRadius.circular(12), // Rounded corners
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.1), // Subtle shadow
+              blurRadius: 8,
+              offset: const Offset(0, 4),
+            ),
+          ],
+        ),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Text(title),
+            Text(
+              title,
+              style: const TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.bold,
+                color: Colors.black87, // Text color
+              ),
+            ),
             const Icon(
               Icons.arrow_forward_ios,
-              color: Colors.purple,
+              color: Colors.purple, // Icon color
+              size: 18,
             ),
           ],
         ),

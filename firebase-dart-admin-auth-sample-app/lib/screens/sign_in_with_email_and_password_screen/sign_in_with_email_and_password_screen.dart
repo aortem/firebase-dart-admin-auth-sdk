@@ -31,9 +31,18 @@ class _SignInWithEmailAndPasswordScreenState
       create: (context) => SignInWithEmailAndPasswordViewModel(),
       child: Consumer<SignInWithEmailAndPasswordViewModel>(
         builder: (context, value, child) => Scaffold(
-          body: Center(
-            child: SingleChildScrollView(
-              padding: 20.horizontal,
+          body: Container(
+            decoration: const BoxDecoration(
+              gradient: LinearGradient(
+                colors: [Color(0xFF6A0DAD), Color(0xFF4B0082)], // Purple gradient
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+              ),
+            ),
+            child: SafeArea(
+              child: Center(
+                child: SingleChildScrollView(
+                  padding: const EdgeInsets.all(20),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 mainAxisAlignment: MainAxisAlignment.center,
@@ -72,9 +81,16 @@ class _SignInWithEmailAndPasswordScreenState
                     child: const Text(
                       'Explore more sign in options',
                       textAlign: TextAlign.end,
-                    ),
+                      style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.yellowAccent,
+                      ),
+                        ),
+                      ),
+                    ],
                   ),
-                ],
+                ),
               ),
             ),
           ),

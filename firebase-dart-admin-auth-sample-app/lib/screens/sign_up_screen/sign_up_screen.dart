@@ -31,7 +31,15 @@ class _SignUpScreenState extends State<SignUpScreen> {
       create: (context) => SignUpViewModel(),
       child: Consumer<SignUpViewModel>(
         builder: (context, value, child) => Scaffold(
-          body: SafeArea(
+          body: Container(
+            decoration: const BoxDecoration(
+              gradient: LinearGradient(
+                colors: [Color(0xFF6A0DAD), Color(0xFF4B0082)], // Purple gradient
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+              ),
+            ),
+            child: SafeArea(
             child: Center(
               child: SingleChildScrollView(
                 padding: 20.all,
@@ -66,24 +74,29 @@ class _SignUpScreenState extends State<SignUpScreen> {
                     Text.rich(
                       textAlign: TextAlign.end,
                       TextSpan(
-                        text: 'Have an account? ',
-                        children: [
-                          TextSpan(
-                            text: 'Sign In With Varieties Of Method',
-                            recognizer: TapGestureRecognizer()
-                              ..onTap =
-                                  () => showSignMethodsBottomSheet(context),
-                            style:
-                                Theme.of(context).textTheme.bodySmall?.copyWith(
-                                      fontWeight: FontWeight.bold,
-                                      fontSize: 16,
-                                      color: Colors.purple,
-                                    ),
-                          )
-                        ],
+                          text: 'Have an account? ',
+                          style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                                fontWeight: FontWeight.bold,
+                                fontSize: 16,
+                                color: Colors.white,
+                              ),
+                          children: [
+                            TextSpan(
+                              text: 'Sign In With Varieties Of Method',
+                              recognizer: TapGestureRecognizer()
+                                ..onTap = () =>
+                                    showSignMethodsBottomSheet(context),
+                              style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 18,
+                                    color: Colors.yellowAccent, // Highlighted link color
+                              ),
+                            ),
+                          ],
                       ),
                     ),
                   ],
+                ),
                 ),
               ),
             ),
