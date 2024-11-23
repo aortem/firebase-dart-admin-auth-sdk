@@ -26,11 +26,12 @@ void main() async {
       // Initialize for web
       debugPrint('Initializing Firebase for Web...');
       await FirebaseApp.initializeAppWithEnvironmentVariables(
-        apiKey: 'YOUR_API_KEY', // 'YOUR_API_KEY'
+        apiKey: 'AIzaSyBli2c-dmD4w2kLHmZU3UtewETvuruVAN4', // 'YOUR_API_KEY'
         authdomain: 'YOUR_AUTH_DOMAIN', // 'YOUR_AUTH_DOMAIN'
-        projectId: 'YOUR_PROJECT_ID', // 'YOUR_PROJECT_ID'
+        projectId: 'fire-base-dart-admin-auth-sdk', // 'YOUR_PROJECT_ID'
         messagingSenderId: 'YOUR_SENDER_ID', // 'YOUR_SENDER_ID'
-        bucketName: 'YOUR_BUCKET_NAME', // 'YOUR_BUCKET_NAME'
+        bucketName:
+            'fire-base-dart-admin-auth-sdk.appspot.com', // 'YOUR_BUCKET_NAME'
         appId: 'YOUR_APP_ID', // 'YOUR_APP_ID'
       );
       auth = FirebaseApp.instance.getAuth(); // Initialize auth for web
