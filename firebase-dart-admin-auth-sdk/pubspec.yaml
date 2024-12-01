@@ -27,3 +27,11 @@ dev_dependencies:
   http: any
   mockito: any
   test: any
+  git_hooks: any
+
+# Optional Local Hooks for development.
+git_hooks:
+  hooks:
+    pre-commit: ./local_dev_tools/validate_commit.dart
+    commit-msg: ./local_dev_tools/validate_commit_msg.dart
+    pre-push: ./local_dev_tools/validate_branch.dart
