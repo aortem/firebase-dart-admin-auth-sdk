@@ -42,6 +42,7 @@ class _SignInWithEmailAndPasswordScreenState
                     controller: _emailController,
                     hint: 'test@gmail.com',
                     label: 'Email',
+                    tooltip: 'Enter your registered email address', // Tooltip added
                   ),
                   20.vSpace,
                   InputField(
@@ -49,6 +50,7 @@ class _SignInWithEmailAndPasswordScreenState
                     hint: '******',
                     label: 'Password',
                     obscure: true,
+                    tooltip: 'Enter your account password', // Tooltip added
                   ),
                   20.vSpace,
                   Button(
@@ -65,6 +67,7 @@ class _SignInWithEmailAndPasswordScreenState
                       );
                     },
                     title: 'Sign In',
+                    loading: value.loading, // Spinner already integrated
                   ),
                   20.vSpace,
                   GestureDetector(

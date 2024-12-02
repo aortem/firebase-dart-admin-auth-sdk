@@ -1,4 +1,6 @@
 import 'dart:math';
+import 'dart:async';
+import 'dart:io';
 
 /// Validates if the provided email is in a proper format.
 ///
@@ -32,37 +34,15 @@ String? validatePassword(String password) {
 
 /// Settings used when sending an action code (such as email verification or password reset).
 /// Contains details about how the action code should be handled on the client-side.
-///
-/// Example usage:
-/// ```dart
-/// ActionCodeSettings(
-///   url: 'https://your-app.com/verify-email',
-///   handleCodeInApp: true,
-/// )
-/// ```
 class ActionCodeSettings {
-  /// The URL to which the user should be redirected after completing the action.
   final String url;
-
-  /// Whether the action code should be handled in the app or through the browser.
   final bool handleCodeInApp;
-
-  /// Optional: iOS bundle ID to associate with the action code.
   final String? iOSBundleId;
-
-  /// Optional: Android package name to associate with the action code.
   final String? androidPackageName;
-
-  /// Optional: Whether the Android app should be installed if not already.
   final bool? androidInstallApp;
-
-  /// Optional: Minimum version of the Android app required to handle the action code.
   final String? androidMinimumVersion;
-
-  /// Optional: The domain for dynamic links to be used with the action code.
   final String? dynamicLinkDomain;
 
-  /// Creates an instance of [ActionCodeSettings] with the required and optional properties.
   ActionCodeSettings({
     required this.url,
     this.handleCodeInApp = false,
@@ -73,8 +53,6 @@ class ActionCodeSettings {
     this.dynamicLinkDomain,
   });
 
-  /// Converts the [ActionCodeSettings] object to a map.
-  /// This map can be used to send the settings in an API call.
   Map<String, dynamic> toMap() {
     return {
       'continueUrl': url,
@@ -90,23 +68,14 @@ class ActionCodeSettings {
 }
 
 /// Generates a unique identifier (UID) in the format of a UUIDv4.
-///
-/// UUID (Universally Unique Identifier) is a 128-bit value that is typically
-/// represented as a 32-character string in the form `xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx`
-/// where `x` is a random hexadecimal digit and `y` is a random digit from 8, 9, A, or B.
-///
-/// Returns:
-/// - A randomly generated UUID (v4) string.
 String generateUid() {
   final random = Random.secure();
 
-  /// Generates a random hexadecimal string of the specified length.
   String generateRandomHex(int length) {
     const hexDigits = '0123456789abcdef';
     return List.generate(length, (_) => hexDigits[random.nextInt(16)]).join();
   }
 
-  // Set the version (UUIDv4)
   String uuid = '${generateRandomHex(8)}-'
       '${generateRandomHex(4)}-'
       '4${generateRandomHex(3)}-' // UUID version 4
@@ -114,4 +83,43 @@ String generateUid() {
       '${generateRandomHex(12)}';
 
   return uuid;
+}
+
+/// Sorts a list of users by a specified field (e.g., name, email).
+List<Map<String, dynamic>> sortUsers(
+    List<Map<String, dynamic>> users, String field) {
+  users.sort((a, b) => a[field].toString().compareTo(b[field].toString()));
+  return users;
+}
+
+/// Filters a list of users based on a search query.
+List<Map<String, dynamic>> filterUsers(
+    List<Map<String, dynamic>> users, String query) {
+  final lowerQuery = query.toLowerCase();
+  return users.where((user) {
+    final name = user['name']?.toString().toLowerCase() ?? '';
+    final email = user['email']?.toString().toLowerCase() ?? '';
+    return name.contains(lowerQuery) || email.contains(lowerQuery);
+  }).toList();
+}
+
+/// Displays an animated spinner in the terminal.
+///
+/// [message] is the text displayed next to the spinner.
+/// [durationInSeconds] specifies how long the spinner runs.
+void showSpinner(String message, [int durationInSeconds = 5]) {
+  const frames = ['|', '/', '-', '\\'];
+  int index = 0;
+
+  // Start a periodic timer to show spinner animation
+  Timer? timer = Timer.periodic(const Duration(milliseconds: 100), (timer) {
+    stdout.write('\r$message ${frames[index]}');
+    index = (index + 1) % frames.length;
+  });
+
+  // Stop the spinner after the specified duration
+  Future.delayed(Duration(seconds: durationInSeconds), () {
+    timer.cancel();
+    stdout.write('\r$message Done!\n');
+  });
 }

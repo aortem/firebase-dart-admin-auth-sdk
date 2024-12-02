@@ -7,6 +7,8 @@ class InputField extends StatelessWidget {
   final bool? obscure;
   final TextInputType? textInputType;
   final bool obscureText;
+  final String? tooltip; // New field for the tooltip message
+
   const InputField({
     super.key,
     this.controller,
@@ -15,18 +17,21 @@ class InputField extends StatelessWidget {
     this.obscure,
     this.textInputType,
     this.obscureText = false,
+    this.tooltip, // Initialize the tooltip field
   });
 
   @override
   Widget build(BuildContext context) {
-    return TextField(
-      controller: controller,
-      obscureText: obscure ?? false,
-      // obscureText: obscureText,
-      keyboardType: textInputType,
-      decoration: InputDecoration(
-        hintText: hint,
-        labelText: label,
+    return Tooltip(
+      message: tooltip ?? '', // Display tooltip if provided
+      child: TextField(
+        controller: controller,
+        obscureText: obscure ?? false,
+        keyboardType: textInputType,
+        decoration: InputDecoration(
+          hintText: hint,
+          labelText: label,
+        ),
       ),
     );
   }

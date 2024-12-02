@@ -1,5 +1,7 @@
 import 'dart:convert';
 import 'package:firebase_dart_admin_auth_sdk/firebase_dart_admin_auth_sdk.dart';
+import '../../utils.dart'; // Import the spinner function
+
 
 ///create user connect
 class CreateUserWithEmailAndPasswordService {
@@ -11,6 +13,7 @@ class CreateUserWithEmailAndPasswordService {
 
   ///create function
   Future<UserCredential> create(String email, String password) async {
+    showSpinner('Creating user', 3); // Add spinner at the start
     final url = Uri.https(
       'identitytoolkit.googleapis.com',
       '/v1/accounts:signUp',

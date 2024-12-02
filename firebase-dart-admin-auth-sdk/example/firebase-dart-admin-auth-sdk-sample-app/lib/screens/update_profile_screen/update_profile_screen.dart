@@ -44,12 +44,14 @@ class _UpdateProfileScreenState extends State<UpdateProfileScreen> {
                     controller: _displayNameController,
                     label: 'Display Name',
                     hint: 'Drake',
+                    tooltip: 'Enter the name you want displayed', // Tooltip added
                   ),
                   20.vSpace,
                   InputField(
                     controller: _displayImageController,
                     label: 'Display Image',
                     hint: 'www.sample.jpg',
+                    tooltip: 'Enter a valid image URL', // Tooltip added
                   ),
                   20.vSpace,
                   Button(
@@ -59,7 +61,7 @@ class _UpdateProfileScreenState extends State<UpdateProfileScreen> {
                       () => Navigator.of(context).pop(),
                     ),
                     title: 'Update Profile',
-                    loading: value.loading,
+                    loading: value.loading, // Spinner already integrated
                   ),
                 ],
               ),

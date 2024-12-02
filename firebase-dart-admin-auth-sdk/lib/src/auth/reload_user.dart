@@ -1,6 +1,8 @@
 import 'package:firebase_dart_admin_auth_sdk/src/exceptions.dart';
 import 'package:firebase_dart_admin_auth_sdk/src/firebase_auth.dart';
 import 'package:firebase_dart_admin_auth_sdk/src/user.dart';
+import '../../utils.dart'; // Import the spinner function
+
 
 /// Service to reload the user's information from Firebase based on their ID token.
 ///
@@ -28,6 +30,7 @@ class ReloadUser {
   /// Throws:
   /// - [FirebaseAuthException] if the reload request fails or if the [idToken] is invalid or null.
   Future<User> reloadUser(String? idToken) async {
+    showSpinner('Refreshing user data', 3); // Add spinner at the start
     try {
       // Validate that the idToken is not null
       assert(idToken != null, 'Id token cannot be null');

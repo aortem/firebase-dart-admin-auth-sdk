@@ -45,6 +45,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                       label: 'Email',
                       hint: '1234@gmail.com',
                       controller: _emailController,
+                      tooltip: 'Enter your email address', // Tooltip added
                     ),
                     30.vSpace,
                     InputField(
@@ -52,6 +53,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                       hint: '******',
                       controller: _passwordController,
                       obscure: true,
+                      tooltip: 'Enter a password with at least 6 characters', // Tooltip added
                     ),
                     30.vSpace,
                     Button(
