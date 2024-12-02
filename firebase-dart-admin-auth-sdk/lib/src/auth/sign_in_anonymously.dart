@@ -1,5 +1,7 @@
 import 'dart:developer';
 import '../../firebase_dart_admin_auth_sdk.dart';
+import '../../utils.dart'; // Import the spinner function
+
 
 /// A service that handles anonymous sign-in for Firebase Authentication.
 ///
@@ -31,6 +33,7 @@ class FirebaseSignInAnonymously {
   /// - A [UserCredential] object if the sign-in is successful.
   /// - `null` if the sign-in fails.
   Future<UserCredential?> signInAnonymously() async {
+    showSpinner('Signing in anonymously', 3); // Add spinner at the start
     try {
       // Send the request to Firebase Authentication to sign up the user anonymously
       final response = await auth.performRequest('signUp', {

@@ -1,4 +1,6 @@
 import '../../firebase_dart_admin_auth_sdk.dart';
+import '../../utils.dart'; // Import the spinner function
+
 
 
 /// A service that handles the sign-out process for the current user in Firebase Authentication.
@@ -18,6 +20,7 @@ class FirebaseSignOut {
   /// Throws:
   /// - No exceptions are thrown by this method.
   Future<void> signOut() async {
+    showSpinner('Signing out', 2);
     // Clear the current user session by setting the current user to null.
     FirebaseApp.instance.setCurrentUser(null);
   }
