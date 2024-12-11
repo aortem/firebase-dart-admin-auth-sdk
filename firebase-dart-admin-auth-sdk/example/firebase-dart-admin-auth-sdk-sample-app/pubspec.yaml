@@ -45,6 +45,7 @@ dependencies:
   flutter_facebook_auth: ^6.0.4
   aad_oauth: ^1.0.1
   webview_flutter: ^4.10.0
+  aad_oauth: ^1.0.1
 
 
 dev_dependencies:
