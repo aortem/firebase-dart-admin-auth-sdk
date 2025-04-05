@@ -37,37 +37,8 @@ jobs:
             --repo-url=https://github.com/aortem/firebase-dart-admin-auth-sdk \
             --token="${{ secrets.RELEASE_PLEASE_ACTION_TOKEN }}" \
             --target-branch=main \
-            --config-file=release-please-config.json \
-            --manifest-file=.release-please-manifest.json
+            --config-file=../release-please-config.json \
+            --manifest-file=../.release-please-manifest.json
 
       - name: Dump Release Output
         run: echo "Release process completed."
-
-  dart-release:
-    defaults:
-      run:
-        working-directory: firebase-dart-admin-auth-sdk
-    needs: release-please
-    runs-on: ubuntu-latest
-    permissions:
-      contents: write
-      id-token: write
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-
-      - name: Check current directory
-        run: |
-          echo "Current directory in dart-release job:"
-          pwd
-          echo "Contents:"
-          ls -la
-
-      - name: Setup Dart
-        uses: dart-lang/setup-dart@v1
-
-      - name: Install dependencies
-        run: dart pub get
-
-      - name: Publish
-        run: dart pub publish --force
