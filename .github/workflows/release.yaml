@@ -15,7 +15,7 @@ jobs:
   release-please:
     defaults:
       run:
-        working-directory: firebase-dart-admin-auth-sdk
+        working-directory: .
     runs-on: ubuntu-latest
     permissions:
       contents: write
