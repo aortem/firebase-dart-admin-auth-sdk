@@ -38,7 +38,7 @@ jobs:
             --token="${{ secrets.RELEASE_PLEASE_ACTION_TOKEN }}" \
             --target-branch=main \
             --config-file=firebase-dart-admin-auth-sdk/release-please-config.json \
-            --manifest-file=.release-please-manifest.json
+            --manifest-file=firebase-dart-admin-auth-sdk/.release-please-manifest.json
 
       - name: Dump Release Output
         run: echo "Release process completed."
