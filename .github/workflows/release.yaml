@@ -1,7 +1,7 @@
 name: Run Release
 
 on:
-  workflow_dispatch:  # Enables manual triggering from the Actions tab
+  workflow_dispatch:
   push:
     branches:
       - main
@@ -18,11 +18,18 @@ jobs:
         working-directory: firebase-dart-admin-auth-sdk
     runs-on: ubuntu-latest
     permissions:
-      contents: write        # For release-please to create release commits and tags
-      pull-requests: write     # For release-please to create PRs
+      contents: write
+      pull-requests: write
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+
+      - name: Check current directory
+        run: |
+          echo "Current directory:"
+          pwd
+          echo "Contents:"
+          ls -la
 
       - name: Run release-please CLI
         run: |
@@ -44,10 +51,17 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: write
-      id-token: write        # Required for authentication using OIDC
+      id-token: write
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+
+      - name: Check current directory
+        run: |
+          echo "Current directory in dart-release job:"
+          pwd
+          echo "Contents:"
+          ls -la
 
       - name: Setup Dart
         uses: dart-lang/setup-dart@v1
