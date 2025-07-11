@@ -14,7 +14,7 @@ dependencies:
 #------------------ STANDARD FEATURES---------------------------------
 ## There are three standard libraries. 
 
-  ds_standard_features: ^0.0.4  # Dart Team Utilities For HTTP //Default
+  ds_standard_features: ^0.0.7  # Dart Team Utilities For HTTP //Default
   googleapis_auth: ^2.0.0 #Googe Apis
   jwt_generator: ^0.0.3 # Internal JWT Generator Package
   
