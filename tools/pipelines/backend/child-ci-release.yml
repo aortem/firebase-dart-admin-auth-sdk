@@ -31,7 +31,14 @@ release:
         echo "Current working directory: $(pwd)"
         ls -la
 
-        git fetch --prune --unshallow --tags
+         if [ "$(git rev-parse --is-shallow-repository 2>/dev/null)" = "true" ]; then
+          git fetch --prune --unshallow
+        else
+          git fetch --prune
+        fi
+
+      # fetch tags (but don’t fail on tag conflicts)
+      git fetch --tags || echo "⚠️  tag fetch failed, but continuing"
 
         VERSION=$(grep "^version:" pubspec.yaml | sed "s/version: //" | tr -d '[:space:]')
         echo "Version from pubspec.yaml: $VERSION"
@@ -71,7 +78,7 @@ release:
         git config --global user.email "${_GIT_USER}"
         git config --global user.name "${_GIT_USER}"
 
-        git remote set-url origin https://${GITLAB_USERNAME}:${GITLAB_TOKEN}@gitlab.com/dartapps/apps/dartstream/dartstream-opensource.git
+        git remote set-url origin https://${GITLAB_USERNAME}:${GITLAB_TOKEN}@gitlab.com/dartapps/apps/aortem-sdks/firebase-dart-admin-auth-sdk.git
 
         echo "Creating Git tag: v$VERSION"
         git tag "v$VERSION"
@@ -87,6 +94,7 @@ release:
           --header "PRIVATE-TOKEN: ${GITLAB_TOKEN}" \
           --data "name=Release v$VERSION" \
           --data "tag_name=v$VERSION" \
+          --data "ref=v$VERSION" \
           --data-urlencode "description=${RELEASE_NOTES}" \
           "https://gitlab.com/api/v4/projects/${CI_PROJECT_ID}/releases"
 
