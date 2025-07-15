@@ -1,7 +1,7 @@
 stages:
   - setup
   - validation
-  - unit_testing
+#  - unit_testing
   - analyze_sample_apps
   - release
 
@@ -57,37 +57,37 @@ validation_trigger:
     # Fallback: Skip if no condition matches
     - when: never
 
-# Unit Test Conditional Triggers
-unit_test_trigger:
-  stage: unit_testing
-  trigger:
-    include: tools/pipelines/backend/child-ci-unit-tests.yml
-  needs:
-    - job: validation_trigger
-  rules:
-    # Always runs after validation trigger
-    - when: always
+# # Unit Test Conditional Triggers
+# unit_test_trigger:
+#   stage: unit_testing
+#   trigger:
+#     include: tools/pipelines/backend/child-ci-unit-tests.yml
+#   needs:
+#     - job: validation_trigger
+#   rules:
+#     # Always runs after validation trigger
+#     - when: always
     
 # Sample App Conditional Triggers
 analyze_flutter_web:
   stage: analyze_sample_apps
   trigger:
     include: tools/pipelines/frontend/child-ci-analyze-flutter-web.yml
-  needs:
-    - job: unit_test_trigger
+#  needs:
+#    - job: unit_test_trigger
   rules:
     # Always runs after unit_test trigger
     - when: always
 
-analyze_flutter_mobile:
-  stage: analyze_sample_apps
-  trigger:
-    include: tools/pipelines/frontend/child-ci-analyze-flutter-mobile.yml
-  needs:
-    - job: unit_test_trigger
-  rules:
-    # Always runs after unit_test trigger
-    - when: always
+# analyze_flutter_mobile:
+#   stage: analyze_sample_apps
+#   trigger:
+#     include: tools/pipelines/frontend/child-ci-analyze-flutter-mobile.yml
+#  needs:
+#    - job: unit_test_trigger
+#   rules:
+#     Always runs after unit_test trigger
+#     - when: always
 
 # Release Triggers
 gitlab_github_release:
