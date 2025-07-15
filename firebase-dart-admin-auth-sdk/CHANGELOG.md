@@ -1,4 +1,11 @@
-# Changelog
+## 0.0.3
+
+### Changed
+- Bump `ds_standard_features` dependency from `^0.0.4` to `^0.0.7` to pull in the latest HTTP utilities.
+
+### Removed
+- Split the Flutter mobile sample app into web and mobile (`example/firebase-dart-admin-auth-sdk-flutter-mobile-app`).
+- Purged generated build artifacts (e.g. `build/`, intermediate CMake files) from the example directories to keep the package lean.
 
 ## 0.0.2
 
