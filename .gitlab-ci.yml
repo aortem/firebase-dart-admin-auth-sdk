@@ -79,15 +79,15 @@ analyze_flutter_web:
     # Always runs after unit_test trigger
     - when: always
 
-analyze_flutter_mobile:
-  stage: analyze_sample_apps
-  trigger:
-    include: tools/pipelines/frontend/child-ci-analyze-flutter-mobile.yml
+# analyze_flutter_mobile:
+#   stage: analyze_sample_apps
+#   trigger:
+#     include: tools/pipelines/frontend/child-ci-analyze-flutter-mobile.yml
 #  needs:
 #    - job: unit_test_trigger
-  rules:
-    # Always runs after unit_test trigger
-    - when: always
+#   rules:
+#     Always runs after unit_test trigger
+#     - when: always
 
 # Release Triggers
 gitlab_github_release:
