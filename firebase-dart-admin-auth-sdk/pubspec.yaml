@@ -22,6 +22,7 @@ dependencies:
 
 dev_dependencies:
   ds_tools_testing: ^0.0.5 #Standard Dart Team Testing Tools
+  lints: ^6.0.0
   git_hooks: any
 
 # Optional Local Hooks for development.
