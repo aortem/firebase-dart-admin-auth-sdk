@@ -1,3 +1,10 @@
+## 0.0.4
+
+### Changed
+- **Dependencies**:
+  - Updated `ds_standard_features` to `^0.0.8`.
+  - Updated `ds_tools_testing` dev dependency to `^0.0.5` and added `lints: ^6.0.0`.
+
 ## 0.0.3
 
 ### Changed
