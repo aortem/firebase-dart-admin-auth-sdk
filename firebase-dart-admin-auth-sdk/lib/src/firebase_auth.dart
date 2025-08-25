@@ -217,8 +217,9 @@ class FirebaseAuth {
 
   /// Service for verifying ID tokens
   late VerifyIdTokenService verifyTokenService;
+
   /// ✅ new reference to parent
- final FirebaseApp? firebaseApp; // ✅ new reference to parent
+  final FirebaseApp? firebaseApp; // ✅ new reference to parent
   /// Firebae Auth constructor class
   FirebaseAuth({
     this.apiKey,
@@ -230,7 +231,8 @@ class FirebaseAuth {
     this.appId,
     this.accessToken,
     this.serviceAccount,
-    this.generateCustomToken, this.firebaseApp,
+    this.generateCustomToken,
+    this.firebaseApp,
   }) {
     log(apiKey ?? 'api key');
     this.httpClient =
@@ -294,9 +296,8 @@ class FirebaseAuth {
     verifyTokenService = VerifyIdTokenService(auth: this);
   }
 
-
   /// Core request performer
- Future<HttpResponse> performRequest(
+  Future<HttpResponse> performRequest(
     String endpoint,
     Map<String, dynamic> body,
   ) async {
@@ -932,18 +933,17 @@ class FirebaseAuth {
   }
 
   ///create user email
-Future<UserCredential> createUserWithEmailAndPassword(
-  String email,
-  String password,
-) async {
-  // Ensure token is valid before making request
-  if (firebaseApp != null) {
-    await firebaseApp!.getValidAccessToken();
+  Future<UserCredential> createUserWithEmailAndPassword(
+    String email,
+    String password,
+  ) async {
+    // Ensure token is valid before making request
+    if (firebaseApp != null) {
+      await firebaseApp!.getValidAccessToken();
+    }
+
+    return createUserWithEmailAndPasswordService.create(email, password, this);
   }
-
-  return createUserWithEmailAndPasswordService.create(email, password, this);
-}
-
 
   ///connect auth Emulator
   void connectAuthEmulator(String host, int port) {
