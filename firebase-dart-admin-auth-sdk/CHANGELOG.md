@@ -1,3 +1,10 @@
+## 0.0.5
+
+### Changed
+- **Dependencies**:
+  - Updated `ds_standard_features` to `^0.1.0`.
+  - Updated `ds_tools_testing` dev dependency to `^0.0.9`
+
 ## 0.0.4
 
 ### Changed
@@ -16,7 +23,7 @@
 
 ## 0.0.2
 
-- Bump Dart Version to 3.8.2
+- Bump Dart Version to 3.9.0
 - Formatting Changes To Satify Dart Formatter
 - Update BSD-3 License
 
@@ -76,7 +83,7 @@
 
 ## 0.0.1-pre+21
 
-- update SDK to 3.8.2
+- update SDK to 3.9.0
 
 ## 0.0.1-pre+20
 

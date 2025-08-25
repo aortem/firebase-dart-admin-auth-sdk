@@ -16,7 +16,7 @@ The Firebase Dart Admin Auth SDK offers a robust and flexible set of tools to pe
 
 If you want to use the Firebase Dart Admin Auth SDK for implementing a Firebase authentication in your Flutter projects follow the instructions on how to set up the auth SDK.
 
-- Ensure you have a Flutter or Dart (3.8.2) SDK installed in your system.
+- Ensure you have a Flutter or Dart (3.9.0) SDK installed in your system.
 - Set up a Firebase project and service account.
 - Set up a Flutter project.
 
