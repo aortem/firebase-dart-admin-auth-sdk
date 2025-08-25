@@ -80,7 +80,7 @@ class FirebaseAuth {
   final String? appId;
 
   /// The access token to the firebase project
-  final String? accessToken;
+  late final String? accessToken;
 
   /// The service account of your firebase project
   final ServiceAccount? serviceAccount;
@@ -218,6 +218,8 @@ class FirebaseAuth {
   /// Service for verifying ID tokens
   late VerifyIdTokenService verifyTokenService;
 
+  /// ✅ new reference to parent
+  final FirebaseApp? firebaseApp; // ✅ new reference to parent
   /// Firebae Auth constructor class
   FirebaseAuth({
     this.apiKey,
@@ -230,6 +232,7 @@ class FirebaseAuth {
     this.accessToken,
     this.serviceAccount,
     this.generateCustomToken,
+    this.firebaseApp,
   }) {
     log(apiKey ?? 'api key');
     this.httpClient =
@@ -293,48 +296,76 @@ class FirebaseAuth {
     verifyTokenService = VerifyIdTokenService(auth: this);
   }
 
-  /// Base function for http calls
+  /// Core request performer
   Future<HttpResponse> performRequest(
     String endpoint,
     Map<String, dynamic> body,
   ) async {
-    //log(apiKey.toString());
+    String? currentAccessToken = accessToken;
+
+    // ✅ Ensure fresh token before request
+    if (firebaseApp != null && serviceAccount != null) {
+      currentAccessToken = await firebaseApp!.getValidAccessToken();
+      if (currentAccessToken != null && currentAccessToken != accessToken) {
+        accessToken = currentAccessToken;
+      }
+    }
+
     final url = Uri.https(
       'identitytoolkit.googleapis.com',
       '/v1/accounts:$endpoint',
       {if (apiKey != 'your_api_key') 'key': apiKey},
     );
 
-    final response = await httpClient.post(
-      url,
-      body: json.encode(body),
-      headers: {
-        if (accessToken != null) 'Authorization': 'Bearer $accessToken',
-        'Content-Type': 'application/json',
-      },
-    );
+    int retryCount = 0;
+    const maxRetries = 2;
 
-    if (response.statusCode != 200) {
-      final error = json.decode(response.body)['error'];
-      throw FirebaseAuthException(
-        code: error['message'],
-        message: error['message'],
-      );
+    while (retryCount < maxRetries) {
+      try {
+        final response = await httpClient.post(
+          url,
+          body: json.encode(body),
+          headers: {
+            if (currentAccessToken != null)
+              'Authorization': 'Bearer $currentAccessToken',
+            'Content-Type': 'application/json',
+          },
+        );
+
+        // ✅ Retry once if token expired
+        if (response.statusCode == 401 &&
+            retryCount == 0 &&
+            firebaseApp != null) {
+          log('⚠️ Got 401, refreshing token...');
+          await firebaseApp!.refreshAccessToken();
+          currentAccessToken = firebaseApp!.accessToken;
+          accessToken = currentAccessToken;
+          retryCount++;
+          continue;
+        }
+
+        if (response.statusCode != 200) {
+          final error = json.decode(response.body)['error'];
+          throw FirebaseAuthException(
+            code: error['message'],
+            message: error['message'],
+          );
+        }
+
+        return HttpResponse(
+          statusCode: response.statusCode,
+          body: json.decode(response.body),
+          headers: response.headers,
+        );
+      } catch (e) {
+        if (retryCount >= maxRetries - 1) rethrow;
+        retryCount++;
+      }
     }
 
-    // Add CORS headers to the response
-    // final modifiedHeaders = Map<String, String>.from(response.headers)
-    //   ..addAll({
-    //     'Access-Control-Allow-Origin': '*',
-    //     'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
-    //     'Access-Control-Allow-Headers': 'Authorization, Content-Type',
-    //   });
-
-    return HttpResponse(
-      statusCode: response.statusCode,
-      body: json.decode(response.body),
-      headers: response.headers,
-      //headers: modifiedHeaders,
+    throw FirebaseAuthException(
+      code: 'max-retries-exceeded',
+      message: 'Failed after $maxRetries attempts',
     );
   }
 
@@ -902,12 +933,16 @@ class FirebaseAuth {
   }
 
   ///create user email
-
   Future<UserCredential> createUserWithEmailAndPassword(
     String email,
     String password,
-  ) {
-    return createUserWithEmailAndPasswordService.create(email, password);
+  ) async {
+    // Ensure token is valid before making request
+    if (firebaseApp != null) {
+      await firebaseApp!.getValidAccessToken();
+    }
+
+    return createUserWithEmailAndPasswordService.create(email, password, this);
   }
 
   ///connect auth Emulator

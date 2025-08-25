@@ -263,5 +263,5 @@ class User {
 
   ///provider data
 
-  get providerData => null;
+  dynamic get providerData => null;
 }
