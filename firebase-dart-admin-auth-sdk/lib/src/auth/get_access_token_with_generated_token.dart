@@ -10,7 +10,7 @@ abstract class GetAccessTokenWithGeneratedToken {
     String? targetServiceAccountEmail,
   });
 
-  /// ✅ New method: retrieves full response (token + expiry)
+  /// ✅ Retrieves full response (token + expiry)
   Future<Map<String, dynamic>> getAccessTokenWithGeneratedTokenResponse(
     String jwt, {
     String? targetServiceAccountEmail,
@@ -131,9 +131,17 @@ class GetAccessTokenWithGcpTokenImplementation
 
     if (response.statusCode == 200) {
       final responseData = json.decode(response.body);
+
+      // ✅ Convert expireTime (ISO string) → expires_in (int seconds)
+      int expiresIn = 3600;
+      if (responseData['expireTime'] != null) {
+        final expireTime = DateTime.parse(responseData['expireTime']);
+        expiresIn = expireTime.difference(DateTime.now()).inSeconds;
+      }
+
       return {
         'access_token': responseData['accessToken'],
-        'expires_in': responseData['expireTime'] ?? 3600,
+        'expires_in': expiresIn,
         'token_type': 'Bearer',
       };
     } else {
