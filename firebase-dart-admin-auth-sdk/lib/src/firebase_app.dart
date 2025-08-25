@@ -60,38 +60,38 @@ class FirebaseApp {
   }
 
   /// Refreshes OAuth2 token
-static bool _isRefreshing = false;
+  static bool _isRefreshing = false;
 
   /// Refreshes OAuth2 token
-Future<void> refreshAccessToken() async {
-  if (_isRefreshing) {
-    await Future.delayed(Duration(milliseconds: 100));
-    return;
-  }
-  _isRefreshing = true;
-
-  try {
-    if (_serviceAccount == null) {
-      throw Exception('Cannot refresh token: No service account available');
+  Future<void> refreshAccessToken() async {
+    if (_isRefreshing) {
+      await Future.delayed(Duration(milliseconds: 100));
+      return;
     }
+    _isRefreshing = true;
 
-    final tokenGen = _tokenGen ??= GenerateCustomTokenImplementation();
-    final accessTokenGen =
-        _accesstokenGen ??= GetAccessTokenWithGeneratedTokenImplementation();
+    try {
+      if (_serviceAccount == null) {
+        throw Exception('Cannot refresh token: No service account available');
+      }
 
-    final jwt = await tokenGen.generateServiceAccountJwt(_serviceAccount!);
-    final tokenResponse =
-        await accessTokenGen.getAccessTokenWithGeneratedTokenResponse(jwt);
+      final tokenGen = _tokenGen ??= GenerateCustomTokenImplementation();
+      final accessTokenGen = _accesstokenGen ??=
+          GetAccessTokenWithGeneratedTokenImplementation();
 
-    accessToken = tokenResponse['access_token'] as String?;
-    final expiresIn = tokenResponse['expires_in'] as int? ?? 3600;
-    tokenExpiryTime = DateTime.now().add(Duration(seconds: expiresIn));
+      final jwt = await tokenGen.generateServiceAccountJwt(_serviceAccount!);
+      final tokenResponse = await accessTokenGen
+          .getAccessTokenWithGeneratedTokenResponse(jwt);
 
-    log('✅ Access token refreshed, expires at $tokenExpiryTime');
-  } finally {
-    _isRefreshing = false;
+      accessToken = tokenResponse['access_token'] as String?;
+      final expiresIn = tokenResponse['expires_in'] as int? ?? 3600;
+      tokenExpiryTime = DateTime.now().add(Duration(seconds: expiresIn));
+
+      log('✅ Access token refreshed, expires at $tokenExpiryTime');
+    } finally {
+      _isRefreshing = false;
+    }
   }
-}
 
   /// Returns valid access token
   Future<String?> getValidAccessToken() async {
@@ -155,61 +155,68 @@ Future<void> refreshAccessToken() async {
 
   ///Used to initialize the project with service account
   ///[serviceAccountContent] is the encoded string of the service account
- static Future<FirebaseApp> initializeAppWithServiceAccount({
-  required String serviceAccountContent,
-}) async {
-  final tokenGen = _tokenGen ??= GenerateCustomTokenImplementation();
-  final accesTokenGen =
-      _accesstokenGen ??= GetAccessTokenWithGeneratedTokenImplementation();
+  static Future<FirebaseApp> initializeAppWithServiceAccount({
+    required String serviceAccountContent,
+  }) async {
+    final tokenGen = _tokenGen ??= GenerateCustomTokenImplementation();
+    final accesTokenGen = _accesstokenGen ??=
+        GetAccessTokenWithGeneratedTokenImplementation();
 
-  try {
-    final Map<String, dynamic> serviceAccount = json.decode(serviceAccountContent);
-    final ServiceAccount serviceAccountModel = ServiceAccount.fromJson(serviceAccount);
-
-    // 1. Generate token
-    final jwt = await tokenGen.generateServiceAccountJwt(serviceAccountModel);
-    final tokenResponse = await accesTokenGen.getAccessTokenWithGeneratedTokenResponse(jwt);
-
-    final accessToken = tokenResponse['access_token'] as String;
-    final expiresIn = tokenResponse['expires_in'] as int? ?? 3600;
-
-    // 2. Extract config values
-    final projectId = serviceAccount['project_id'];
-    final authDomain = serviceAccount['auth_domain'] ?? '';
-    final messagingSenderId = serviceAccount['messaging_sender_id'] ?? '';
-    final bucketName = serviceAccount['bucket_name'];
-    final appId = serviceAccount['app_id'];
-
-    if (projectId == null) {
-      throw FormatException('Missing project_id in service account JSON');
-    }
-
-    // 3. Create or update instance
-    if (_instance == null) {
-      _instance = FirebaseApp._(
-        null,
-        projectId,
-        authDomain,
-        messagingSenderId,
-        bucketName,
-        appId,
-        serviceAccountModel,
-        accessToken,
+    try {
+      final Map<String, dynamic> serviceAccount = json.decode(
+        serviceAccountContent,
       );
-    } else {
-      _instance!
-        ..accessToken = accessToken
-        .._serviceAccount = serviceAccountModel;
+      final ServiceAccount serviceAccountModel = ServiceAccount.fromJson(
+        serviceAccount,
+      );
+
+      // 1. Generate token
+      final jwt = await tokenGen.generateServiceAccountJwt(serviceAccountModel);
+      final tokenResponse = await accesTokenGen
+          .getAccessTokenWithGeneratedTokenResponse(jwt);
+
+      final accessToken = tokenResponse['access_token'] as String;
+      final expiresIn = tokenResponse['expires_in'] as int? ?? 3600;
+
+      // 2. Extract config values
+      final projectId = serviceAccount['project_id'];
+      final authDomain = serviceAccount['auth_domain'] ?? '';
+      final messagingSenderId = serviceAccount['messaging_sender_id'] ?? '';
+      final bucketName = serviceAccount['bucket_name'];
+      final appId = serviceAccount['app_id'];
+
+      if (projectId == null) {
+        throw FormatException('Missing project_id in service account JSON');
+      }
+
+      // 3. Create or update instance
+      if (_instance == null) {
+        _instance = FirebaseApp._(
+          null,
+          projectId,
+          authDomain,
+          messagingSenderId,
+          bucketName,
+          appId,
+          serviceAccountModel,
+          accessToken,
+        );
+      } else {
+        _instance!
+          ..accessToken = accessToken
+          .._serviceAccount = serviceAccountModel;
+      }
+
+      // 4. Now safe to set expiry
+      _instance!.tokenExpiryTime = DateTime.now().add(
+        Duration(seconds: expiresIn),
+      );
+
+      return _instance!;
+    } catch (e) {
+      throw Exception('Failed to initialize Firebase with service account: $e');
     }
-
-    // 4. Now safe to set expiry
-    _instance!.tokenExpiryTime = DateTime.now().add(Duration(seconds: expiresIn));
-
-    return _instance!;
-  } catch (e) {
-    throw Exception('Failed to initialize Firebase with service account: $e');
   }
-}
 
   ///This is for unit testing purposes
   static void overrideInstanceForTesting(
