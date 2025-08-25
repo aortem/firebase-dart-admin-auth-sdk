@@ -86,7 +86,7 @@ validate_dart_sdk_version:
   script:
     - echo "Validating Dart SDK versions in all pubspec.yaml files..."
     - apk add --no-cache grep
-    - cd firebase-admin-auth-dart-auth-sdk
+    - cd firebase-dart-admin-auth-sdk
 
     # Find all pubspec.yaml files (recursively, all levels)
     - PUBSPEC_FILES=$(find . -name "pubspec.yaml")
@@ -94,7 +94,7 @@ validate_dart_sdk_version:
     - echo "$PUBSPEC_FILES"
 
     # Define the minimum required Dart SDK version
-    - MINIMUM_VERSION="3.8.2"
+    - MINIMUM_VERSION="3.9.0"
     - ALL_VALID="true"
 
     # Iterate over each pubspec.yaml file
@@ -142,14 +142,14 @@ validate_format:
   image: dart:stable
   script:
     - echo "🔍 Fetching Dart deps…"
-    - cd firebase-admin-auth-dart-auth-sdk
+    - cd firebase-dart-admin-auth-sdk
     - dart pub get
 
     # # if you have a Flutter example, fetch its deps too:
     # - |
-    #   if [ -d example/firebase-admin-auth-dart-auth-sdk-flutter-mobile-app ]; then
+    #   if [ -d example/firebase-dart-admin-auth-sdk-flutter-mobile-app ]; then
     #     echo "🔍 Fetching Flutter example deps…"
-    #     cd example/firebase-admin-auth-dart-auth-sdk-flutter-mobile-app
+    #     cd example/firebase-dart-admin-auth-sdk-flutter-mobile-app
     #     flutter pub get
     #     cd - >/dev/null
     #   fi
@@ -176,7 +176,7 @@ analyze_main:
     - validate_commit_messages
   script:
     - echo "Analyzing main project..."
-    - cd firebase-admin-auth-dart-auth-sdk
+    - cd firebase-dart-admin-auth-sdk
     - dart pub get || { echo "Failed to install dependencies. Exiting..."; exit 1; }
     - dart analyze lib/ > analysis_report.txt 2> error_log.txt || true
 
@@ -213,9 +213,9 @@ analyze_main:
     - echo "Main project analysis complete. Check categorized issue files for details."
   artifacts:
     paths:
-      - firebase-admin-auth-dart-auth-sdk/info_issues.txt
-      - firebase-admin-auth-dart-auth-sdk/warning_issues.txt
-      - firebase-admin-auth-dart-auth-sdk/error_issues.txt
+      - firebase-dart-admin-auth-sdk/info_issues.txt
+      - firebase-dart-admin-auth-sdk/warning_issues.txt
+      - firebase-dart-admin-auth-sdk/error_issues.txt
     expire_in: 1h
   rules:
    - when: always
