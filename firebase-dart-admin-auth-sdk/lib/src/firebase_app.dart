@@ -25,8 +25,13 @@ class FirebaseApp {
   final String _messagingSenderId;
   final String? _bucketName;
   final String? _appId;
+    ///The access token
+   String? accessToken;   // remove 'final'
+   ///The access token expire time
+  DateTime? tokenExpiryTime;   // new
+     ///The access token refresh time
+  static const Duration tokenRefreshBuffer = Duration(minutes: 5);  // new
   final ServiceAccount? _serviceAccount;
-  final String? _accessToken;
 
   ///The class to interact with the various firebase auth methods
   static FirebaseAuth? firebaseAuth;
@@ -44,8 +49,45 @@ class FirebaseApp {
     this._bucketName,
     this._appId,
     this._serviceAccount,
-    this._accessToken,
+    this.accessToken,
   );
+  bool _isTokenValid() {
+    if (accessToken == null || tokenExpiryTime == null) return false;
+    return DateTime.now().isBefore(
+      tokenExpiryTime!.subtract(tokenRefreshBuffer),
+    );
+  }
+
+   /// Refreshes OAuth2 token
+  Future<void> refreshAccessToken() async {
+    if (_serviceAccount == null) {
+      throw Exception('Cannot refresh token: No service account available');
+    }
+    final tokenGen = _tokenGen ??= GenerateCustomTokenImplementation();
+    final accessTokenGen =
+        _accesstokenGen ??= GetAccessTokenWithGeneratedTokenImplementation();
+
+    final jwt = await tokenGen.generateServiceAccountJwt(_serviceAccount);
+    final tokenResponse =
+        await accessTokenGen.getAccessTokenWithGeneratedTokenResponse(jwt);
+
+    accessToken = tokenResponse['access_token'] as String?;
+    final expiresIn = tokenResponse['expires_in'] as int? ?? 3600;
+    tokenExpiryTime = DateTime.now().add(Duration(seconds: expiresIn));
+
+    log('✅ Access token refreshed, expires at $tokenExpiryTime');
+  }
+
+  /// Returns valid access token
+  Future<String?> getValidAccessToken() async {
+    if (!_isTokenValid()) {
+      await refreshAccessToken();
+    }
+    return accessToken;
+  }
+
+
+
 
   User? _currentUser;
 
@@ -121,10 +163,14 @@ class FirebaseApp {
       );
 
       // Generate JWT and access token
-      final jwt = await tokenGen.generateServiceAccountJwt(serviceAccountModel);
-      final accessToken = await accesTokenGen.getAccessTokenWithGeneratedToken(
-        jwt,
-      );
+           final jwt = await tokenGen.generateServiceAccountJwt(serviceAccountModel);
+      final tokenResponse =
+          await accesTokenGen.getAccessTokenWithGeneratedTokenResponse(jwt);
+
+      final accessToken = tokenResponse['access_token'] as String;
+      final expiresIn = tokenResponse['expires_in'] as int? ?? 3600;
+  _instance!.tokenExpiryTime =
+          DateTime.now().add(Duration(seconds: expiresIn));
 
       // Extract values with defaults for optional fields
       final projectId = serviceAccount['project_id'];
@@ -395,22 +441,29 @@ class FirebaseApp {
   //e Auth instance associated with the Project
   ///Throws not initialized if Firebase app is not intialized
   FirebaseAuth getAuth() {
-    if (_accessToken == null) assert(_apiKey != null, 'API Key is null');
+    if (accessToken == null) assert(_apiKey != null, 'API Key is null');
     assert(_projectId != null, 'Project ID is null');
     if (_instance == null) {
       throw ("FirebaseApp is not initialized. Please call initializeApp() first.");
     }
-    return firebaseAuth ??= FirebaseAuth(
-      apiKey: _apiKey,
-      projectId: _projectId,
-      authDomain: _authdomain,
-      messagingSenderId: _messagingSenderId,
-      bucketName: _bucketName,
-      accessToken: _accessToken,
-      serviceAccount: _serviceAccount,
-      generateCustomToken: _tokenGen,
-      appId: _appId,
-    );
+   if (!_isTokenValid() && _serviceAccount != null) {
+    // Kick off background refresh (non-blocking)
+    Future.microtask(() => refreshAccessToken());
+  }
+
+  return firebaseAuth ??= FirebaseAuth(
+    apiKey: _apiKey,
+    projectId: _projectId,
+    authDomain: _authdomain,
+    messagingSenderId: _messagingSenderId,
+    bucketName: _bucketName,
+    accessToken: accessToken,
+    serviceAccount: _serviceAccount,
+    generateCustomToken: _tokenGen,
+    appId: _appId,
+    firebaseApp: this, // 🔥 add reference so FirebaseAuth can refresh itself
+  );
+
   }
 
   ///Used to get firebase storage

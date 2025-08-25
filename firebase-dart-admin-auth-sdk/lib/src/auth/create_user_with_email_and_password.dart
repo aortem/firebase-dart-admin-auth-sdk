@@ -10,7 +10,13 @@ class CreateUserWithEmailAndPasswordService {
   CreateUserWithEmailAndPasswordService(this.auth);
 
   ///create function
-  Future<UserCredential> create(String email, String password) async {
+  Future<UserCredential> create(String email, String password, FirebaseAuth auth,) async {
+   if (auth.firebaseApp != null) {
+  final freshToken = await auth.firebaseApp!.getValidAccessToken();
+  if (freshToken != null) {
+    auth.accessToken = freshToken;
+  }
+}
     final url = Uri.https(
       'identitytoolkit.googleapis.com',
       '/v1/accounts:signUp',
