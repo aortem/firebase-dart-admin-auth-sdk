@@ -80,7 +80,7 @@ class FirebaseAuth {
   final String? appId;
 
   /// The access token to the firebase project
-  late final String? accessToken;
+    String? accessToken;
 
   /// The service account of your firebase project
   final ServiceAccount? serviceAccount;
