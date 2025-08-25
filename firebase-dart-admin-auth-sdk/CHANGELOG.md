@@ -1,3 +1,37 @@
+## 0.0.6
+
+### Changed
+
+* **Dart SDK**:
+
+  * Raised minimum version requirement from `3.8.1` → `3.9.0` across examples and documentation.
+  * Updated README instructions to reflect `Dart 3.9.0` requirement.
+
+* **Dependencies / Examples**:
+
+  * Updated example `pubspec.yaml` to require `sdk: ^3.9.0`.
+  * Simplified dependency reference in the example Flutter web app:
+
+    * Replaced local path dependency (`firebase_dart_admin_auth_sdk: { path: ... }`) with a versioned dependency string.
+
+* **Documentation**:
+
+  * Updated README installation snippet to reference `firebase_dart_admin_auth_sdk: ^0.0.6` (was `^0.0.1-pre+15`).
+
+## 0.0.5
+
+### Changed
+- **Dependencies**:
+  - Updated `ds_standard_features` to `^0.1.0`.
+  - Updated `ds_tools_testing` dev dependency to `^0.0.9`
+
+## 0.0.4
+
+### Changed
+- **Dependencies**:
+  - Updated `ds_standard_features` to `^0.0.8`.
+  - Updated `ds_tools_testing` dev dependency to `^0.0.5` and added `lints: ^6.0.0`.
+
 ## 0.0.3
 
 ### Changed
@@ -9,7 +43,7 @@
 
 ## 0.0.2
 
-- Bump Dart Version to 3.8.1
+- Bump Dart Version to 3.9.0
 - Formatting Changes To Satify Dart Formatter
 - Update BSD-3 License
 
@@ -69,7 +103,7 @@
 
 ## 0.0.1-pre+21
 
-- update SDK to 3.8.1
+- update SDK to 3.9.0
 
 ## 0.0.1-pre+20
 
