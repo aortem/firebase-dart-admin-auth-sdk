@@ -454,6 +454,133 @@ class FirebaseApp {
     }
   }
 
+  /////////////////////////////////////////////////////////
+  /// Initialize Firebase with Workload Identity Federation.
+  ///
+  /// - If [externalToken] is provided → External IdP flow (Google Workspace, Azure AD, Okta, CI/CD, etc.)
+  /// - If no token but running on GCP → Workload Identity flow via metadata server (GKE/Cloud Run)
+  /// - Otherwise → throws exception
+  static Future<FirebaseApp> initializeAppWithWorkloadIdentity({
+    required String targetServiceAccount,
+    String? externalToken,
+    String? projectNumber,
+    String? workforcePoolId,
+    String? providerId,
+  }) async {
+    String accessToken;
+
+    if (externalToken != null) {
+      // External IdP flow
+      accessToken = await _exchangeExternalToken(
+        externalToken,
+        targetServiceAccount,
+        projectNumber!,
+        workforcePoolId!,
+        providerId!,
+      );
+    } else if (await _isRunningOnGCP()) {
+      // GCP Workload Identity flow
+      accessToken = await _getTokenFromMetadataServer(targetServiceAccount);
+    } else {
+      throw Exception("❌ No valid authentication method available");
+    }
+
+    // Initialize Firebase with obtained token
+    return _initializeWithAccessToken(accessToken);
+  }
+
+  /// Detect if running on GCP (metadata server available)
+  static Future<bool> _isRunningOnGCP() async {
+    try {
+      final response = await http
+          .get(
+            Uri.parse("http://metadata.google.internal"),
+            headers: {"Metadata-Flavor": "Google"},
+          )
+          .timeout(const Duration(seconds: 1));
+      return response.statusCode == 200;
+    } catch (_) {
+      return false;
+    }
+  }
+
+  /// Exchange external IdP token for Firebase access token
+  static Future<String> _exchangeExternalToken(
+    String externalToken,
+    String targetServiceAccount,
+    String projectNumber,
+    String workforcePoolId,
+    String providerId,
+  ) async {
+    final audience =
+        "//iam.googleapis.com/projects/$projectNumber/locations/global/workforcePools/$workforcePoolId/providers/$providerId";
+
+    // 1. Exchange external IdP token via STS
+    final stsResponse = await http.post(
+      Uri.parse("https://sts.googleapis.com/v1/token"),
+      headers: {"Content-Type": "application/x-www-form-urlencoded"},
+      body: {
+        "grant_type": "urn:ietf:params:oauth:grant-type:token-exchange",
+        "audience": audience,
+        "scope": "https://www.googleapis.com/auth/cloud-platform",
+        "subject_token_type": "urn:ietf:params:oauth:token-type:id_token",
+        "subject_token": externalToken,
+      },
+    );
+
+    if (stsResponse.statusCode != 200) {
+      throw Exception("STS exchange failed: ${stsResponse.body}");
+    }
+    final stsAccessToken = jsonDecode(stsResponse.body)["access_token"];
+
+    // 2. Impersonate service account
+    return await _impersonateServiceAccount(
+      stsAccessToken,
+      targetServiceAccount,
+    );
+  }
+
+  /// Get token from GCP metadata server (Workload Identity on GKE/Cloud Run)
+  static Future<String> _getTokenFromMetadataServer(
+    String targetServiceAccount,
+  ) async {
+    final adcResponse = await http.get(
+      Uri.parse(
+        "http://metadata.google.internal/computeMetadata/v1/instance/service-accounts/default/token",
+      ),
+      headers: {"Metadata-Flavor": "Google"},
+    );
+
+    if (adcResponse.statusCode != 200) {
+      throw Exception("Failed to get ADC token: ${adcResponse.body}");
+    }
+    final adcAccessToken = jsonDecode(adcResponse.body)["access_token"];
+
+    return await _impersonateServiceAccount(
+      adcAccessToken,
+      targetServiceAccount,
+    );
+  }
+
+  /// Final initializer with access token
+  static Future<FirebaseApp> _initializeWithAccessToken(
+    String accessToken,
+  ) async {
+    _instance = FirebaseApp._(
+      null,
+      "your_project_id", // Replace with your Firebase Project ID
+      "your_auth_domain",
+      "your_messaging_sender_id",
+      "your_bucket_name",
+      "your_app_id",
+      null,
+      accessToken,
+    );
+    log("✅ Firebase initialized with Workload Identity");
+    return _instance!;
+  }
+
+  ////////////////////////////////////////////////////////
   ///
   ///
   //e Auth instance associated with the Project
