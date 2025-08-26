@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'package:firebase_dart_admin_auth_sdk/src/provider_user_info.dart';
 import 'id_token_result_model.dart';
+import 'package:ds_standard_features/ds_standard_features.dart' as http;
 
 /// Represents a user object that contains all the necessary information
 /// related to a user in Firebase Authentication.
@@ -63,6 +64,12 @@ class User {
   /// The tenant ID for the user.
   String? tenantId;
 
+  /// Firebase API key for token refresh
+  final String? _apiKey;
+
+  /// Getter for API key
+  String? get apiKey => _apiKey;
+
   /// Creates an instance of the [User] class with the given parameters.
   ///
   /// The constructor initializes the user's details, authentication tokens,
@@ -85,7 +92,8 @@ class User {
     this.mfaEnabled = false,
     this.idToken,
     this.tenantId,
-  });
+    String? apiKey,
+  }) : _apiKey = apiKey;
 
   /// A getter to determine if the user is signed in anonymously.
   ///
@@ -97,22 +105,88 @@ class User {
   ///
   /// If the `forceRefresh` flag is set to `true` or if the token is expired
   /// or null, this method will refresh the ID token and return the new token.
-  /// This method simulates a token refresh process and updates the expiration time.
+  /// This method now properly refreshes tokens using Firebase REST API.
   Future<String> getIdToken([bool forceRefresh = false]) async {
-    if (forceRefresh || idToken == null || _idTokenExpiration == null) {
-      // Simulate a token refresh process
-      idToken = 'refreshed_token_${DateTime.now().millisecondsSinceEpoch}';
-      _idTokenExpiration = DateTime.now().add(Duration(hours: 1));
+    // Debug logging
+    //print('[User.getIdToken] Called with forceRefresh=$forceRefresh');
+    //print('[User.getIdToken] Current idToken exists: ${idToken != null}');
+    //print('[User.getIdToken] Current idToken length: ${idToken?.length ?? 0}');
+    //print('[User.getIdToken] RefreshToken exists: ${refreshToken != null}');
+    //print('[User.getIdToken] API key exists: ${_apiKey != null}');
+
+    // First, check if we have a valid token that doesn't need refreshing
+    if (!forceRefresh && idToken != null && idToken!.isNotEmpty) {
+      // Check expiration if we have it
+      if (_idTokenExpiration != null) {
+        final bufferTime = _idTokenExpiration!.subtract(Duration(seconds: 30));
+        if (DateTime.now().isBefore(bufferTime)) {
+          //print('[User.getIdToken] Returning existing valid token');
+          return idToken!;
+        }
+        //print('[User.getIdToken] Token exists but is expired');
+      } else {
+        // No expiration set, but we have a token - set default expiration
+        // print(
+        //   '[User.getIdToken] Token exists without expiration, setting default',
+        // );
+        _idTokenExpiration = DateTime.now().add(Duration(hours: 1));
+        return idToken!;
+      }
     }
-    return idToken!;
+
+    // Try to refresh if we have the necessary credentials
+    if (forceRefresh || (idToken == null || idToken!.isEmpty)) {
+      if (refreshToken != null && refreshToken!.isNotEmpty && _apiKey != null) {
+        print('[User.getIdToken] Attempting to refresh token');
+        try {
+          final response = await http.post(
+            Uri.parse(
+              'https://securetoken.googleapis.com/v1/token?key=$_apiKey',
+            ),
+            headers: {'Content-Type': 'application/x-www-form-urlencoded'},
+            body: 'grant_type=refresh_token&refresh_token=$refreshToken',
+          );
+
+          if (response.statusCode == 200) {
+            final data = jsonDecode(response.body);
+            idToken = data['id_token'];
+            refreshToken = data['refresh_token'];
+            final expiresIn = int.parse(data['expires_in'] ?? '3600');
+            _idTokenExpiration = DateTime.now().add(
+              Duration(seconds: expiresIn),
+            );
+            //print('[User.getIdToken] Token refreshed successfully');
+            return idToken!;
+          } else {
+            //print('[User.getIdToken] Refresh failed: ${response.body}');
+          }
+        } catch (e) {
+          //print('[User.getIdToken] Refresh error: $e');
+        }
+      } else {
+        //print('[User.getIdToken] Cannot refresh - missing credentials');
+      }
+    }
+
+    // Last resort - if we have any token at all, return it
+    if (idToken != null && idToken!.isNotEmpty) {
+      //print('[User.getIdToken] Returning existing token as last resort');
+      _idTokenExpiration ??= DateTime.now().add(Duration(hours: 1));
+      return idToken!;
+    }
+
+    // No token available at all
+    //print('[User.getIdToken] No token available - throwing exception');
+    //print('[User.getIdToken] Debug info: uid=$uid, email=$email');
+    throw Exception('No valid ID token available');
   }
 
   /// Updates the user's ID token and refresh token.
-
   void updateIdToken(String newToken) {
     idToken = newToken;
     _idTokenExpiration = DateTime.now().add(Duration(hours: 1));
-    refreshToken = newToken;
+    // Don't overwrite refresh token with ID token
+    // refreshToken should only be updated when we get a new refresh token
   }
 
   /// Converts the [User] instance to a map for easy serialization.
@@ -136,8 +210,8 @@ class User {
   /// Factory constructor to create a [User] instance from a JSON object.
   ///
   /// This is useful for parsing JSON responses from Firebase or other services.
-  factory User.fromJson(Map<String, dynamic> json) {
-    return User(
+  factory User.fromJson(Map<String, dynamic> json, {String? apiKey}) {
+    final user = User(
       uid: json['localId'] ?? json['uid'],
       email: json['email'],
       emailVerified: json['emailVerified'] ?? false,
@@ -148,6 +222,7 @@ class User {
       idToken: json['idToken'],
       refreshToken: json['refreshToken'],
       tenantId: json['tenantId'],
+      apiKey: apiKey,
       createdAt: json['createdAt'] == null
           ? null
           : DateTime?.fromMillisecondsSinceEpoch(
@@ -180,6 +255,25 @@ class User {
               int.tryParse(json['validSince'].toString()) ?? 0,
             ),
     );
+
+    // Set token expiration based on expiresIn if available
+    if (user.idToken != null && user.idToken!.isNotEmpty) {
+      final expiresIn = json['expiresIn'];
+      if (expiresIn != null) {
+        // Parse expiresIn which could be string or int (seconds)
+        final seconds = expiresIn is String
+            ? int.tryParse(expiresIn) ?? 3600
+            : (expiresIn as int);
+        user._idTokenExpiration = DateTime.now().add(
+          Duration(seconds: seconds),
+        );
+      } else {
+        // Default to 1 hour expiration for new tokens
+        user._idTokenExpiration = DateTime.now().add(Duration(hours: 1));
+      }
+    }
+
+    return user;
   }
 
   /// Creates a copy of the [User] instance with optional updates to fields.
@@ -187,7 +281,7 @@ class User {
   /// This method allows you to create a new [User] object with some updated
   /// values while keeping the unchanged fields from the original instance.
   User copyWith(User user) {
-    return User(
+    final copiedUser = User(
       uid: user.uid,
       displayName: user.displayName ?? displayName,
       email: user.email ?? email,
@@ -203,7 +297,16 @@ class User {
       passwordUpdatedAt: user.passwordUpdatedAt ?? passwordUpdatedAt,
       providerUserInfo: user.providerUserInfo ?? providerUserInfo,
       validSince: user.validSince ?? validSince,
+      apiKey: user._apiKey ?? _apiKey,
     );
+
+    // Copy over the token expiration if we're copying the token
+    if (user.idToken != null && user.idToken == copiedUser.idToken) {
+      copiedUser._idTokenExpiration =
+          user._idTokenExpiration ?? _idTokenExpiration;
+    }
+
+    return copiedUser;
   }
 
   /// Returns a string representation of the [User] object.
@@ -222,15 +325,17 @@ class User {
     final token = await getIdToken(forceRefresh);
     return IdTokenResult(
       token: token,
-      expirationTime: _idTokenExpiration?.millisecondsSinceEpoch ?? 0,
+      expirationTime:
+          _idTokenExpiration?.millisecondsSinceEpoch ??
+          DateTime.now().add(Duration(hours: 1)).millisecondsSinceEpoch,
       issuedAtTime: DateTime.now().millisecondsSinceEpoch,
-      signInProvider: 'password', // or 'phone' or '(link unavailable)' etc.
+      signInProvider: 'password', // or 'phone' or 'google.com' etc.
       userId: uid,
       authTime: DateTime.now().millisecondsSinceEpoch.toString(),
     );
   }
 
-  /// Implements equality based on the user’s fields.
+  /// Implements equality based on the user's fields.
   ///
   /// This method compares two [User] objects based on their field values.
   @override
@@ -262,6 +367,5 @@ class User {
   }
 
   ///provider data
-
   dynamic get providerData => null;
 }
