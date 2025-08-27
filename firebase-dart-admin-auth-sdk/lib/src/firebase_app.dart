@@ -455,6 +455,7 @@ class FirebaseApp {
   }
 
   /////////////////////////////////////////////////////////
+  /////////////////////////////////////////////////////////
   /// Initialize Firebase with Workload Identity Federation.
   ///
   /// - If [externalToken] is provided → External IdP flow (Google Workspace, Azure AD, Okta, CI/CD, etc.)
@@ -486,7 +487,7 @@ class FirebaseApp {
     }
 
     // Initialize Firebase with obtained token
-    return _initializeWithAccessToken(accessToken);
+    return _initializeWithAccessToken(accessToken, targetServiceAccount);
   }
 
   /// Detect if running on GCP (metadata server available)
@@ -515,17 +516,16 @@ class FirebaseApp {
     final audience =
         "//iam.googleapis.com/projects/$projectNumber/locations/global/workforcePools/$workforcePoolId/providers/$providerId";
 
-    // 1. Exchange external IdP token via STS
+    // 1. Exchange external IdP token via STS (must use URL-encoded string)
     final stsResponse = await http.post(
       Uri.parse("https://sts.googleapis.com/v1/token"),
       headers: {"Content-Type": "application/x-www-form-urlencoded"},
-      body: {
-        "grant_type": "urn:ietf:params:oauth:grant-type:token-exchange",
-        "audience": audience,
-        "scope": "https://www.googleapis.com/auth/cloud-platform",
-        "subject_token_type": "urn:ietf:params:oauth:token-type:id_token",
-        "subject_token": externalToken,
-      },
+      body:
+          'grant_type=urn:ietf:params:oauth:grant-type:token-exchange'
+          '&audience=${Uri.encodeComponent(audience)}'
+          '&scope=${Uri.encodeComponent("https://www.googleapis.com/auth/cloud-platform")}'
+          '&subject_token_type=urn:ietf:params:oauth:token-type:id_token'
+          '&subject_token=${Uri.encodeComponent(externalToken)}',
     );
 
     if (stsResponse.statusCode != 200) {
@@ -562,23 +562,30 @@ class FirebaseApp {
     );
   }
 
-  /// Final initializer with access token
+  /// Final initializer with access token (Fix: no hardcoded values, projectId extracted)
   static Future<FirebaseApp> _initializeWithAccessToken(
     String accessToken,
+    String targetServiceAccount,
   ) async {
+    // Extract projectId from service account email (firebase-admin@<project-id>.iam.gserviceaccount.com)
+    final projectId = targetServiceAccount.split('@')[1].split('.')[0];
+
     _instance = FirebaseApp._(
       null,
-      "your_project_id", // Replace with your Firebase Project ID
-      "your_auth_domain",
-      "your_messaging_sender_id",
-      "your_bucket_name",
-      "your_app_id",
+      projectId, // projectId dynamically resolved
+      '$projectId.firebaseapp.com', // auth domain
+      '', // messaging sender ID (can be set if needed)
+      '$projectId.appspot.com', // bucket name
+      '', // app ID (optional, can be set)
       null,
       accessToken,
     );
-    log("✅ Firebase initialized with Workload Identity");
+
+    _instance!.tokenExpiryTime = DateTime.now().add(const Duration(hours: 1));
+    log("✅ Firebase initialized with Workload Identity for $projectId");
     return _instance!;
   }
+
 
   ////////////////////////////////////////////////////////
   ///
