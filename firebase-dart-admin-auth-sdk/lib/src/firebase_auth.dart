@@ -80,7 +80,7 @@ class FirebaseAuth {
   final String? appId;
 
   /// The access token to the firebase project
-  late final String? accessToken;
+  String? accessToken;
 
   /// The service account of your firebase project
   final ServiceAccount? serviceAccount;
@@ -371,6 +371,30 @@ class FirebaseAuth {
 
   /// updateCurrentUser method to automatically trigger the streams
   void updateCurrentUser(User user) {
+    // Check using the getter instead of private field
+    if (user.apiKey == null && apiKey != null) {
+      user = User(
+        uid: user.uid,
+        email: user.email,
+        emailVerified: user.emailVerified,
+        phoneNumber: user.phoneNumber,
+        displayName: user.displayName,
+        photoURL: user.photoURL,
+        refreshToken: user.refreshToken,
+        idToken: user.idToken,
+        tenantId: user.tenantId,
+        createdAt: user.createdAt,
+        customAttributes: user.customAttributes,
+        disabled: user.disabled,
+        lastLoginAt: user.lastLoginAt,
+        passwordUpdatedAt: user.passwordUpdatedAt,
+        providerUserInfo: user.providerUserInfo,
+        validSince: user.validSince,
+        mfaEnabled: user.mfaEnabled,
+        apiKey: apiKey,
+      );
+    }
+
     currentUser = currentUser == null ? user : currentUser?.copyWith(user);
     authStateChangedController.add(currentUser);
     idTokenChangedController.add(currentUser);
@@ -933,16 +957,108 @@ class FirebaseAuth {
   }
 
   ///create user email
+  // Future<UserCredential> createUserWithEmailAndPassword(
+  //   String email,
+  //   String password,
+  // ) async {
+  //   // Ensure token is valid before making request
+  //   if (firebaseApp != null) {
+  //     await firebaseApp!.getValidAccessToken();
+  //   }
+
+  //   return createUserWithEmailAndPasswordService.create(email, password, this);
+  // }
+
+  ///create user email
   Future<UserCredential> createUserWithEmailAndPassword(
     String email,
     String password,
   ) async {
-    // Ensure token is valid before making request
-    if (firebaseApp != null) {
-      await firebaseApp!.getValidAccessToken();
-    }
+    try {
+      //print('[FirebaseAuth] Creating user with email: $email');
+      //print('[FirebaseAuth] API Key available: ${apiKey != null}');
+      //print('[FirebaseAuth] Access Token available: ${accessToken != null}');
 
-    return createUserWithEmailAndPasswordService.create(email, password, this);
+      // Ensure token is valid before making request
+      if (firebaseApp != null) {
+        await firebaseApp!.getValidAccessToken();
+      }
+
+      // Make the signup request directly here to ensure proper token handling
+      final response = await performRequest('signUp', {
+        'email': email,
+        'password': password,
+        'returnSecureToken': true,
+      });
+
+      //print('[FirebaseAuth] Signup response status: ${response.statusCode}');
+
+      if (response.statusCode == 200) {
+        final userData = response.body;
+
+        //print('[FirebaseAuth] Response contains:');
+        //print('[FirebaseAuth] - idToken: ${userData['idToken'] != null}');
+        //print(
+        //  '[FirebaseAuth] - refreshToken: ${userData['refreshToken'] != null}',
+        //);
+        //print('[FirebaseAuth] - localId: ${userData['localId']}');
+
+        // Create User with proper API key for token operations
+        final user = User(
+          uid: userData['localId'] ?? userData['uid'],
+          email: userData['email'],
+          emailVerified: userData['emailVerified'] ?? false,
+          displayName: userData['displayName'] ?? email.split('@').first,
+          photoURL: userData['photoUrl'] ?? userData['photoURL'],
+          mfaEnabled: userData['mfaEnabled'] ?? false,
+          idToken: userData['idToken'],
+          refreshToken: userData['refreshToken'],
+          tenantId: userData['tenantId'],
+          apiKey: apiKey, // CRITICAL: Pass the API key for token operations
+        );
+
+        // Set token expiration
+        if (userData['expiresIn'] != null) {
+          final expiresIn = userData['expiresIn'] is String
+              ? int.tryParse(userData['expiresIn']) ?? 3600
+              : userData['expiresIn'] as int;
+          // This would need to be set via reflection or a setter method
+          // For now, the User constructor should handle this
+        }
+
+        //print('[FirebaseAuth] Created User object:');
+        //print('[FirebaseAuth] - uid: ${user.uid}');
+        //print('[FirebaseAuth] - idToken exists: ${user.idToken != null}');
+        //print(
+        //  '[FirebaseAuth] - refreshToken exists: ${user.refreshToken != null}',
+        //);
+        //print('[FirebaseAuth] - apiKey exists: ${user.apiKey != null}');
+
+        final userCredential = UserCredential(
+          user: user,
+          additionalUserInfo: AdditionalUserInfo(
+            isNewUser: true,
+            providerId: 'password',
+          ),
+          operationType: 'signUp',
+        );
+
+        // Update current user
+        updateCurrentUser(user);
+
+        return userCredential;
+      } else {
+        final error = response.body['error'];
+        throw FirebaseAuthException(
+          code: error['message'] ?? 'signup-failed',
+          message: error['message'] ?? 'Failed to create user',
+        );
+      }
+    } catch (e) {
+      print('[FirebaseAuth] Error creating user: $e');
+      if (e is FirebaseAuthException) rethrow;
+      throw FirebaseAuthException(code: 'signup-error', message: e.toString());
+    }
   }
 
   ///connect auth Emulator
