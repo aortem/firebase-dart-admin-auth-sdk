@@ -1,3 +1,34 @@
+## 0.0.7
+
+### Changed
+
+* **Refactored `CreateUserWithEmailAndPasswordService`**:
+
+  * Constructor simplified: `final FirebaseAuth auth` defined directly, instead of passing multiple redundant fields.
+  * Method signature updated: `create(String email, String password, FirebaseAuth authInstance)` (was `auth`).
+  * Replaced manual HTTP request logic with `authInstance.performRequest('signUp', {...})`.
+
+### Improved
+
+* Added structured `try` block for better error handling and logging.
+* Debug logging (commented out) for easier troubleshooting:
+
+  * Email being processed.
+  * Presence of API key.
+  * Response status and presence of tokens.
+
+### Added
+
+* Proper construction of `User` object using `User.fromJson(userData, apiKey: authInstance.apiKey)`.
+* Automatic assignment of `idToken` and `refreshToken` if present in response.
+* More detailed debug output for created `User` object (UID, tokens, API key).
+
+### Removed
+
+* Manual token refresh flow (`firebaseApp.getValidAccessToken()`).
+* Custom HTTP request building with `Uri.https` and manual headers.
+* Inline JSON serialization and error decoding — now centralized in `performRequest`.
+
 ## 0.0.6
 
 ### Changed
@@ -9,7 +40,7 @@
 
 * **Dependencies / Examples**:
 
-  * Updated example `pubspec.yaml` to require `sdk: ^3.9.0`.
+  * Updated example `pubspec.yaml` to require `sdk: ^3.9.2`.
   * Simplified dependency reference in the example Flutter web app:
 
     * Replaced local path dependency (`firebase_dart_admin_auth_sdk: { path: ... }`) with a versioned dependency string.
