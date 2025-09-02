@@ -40,17 +40,24 @@ class SignInWithRedirectService {
       String url =
           'https://identitytoolkit.googleapis.com/v1/accounts:signInWithIdp';
 
-      if (auth.apiKey != 'your_api_key') {
+      // Build headers
+      Map<String, String> headers = {
+        'Content-Type': 'application/json; charset=UTF-8',
+      };
+
+      if (auth.apiKey != null && auth.apiKey!.isNotEmpty) {
+        // API key flow
         url = '$url?key=${auth.apiKey}';
+      } else if (auth.accessToken != null && auth.accessToken!.isNotEmpty) {
+        // Service account / Workload Identity flow
+        headers['Authorization'] = 'Bearer ${auth.accessToken}';
+      } else {
+        throw Exception('No API key or service account access token found');
       }
 
       final response = await http.post(
         Uri.parse(url),
-        headers: <String, String>{
-          'Content-Type': 'application/json; charset=UTF-8',
-          if (auth.accessToken != null)
-            'Authorization': 'Bearer ${auth.accessToken}',
-        },
+        headers: headers,
         body: jsonEncode(<String, dynamic>{
           'postBody': 'access_token=$idToken&providerId=$providerId',
           'requestUri': redirectUri,
@@ -77,9 +84,9 @@ class SignInWithRedirectService {
         log('Error response body: ${response.body}');
         return null;
       }
-    } catch (error) {
-      log('Error occurred during sign in: $error');
+    } catch (error, st) {
+      log('Error occurred during sign in: $error\n$st');
+      return null;
     }
-    return null;
   }
 }
