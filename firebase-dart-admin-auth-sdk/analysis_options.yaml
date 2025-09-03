@@ -19,9 +19,12 @@ linter:
   rules:
      - public_member_api_docs
 
-# analyzer:
-#   exclude:
-#     - path/to/excluded/files/**
+analyzer:
+  exclude:
+    - example/**
+    - test/**/.dart_tool/**
+    - .dart_tool/**
+    - build/**
 
 # For more information about the core and recommended set of lints, see
 # https://dart.dev/go/core-lints
