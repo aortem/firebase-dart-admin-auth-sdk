@@ -7,9 +7,6 @@ license: BSD-3
 environment:
    sdk: ^3.9.2
 
-
-# Add regular dependencies here.
-
 dependencies:
 #------------------ STANDARD FEATURES---------------------------------
 ## There are three standard libraries. 
@@ -21,7 +18,7 @@ dependencies:
 #------------------ TESTING FEATURES---------------------------------
 
 dev_dependencies:
-  ds_tools_testing: ^0.0.9 #Standard Dart Team Testing Tools
+  ds_tools_testing: ^0.1.0 #Standard Dart Team Testing Tools
   lints: ^6.0.0
   git_hooks: any
 
