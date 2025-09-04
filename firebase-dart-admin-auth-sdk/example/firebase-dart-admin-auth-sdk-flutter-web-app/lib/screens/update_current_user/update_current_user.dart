@@ -32,11 +32,11 @@ class UpdateUserScreenState extends State<UpdateUserScreen> {
         if (user != null) {
           FirebaseApp.firebaseAuth
               ?.updateUserInformation(user.uid, user.idToken!, {
-                'email': _emailController.text,
-                'phoneNumber': _phoneNumberController.text,
-                'password': _passwordController.text,
-                'displayName': _displayNameController.text,
-              });
+            'email': _emailController.text,
+            'phoneNumber': _phoneNumberController.text,
+            'password': _passwordController.text,
+            'displayName': _displayNameController.text,
+          });
 
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(content: Text('User details updated successfully!')),

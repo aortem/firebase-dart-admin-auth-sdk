@@ -5,8 +5,8 @@ import 'package:firebase_dart_admin_auth_sdk/firebase_dart_admin_auth_sdk.dart';
 typedef NextOrObserver<T> = void Function(T?);
 
 ///error
-typedef ErrorFn =
-    void Function(FirebaseAuthException error, StackTrace? stackTrace);
+typedef ErrorFn = void Function(
+    FirebaseAuthException error, StackTrace? stackTrace);
 
 ///complete
 typedef CompleteFn = void Function();

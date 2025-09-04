@@ -24,8 +24,9 @@ class _StorageExampleState extends State<StorageExample> {
         fileBytes = kIsWeb
             ? result.files.single.bytes
             : await result.files.single.readStream!.toList().then(
-                (parts) => Uint8List.fromList(parts.expand((x) => x).toList()),
-              );
+                  (parts) =>
+                      Uint8List.fromList(parts.expand((x) => x).toList()),
+                );
         fileName = result.files.single.name;
         setState(() {});
       } else {

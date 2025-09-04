@@ -159,23 +159,17 @@ class _GetRedirectResultScreenState extends State<GetRedirectResultScreen> {
                             _buildInfoRow(
                               'Is New User',
                               viewModel
-                                  .redirectResult!
-                                  .additionalUserInfo!
-                                  .isNewUser
+                                  .redirectResult!.additionalUserInfo!.isNewUser
                                   .toString(),
                             ),
                             8.vSpace,
                             _buildInfoRow(
                               'Provider ID',
-                              viewModel
-                                      .redirectResult!
-                                      .additionalUserInfo!
+                              viewModel.redirectResult!.additionalUserInfo!
                                       .providerId ??
                                   'N/A',
                             ),
-                            if (viewModel
-                                    .redirectResult!
-                                    .additionalUserInfo!
+                            if (viewModel.redirectResult!.additionalUserInfo!
                                     .profile !=
                                 null) ...[
                               8.vSpace,
@@ -184,20 +178,17 @@ class _GetRedirectResultScreenState extends State<GetRedirectResultScreen> {
                                 style: TextStyle(fontWeight: FontWeight.bold),
                               ),
                               4.vSpace,
-                              ...viewModel
-                                  .redirectResult!
-                                  .additionalUserInfo!
-                                  .profile!
-                                  .entries
+                              ...viewModel.redirectResult!.additionalUserInfo!
+                                  .profile!.entries
                                   .map(
-                                    (e) => Padding(
-                                      padding: const EdgeInsets.only(
-                                        left: 8,
-                                        top: 4,
-                                      ),
-                                      child: Text('${e.key}: ${e.value}'),
-                                    ),
+                                (e) => Padding(
+                                  padding: const EdgeInsets.only(
+                                    left: 8,
+                                    top: 4,
                                   ),
+                                  child: Text('${e.key}: ${e.value}'),
+                                ),
+                              ),
                             ],
                           ],
                         ),

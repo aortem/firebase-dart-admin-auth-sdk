@@ -53,12 +53,12 @@ class _LinkWithCredentialsState extends State<LinkWithCredentials> {
             }
 
             try {
-              final user = await FirebaseApp.firebaseAuth
-                  ?.linkAccountWithCredientials(
-                    'http://localhost',
-                    token.access_token ?? "",
-                    'google.com',
-                  );
+              final user =
+                  await FirebaseApp.firebaseAuth?.linkAccountWithCredientials(
+                'http://localhost',
+                token.access_token ?? "",
+                'google.com',
+              );
 
               if (user != null) {
                 BotToast.showText(text: 'Account linked');
@@ -96,12 +96,12 @@ class _LinkWithCredentialsState extends State<LinkWithCredentials> {
         log('ID Token: ${googleAuth.idToken}');
 
         try {
-          final user = await FirebaseApp.firebaseAuth
-              ?.linkAccountWithCredientials(
-                'http://localhost',
-                googleAuth.accessToken ?? "",
-                'google.com',
-              );
+          final user =
+              await FirebaseApp.firebaseAuth?.linkAccountWithCredientials(
+            'http://localhost',
+            googleAuth.accessToken ?? "",
+            'google.com',
+          );
 
           if (user != null) {
             BotToast.showText(text: 'Account linked');
@@ -126,8 +126,8 @@ class _LinkWithCredentialsState extends State<LinkWithCredentials> {
   }
 
   Future<void> loginWithFacebook() async {
-    final LoginResult result = await FacebookAuth.instance
-        .login(); // Trigger the sign-in flow
+    final LoginResult result =
+        await FacebookAuth.instance.login(); // Trigger the sign-in flow
 
     if (result.status == LoginStatus.success) {
       final AccessToken accessToken = result.accessToken!;
