@@ -2,8 +2,10 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:developer';
 import 'dart:io';
-
 import 'package:ds_standard_features/ds_standard_features.dart' as http;
+import 'package:ds_standard_features/ds_standard_features.dart'
+    show visibleForTesting;
+
 import 'package:firebase_dart_admin_auth_sdk/src/firebase_auth.dart';
 import 'package:firebase_dart_admin_auth_sdk/src/firebase_storage.dart';
 import 'package:firebase_dart_admin_auth_sdk/src/service_account.dart';
@@ -34,9 +36,11 @@ class FirebaseApp {
   static const Duration tokenRefreshBuffer = Duration(minutes: 5); // new
   ServiceAccount? _serviceAccount;
 
+  static http.Client httpClient = http.Client();
+
   ///The class to interact with the various firebase auth methods
   static FirebaseAuth? firebaseAuth;
-  static GetAccessTokenWithGeneratedToken? _accesstokenGen;
+  static GetAccessTokenWithGeneratedToken? _accessTokenGen;
   static GenerateCustomToken? _tokenGen;
 
   ///The class to interact with the various firebase storage methods
@@ -62,6 +66,13 @@ class FirebaseApp {
   /// Refreshes OAuth2 token
   static bool _isRefreshing = false;
 
+  /// Used only in unit tests to reset static state.
+  @visibleForTesting
+  static void resetForTests() {
+    httpClient = http.Client(); // back to default
+    _instance = null; // if you have a cached singleton
+  }
+
   /// Refreshes OAuth2 token
   Future<void> refreshAccessToken() async {
     if (_isRefreshing) {
@@ -76,12 +87,12 @@ class FirebaseApp {
       }
 
       final tokenGen = _tokenGen ??= GenerateCustomTokenImplementation();
-      final accessTokenGen =
-          _accesstokenGen ??= GetAccessTokenWithGeneratedTokenImplementation();
+      final accessTokenGen = _accessTokenGen ??=
+          GetAccessTokenWithGeneratedTokenImplementation();
 
       final jwt = await tokenGen.generateServiceAccountJwt(_serviceAccount!);
-      final tokenResponse =
-          await accessTokenGen.getAccessTokenWithGeneratedTokenResponse(jwt);
+      final tokenResponse = await accessTokenGen
+          .getAccessTokenWithGeneratedTokenResponse(jwt);
 
       accessToken = tokenResponse['access_token'] as String?;
       final expiresIn = tokenResponse['expires_in'] as int? ?? 3600;
@@ -159,8 +170,8 @@ class FirebaseApp {
     required String serviceAccountContent,
   }) async {
     final tokenGen = _tokenGen ??= GenerateCustomTokenImplementation();
-    final accesTokenGen =
-        _accesstokenGen ??= GetAccessTokenWithGeneratedTokenImplementation();
+    final accessTokenGen = _accessTokenGen ??=
+        GetAccessTokenWithGeneratedTokenImplementation();
 
     try {
       final Map<String, dynamic> serviceAccount = json.decode(
@@ -172,8 +183,8 @@ class FirebaseApp {
 
       // 1. Generate token
       final jwt = await tokenGen.generateServiceAccountJwt(serviceAccountModel);
-      final tokenResponse =
-          await accesTokenGen.getAccessTokenWithGeneratedTokenResponse(jwt);
+      final tokenResponse = await accessTokenGen
+          .getAccessTokenWithGeneratedTokenResponse(jwt);
 
       final accessToken = tokenResponse['access_token'] as String;
       final expiresIn = tokenResponse['expires_in'] as int? ?? 3600;
@@ -223,7 +234,7 @@ class FirebaseApp {
     GetAccessTokenWithGeneratedToken tokenGen,
     GenerateCustomToken generateCustomToken,
   ) {
-    _accesstokenGen = tokenGen;
+    _accessTokenGen = tokenGen;
     _tokenGen = generateCustomToken;
   }
 
@@ -235,8 +246,8 @@ class FirebaseApp {
     required String impersonatedEmail,
   }) async {
     final tokenGen = _tokenGen ??= GenerateCustomTokenImplementation();
-    final accesTokenGen =
-        _accesstokenGen ??= GetAccessTokenWithGeneratedTokenImplementation();
+    final accessTokenGen = _accessTokenGen ??=
+        GetAccessTokenWithGeneratedTokenImplementation();
     // Parse the JSON content
     final Map<String, dynamic> serviceAccount = json.decode(
       serviceAccountContent,
@@ -251,7 +262,7 @@ class FirebaseApp {
       impersonatedEmail: impersonatedEmail,
     );
 
-    final accessToken = await accesTokenGen.getAccessTokenWithGeneratedToken(
+    final accessToken = await accessTokenGen.getAccessTokenWithGeneratedToken(
       jwt,
     );
 
@@ -274,10 +285,10 @@ class FirebaseApp {
     required String gcpAccessToken,
     required String impersonatedEmail,
   }) async {
-    final accesTokenGen =
-        _accesstokenGen ??= GetAccessTokenWithGcpTokenImplementation();
+    final accessTokenGen = _accessTokenGen ??=
+        GetAccessTokenWithGcpTokenImplementation();
 
-    final accessToken = await accesTokenGen.getAccessTokenWithGeneratedToken(
+    final accessToken = await accessTokenGen.getAccessTokenWithGeneratedToken(
       gcpAccessToken,
       targetServiceAccountEmail: impersonatedEmail,
     );
@@ -302,7 +313,7 @@ class FirebaseApp {
     // Get the access token for the current authenticated user (ADC).
     Future<String> getAuthToken() async {
       log("resposns is 987");
-      final response = await http.get(
+      final response = await httpClient.get(
         Uri.parse(
           'http://metadata.google.internal/computeMetadata/v1/instance/service-accounts/default/token',
         ),
@@ -320,7 +331,7 @@ class FirebaseApp {
     final authToken = await getAuthToken();
 
     // Make the impersonation request.
-    final response = await http.post(
+    final response = await httpClient.post(
       Uri.parse(
         'https://iamcredentials.googleapis.com/v1/projects/-/serviceAccounts/$serviceAccountEmail:generateAccessToken',
       ),
@@ -352,7 +363,7 @@ class FirebaseApp {
 
     try {
       // First try GCP metadata server
-      final response = await http.get(
+      final response = await httpClient.get(
         Uri.parse(
           'http://metadata.google.internal/computeMetadata/v1/instance/service-accounts/default/identity',
         ),
@@ -392,7 +403,7 @@ class FirebaseApp {
     String idToken,
     String serviceAccountEmail,
   ) async {
-    final response = await http.post(
+    final response = await httpClient.post(
       Uri.parse(
         'https://iamcredentials.googleapis.com/v1/projects/-/serviceAccounts/$serviceAccountEmail:generateAccessToken',
       ),
@@ -461,42 +472,83 @@ class FirebaseApp {
   /// - If [externalToken] is provided → External IdP flow (Google Workspace, Azure AD, Okta, CI/CD, etc.)
   /// - If no token but running on GCP → Workload Identity flow via metadata server (GKE/Cloud Run)
   /// - Otherwise → throws exception
+
+  // For GKE Workload Identity
   static Future<FirebaseApp> initializeAppWithWorkloadIdentity({
     required String targetServiceAccount,
-    String? externalToken,
-    String? projectNumber,
-    String? workforcePoolId,
-    String? providerId,
   }) async {
-    String accessToken;
-
-    if (externalToken != null) {
-      // External IdP flow
-      accessToken = await _exchangeExternalToken(
-        externalToken,
-        targetServiceAccount,
-        projectNumber!,
-        workforcePoolId!,
-        providerId!,
-      );
-    } else if (await _isRunningOnGCP()) {
-      // GCP Workload Identity flow
-      accessToken = await _getTokenFromMetadataServer(targetServiceAccount);
-    } else {
-      throw Exception("❌ No valid authentication method available");
+    if (!await _isRunningOnGCP()) {
+      throw Exception("Not running on GCP - Workload Identity unavailable");
     }
 
-    // Initialize Firebase with obtained token
+    final accessToken = await _getTokenFromMetadataServer(targetServiceAccount);
     return _initializeWithAccessToken(accessToken, targetServiceAccount);
   }
+
+  // For Workforce Identity Federation (external IdP like GitHub, Azure AD, etc.)
+  static Future<FirebaseApp> initializeAppWithWorkloadIdentityFederation({
+    required String targetServiceAccount,
+    required String externalToken,
+    required String projectNumber,
+    required String workforcePoolId,
+    required String providerId,
+  }) async {
+    final accessToken = await _exchangeExternalToken(
+      externalToken,
+      targetServiceAccount,
+      projectNumber,
+      workforcePoolId,
+      providerId,
+    );
+    if (externalToken.isEmpty) throw ArgumentError('externalToken required');
+    if (projectNumber.isEmpty) throw ArgumentError('projectNumber required');
+    if (workforcePoolId.isEmpty)
+      throw ArgumentError('workforcePoolId required');
+    if (providerId.isEmpty) throw ArgumentError('providerId required');
+
+    return _initializeWithAccessToken(accessToken, targetServiceAccount);
+  }
+
+  // static Future<FirebaseApp> initializeAppWithWorkloadIdentity({
+  //   required String targetServiceAccount,
+  //   String? externalToken,
+  //   String? projectNumber,
+  //   String? workforcePoolId,
+  //   String? providerId,
+  // }) async {
+  //   String accessToken;
+
+  //   if (externalToken != null) {
+  //     // External IdP flow
+  //     accessToken = await _exchangeExternalToken(
+  //       externalToken,
+  //       targetServiceAccount,
+  //       projectNumber!,
+  //       workforcePoolId!,
+  //       providerId!,
+  //     );
+  //   } else if (await _isRunningOnGCP()) {
+  //     // GCP Workload Identity flow
+  //     accessToken = await _getTokenFromMetadataServer(targetServiceAccount);
+  //   } else {
+  //     throw Exception(
+  //       "Workload Identity initialization failed: External token not provided and GCP metadata server unavailable",
+  //     );
+  //   }
+
+  //   // Initialize Firebase with obtained token
+  //   return _initializeWithAccessToken(accessToken, targetServiceAccount);
+  // }
 
   /// Detect if running on GCP (metadata server available)
   static Future<bool> _isRunningOnGCP() async {
     try {
-      final response = await http.get(
-        Uri.parse("http://metadata.google.internal"),
-        headers: {"Metadata-Flavor": "Google"},
-      ).timeout(const Duration(seconds: 1));
+      final response = await httpClient
+          .get(
+            Uri.parse("http://metadata.google.internal"),
+            headers: {"Metadata-Flavor": "Google"},
+          )
+          .timeout(const Duration(seconds: 1));
       return response.statusCode == 200;
     } catch (_) {
       return false;
@@ -515,13 +567,18 @@ class FirebaseApp {
         "//iam.googleapis.com/projects/$projectNumber/locations/global/workforcePools/$workforcePoolId/providers/$providerId";
 
     // 1. Exchange external IdP token via STS (must use URL-encoded string)
-    final stsResponse = await http.post(
+    final stsResponse = await httpClient.post(
       Uri.parse("https://sts.googleapis.com/v1/token"),
       headers: {"Content-Type": "application/x-www-form-urlencoded"},
-      body: 'grant_type=urn:ietf:params:oauth:grant-type:token-exchange'
+      body:
+          'grant_type=urn:ietf:params:oauth:grant-type:token-exchange'
           '&audience=${Uri.encodeComponent(audience)}'
           '&scope=${Uri.encodeComponent("https://www.googleapis.com/auth/cloud-platform")}'
-          '&subject_token_type=urn:ietf:params:oauth:token-type:id_token'
+          // '&subject_token_type=urn:ietf:params:oauth:token-type:id_token'
+          // '&subject_token=${Uri.encodeComponent(externalToken)}',
+          // 👇 FIX HERE
+          '&requested_token_type=urn:ietf:params:oauth:token-type:access_token'
+          '&subject_token_type=urn:ietf:params:oauth:token-type:access_token'
           '&subject_token=${Uri.encodeComponent(externalToken)}',
     );
 
@@ -533,12 +590,15 @@ class FirebaseApp {
     final expiresIn = stsJson["expires_in"] ?? 3600;
 
     // 2. Impersonate service account
-    final impersonatedAccessToken =
-        await _impersonateServiceAccount(stsAccessToken, targetServiceAccount);
+    final impersonatedAccessToken = await _impersonateServiceAccount(
+      stsAccessToken,
+      targetServiceAccount,
+    );
 
     // Save expiry to singleton (so refresh works properly)
-    _instance?.tokenExpiryTime =
-        DateTime.now().add(Duration(seconds: expiresIn));
+    _instance?.tokenExpiryTime = DateTime.now().add(
+      Duration(seconds: expiresIn),
+    );
 
     return impersonatedAccessToken;
   }
@@ -547,7 +607,7 @@ class FirebaseApp {
   static Future<String> _getTokenFromMetadataServer(
     String targetServiceAccount,
   ) async {
-    final adcResponse = await http.get(
+    final adcResponse = await httpClient.get(
       Uri.parse(
         "http://metadata.google.internal/computeMetadata/v1/instance/service-accounts/default/token",
       ),
@@ -561,11 +621,14 @@ class FirebaseApp {
     final adcAccessToken = adcJson["access_token"];
     final expiresIn = adcJson["expires_in"] ?? 3600;
 
-    final impersonatedAccessToken =
-        await _impersonateServiceAccount(adcAccessToken, targetServiceAccount);
+    final impersonatedAccessToken = await _impersonateServiceAccount(
+      adcAccessToken,
+      targetServiceAccount,
+    );
 
-    _instance?.tokenExpiryTime =
-        DateTime.now().add(Duration(seconds: expiresIn));
+    _instance?.tokenExpiryTime = DateTime.now().add(
+      Duration(seconds: expiresIn),
+    );
 
     return impersonatedAccessToken;
   }
