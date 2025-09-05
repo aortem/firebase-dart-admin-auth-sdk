@@ -149,7 +149,7 @@ class FirebaseAuth {
 
   /// email password
   late CreateUserWithEmailAndPasswordService
-      createUserWithEmailAndPasswordService;
+  createUserWithEmailAndPasswordService;
 
   ///connect auth Emulator
   late ConnectAuthEmulatorService connectAuthEmulatorService;
@@ -202,7 +202,7 @@ class FirebaseAuth {
 
   /// Firebase before auth change
   late FirebaseBeforeAuthStateChangeService
-      firebaseBeforeAuthStateChangeService;
+  firebaseBeforeAuthStateChangeService;
 
   /// Current firebase auth user
   User? currentUser;
@@ -235,7 +235,8 @@ class FirebaseAuth {
     this.firebaseApp,
   }) {
     log(apiKey ?? 'api key');
-    this.httpClient = httpClient ??
+    this.httpClient =
+        httpClient ??
         http.Client(); // Use the injected client or default to a new one
     emailPassword = EmailPasswordAuth(this);
     customToken = CustomTokenAuth(this);
@@ -917,8 +918,8 @@ class FirebaseAuth {
   ///fetch signin methods
   Future<List<String>> fetchSignInMethodsForEmail(String email) async {
     try {
-      List<String> methods =
-          await fetchSignInMethods.fetchSignInMethodsForEmail(email);
+      List<String> methods = await fetchSignInMethods
+          .fetchSignInMethodsForEmail(email);
       return methods;
     } catch (e) {
       print('Fetch sign-in methods failed: $e');

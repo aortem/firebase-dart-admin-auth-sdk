@@ -34,10 +34,10 @@ class VerifyPasswordResetCode extends StatelessWidget {
                 onTap: () async {
                   try {
                     // Attempt to verify the password reset code
-                    var email =
-                        await FirebaseApp.firebaseAuth?.verifyPasswordResetCode(
-                      verifyPasswordRestController.text,
-                    );
+                    var email = await FirebaseApp.firebaseAuth
+                        ?.verifyPasswordResetCode(
+                          verifyPasswordRestController.text,
+                        );
 
                     if (email != null) {
                       BotToast.showText(

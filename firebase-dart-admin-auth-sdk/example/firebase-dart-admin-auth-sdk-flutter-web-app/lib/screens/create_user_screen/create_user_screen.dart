@@ -47,11 +47,11 @@ class _CreateUserScreenState extends State<CreateUserScreen> {
                     context,
                     listen: false,
                   );
-                  UserCredential? credential =
-                      await auth.createUserWithEmailAndPassword(
-                    _emailController.text,
-                    _passwordController.text,
-                  );
+                  UserCredential? credential = await auth
+                      .createUserWithEmailAndPassword(
+                        _emailController.text,
+                        _passwordController.text,
+                      );
                   setState(() {
                     _result =
                         'User created: ${credential.user.uid}, Email: ${credential.user.email}';

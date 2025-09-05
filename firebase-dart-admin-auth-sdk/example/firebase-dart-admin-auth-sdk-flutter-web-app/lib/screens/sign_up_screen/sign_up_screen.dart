@@ -78,14 +78,14 @@ class _SignUpScreenState extends State<SignUpScreen> {
                           TextSpan(
                             text: 'Sign In With Varieties Of Method',
                             recognizer: TapGestureRecognizer()
-                              ..onTap =
-                                  () => showSignMethodsBottomSheet(context),
-                            style:
-                                Theme.of(context).textTheme.bodySmall?.copyWith(
-                                      fontWeight: FontWeight.bold,
-                                      fontSize: 16,
-                                      color: Colors.purple,
-                                    ),
+                              ..onTap = () =>
+                                  showSignMethodsBottomSheet(context),
+                            style: Theme.of(context).textTheme.bodySmall
+                                ?.copyWith(
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 16,
+                                  color: Colors.purple,
+                                ),
                           ),
                         ],
                       ),

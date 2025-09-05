@@ -128,13 +128,16 @@ class _HomeScreenState extends State<HomeScreen> {
     setState(() {
       _currentUser = user;
       if (user != null) {
-        user.getIdToken(true).then((idToken) {
-          setState(() {});
-        }).catchError((error) {
-          if (kDebugMode) {
-            print("Error fetching token: $error");
-          }
-        });
+        user
+            .getIdToken(true)
+            .then((idToken) {
+              setState(() {});
+            })
+            .catchError((error) {
+              if (kDebugMode) {
+                print("Error fetching token: $error");
+              }
+            });
       } else {}
     });
   }
@@ -335,8 +338,8 @@ class _HomeScreenState extends State<HomeScreen> {
                 10.vSpace,
                 ActionTile(
                   onTap: () async {
-                    var tokenId =
-                        await FirebaseApp.firebaseAuth?.getIdTokenResult();
+                    var tokenId = await FirebaseApp.firebaseAuth
+                        ?.getIdTokenResult();
 
                     if (kDebugMode) {
                       print("token result  $tokenId");

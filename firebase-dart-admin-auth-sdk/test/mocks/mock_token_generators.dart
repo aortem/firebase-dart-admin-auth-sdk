@@ -46,8 +46,11 @@ class MockCustomTokenGen implements GenerateCustomToken {
   }
 
   @override
-  Future<String> generateSignInJwt(ServiceAccount serviceAccount,
-      {String? uid, Map<String, dynamic>? additionalClaims}) {
+  Future<String> generateSignInJwt(
+    ServiceAccount serviceAccount, {
+    String? uid,
+    Map<String, dynamic>? additionalClaims,
+  }) {
     // TODO: implement generateSignInJwt
     throw UnimplementedError();
   }

@@ -56,9 +56,9 @@ class _LinkPhoneNumberScreenState extends State<LinkPhoneNumberScreen> {
                   } else {
                     await FirebaseApp.firebaseAuth
                         ?.firebasePhoneNumberLinkMethod(
-                      phoneLinkController.text,
-                      codeController.text,
-                    );
+                          phoneLinkController.text,
+                          codeController.text,
+                        );
                   }
                 },
                 title: 'Send',

@@ -23,8 +23,10 @@ void main() {
 
   group('Access token refresh', () {
     test('refreshes when token is expired or inside buffer', () async {
-      final accessTokenGen = MockAccessTokenGen(
-          {'access_token': 'fresh_token', 'expires_in': 3600});
+      final accessTokenGen = MockAccessTokenGen({
+        'access_token': 'fresh_token',
+        'expires_in': 3600,
+      });
       final customTokenGen = MockCustomTokenGen();
 
       FirebaseApp.overrideInstanceForTesting(accessTokenGen, customTokenGen);
@@ -41,13 +43,18 @@ void main() {
       final token = await app.getValidAccessToken();
 
       expect(token, 'fresh_token');
-      expect(accessTokenGen.calls, initialCalls + 1,
-          reason: 'Should refresh exactly once after init');
+      expect(
+        accessTokenGen.calls,
+        initialCalls + 1,
+        reason: 'Should refresh exactly once after init',
+      );
     });
 
     test('does not refresh when token is still valid', () async {
-      final accessTokenGen = MockAccessTokenGen(
-          {'access_token': 'should_not_be_used', 'expires_in': 3600});
+      final accessTokenGen = MockAccessTokenGen({
+        'access_token': 'should_not_be_used',
+        'expires_in': 3600,
+      });
       final customTokenGen = MockCustomTokenGen();
 
       FirebaseApp.overrideInstanceForTesting(accessTokenGen, customTokenGen);
@@ -65,13 +72,18 @@ void main() {
 
       // Still the same token, and no extra refresh call
       expect(token, isNotEmpty);
-      expect(accessTokenGen.calls, initialCalls,
-          reason: 'No refresh should happen when token still valid');
+      expect(
+        accessTokenGen.calls,
+        initialCalls,
+        reason: 'No refresh should happen when token still valid',
+      );
     });
 
     test('concurrent refresh calls only refresh once', () async {
-      final accessTokenGen = MockAccessTokenGen(
-          {'access_token': 'fresh_once', 'expires_in': 3600});
+      final accessTokenGen = MockAccessTokenGen({
+        'access_token': 'fresh_once',
+        'expires_in': 3600,
+      });
       final customTokenGen = MockCustomTokenGen();
 
       FirebaseApp.overrideInstanceForTesting(accessTokenGen, customTokenGen);
@@ -91,8 +103,11 @@ void main() {
 
       expect(results[0], 'fresh_once');
       expect(results[1], 'fresh_once');
-      expect(accessTokenGen.calls, initialCalls + 1,
-          reason: 'Only one refresh should occur after init');
+      expect(
+        accessTokenGen.calls,
+        initialCalls + 1,
+        reason: 'Only one refresh should occur after init',
+      );
     });
   });
 }

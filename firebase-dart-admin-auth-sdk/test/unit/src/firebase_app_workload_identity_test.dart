@@ -19,12 +19,17 @@ void main() {
         'http://metadata.google.internal': http.MockResponse(200, 'OK'),
         'http://metadata.google.internal/computeMetadata/v1/instance/service-accounts/default/token':
             http.MockResponse(
-                200,
-                jsonEncode(
-                    {"access_token": "mock_adc_token", "expires_in": 3600})),
+              200,
+              jsonEncode({
+                "access_token": "mock_adc_token",
+                "expires_in": 3600,
+              }),
+            ),
         'https://iamcredentials.googleapis.com/v1/projects/-/serviceAccounts/test-sa@myproj.iam.gserviceaccount.com:generateAccessToken':
             http.MockResponse(
-                200, jsonEncode({"accessToken": "impersonated_token"})),
+              200,
+              jsonEncode({"accessToken": "impersonated_token"}),
+            ),
       });
 
       final app = await FirebaseApp.initializeAppWithWorkloadIdentity(
@@ -44,8 +49,11 @@ void main() {
         () => FirebaseApp.initializeAppWithWorkloadIdentity(
           targetServiceAccount: 'test-sa@myproj.iam.gserviceaccount.com',
         ),
-        throwsA(predicate(
-            (e) => e.toString().contains('Workload Identity unavailable'))),
+        throwsA(
+          predicate(
+            (e) => e.toString().contains('Workload Identity unavailable'),
+          ),
+        ),
       );
     });
   });

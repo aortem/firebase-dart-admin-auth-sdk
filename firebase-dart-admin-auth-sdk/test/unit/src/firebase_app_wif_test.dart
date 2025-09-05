@@ -22,9 +22,9 @@ void main() {
         ),
         'https://iamcredentials.googleapis.com/v1/projects/-/serviceAccounts/test-sa@myproj.iam.gserviceaccount.com:generateAccessToken':
             http.MockResponse(
-          200,
-          jsonEncode({"accessToken": "impersonated_token"}),
-        ),
+              200,
+              jsonEncode({"accessToken": "impersonated_token"}),
+            ),
       });
 
       final app = await FirebaseApp.initializeAppWithWorkloadIdentityFederation(
@@ -41,8 +41,10 @@ void main() {
 
     test('throws when STS exchange fails', () async {
       http.overrideResponses({
-        'https://sts.googleapis.com/v1/token':
-            http.MockResponse(400, '{"error":"invalid"}'),
+        'https://sts.googleapis.com/v1/token': http.MockResponse(
+          400,
+          '{"error":"invalid"}',
+        ),
       });
 
       expect(
@@ -67,9 +69,13 @@ void main() {
           workforcePoolId: '',
           providerId: '',
         ),
-        throwsA(predicate((e) =>
-            e.toString().contains('STS exchange failed') ||
-            e is ArgumentError)),
+        throwsA(
+          predicate(
+            (e) =>
+                e.toString().contains('STS exchange failed') ||
+                e is ArgumentError,
+          ),
+        ),
       );
     });
   });

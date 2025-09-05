@@ -87,12 +87,12 @@ class FirebaseApp {
       }
 
       final tokenGen = _tokenGen ??= GenerateCustomTokenImplementation();
-      final accessTokenGen =
-          _accessTokenGen ??= GetAccessTokenWithGeneratedTokenImplementation();
+      final accessTokenGen = _accessTokenGen ??=
+          GetAccessTokenWithGeneratedTokenImplementation();
 
       final jwt = await tokenGen.generateServiceAccountJwt(_serviceAccount!);
-      final tokenResponse =
-          await accessTokenGen.getAccessTokenWithGeneratedTokenResponse(jwt);
+      final tokenResponse = await accessTokenGen
+          .getAccessTokenWithGeneratedTokenResponse(jwt);
 
       accessToken = tokenResponse['access_token'] as String?;
       final expiresIn = tokenResponse['expires_in'] as int? ?? 3600;
@@ -170,8 +170,8 @@ class FirebaseApp {
     required String serviceAccountContent,
   }) async {
     final tokenGen = _tokenGen ??= GenerateCustomTokenImplementation();
-    final accessTokenGen =
-        _accessTokenGen ??= GetAccessTokenWithGeneratedTokenImplementation();
+    final accessTokenGen = _accessTokenGen ??=
+        GetAccessTokenWithGeneratedTokenImplementation();
 
     try {
       final Map<String, dynamic> serviceAccount = json.decode(
@@ -183,8 +183,8 @@ class FirebaseApp {
 
       // 1. Generate token
       final jwt = await tokenGen.generateServiceAccountJwt(serviceAccountModel);
-      final tokenResponse =
-          await accessTokenGen.getAccessTokenWithGeneratedTokenResponse(jwt);
+      final tokenResponse = await accessTokenGen
+          .getAccessTokenWithGeneratedTokenResponse(jwt);
 
       final accessToken = tokenResponse['access_token'] as String;
       final expiresIn = tokenResponse['expires_in'] as int? ?? 3600;
@@ -246,8 +246,8 @@ class FirebaseApp {
     required String impersonatedEmail,
   }) async {
     final tokenGen = _tokenGen ??= GenerateCustomTokenImplementation();
-    final accessTokenGen =
-        _accessTokenGen ??= GetAccessTokenWithGeneratedTokenImplementation();
+    final accessTokenGen = _accessTokenGen ??=
+        GetAccessTokenWithGeneratedTokenImplementation();
     // Parse the JSON content
     final Map<String, dynamic> serviceAccount = json.decode(
       serviceAccountContent,
@@ -285,8 +285,8 @@ class FirebaseApp {
     required String gcpAccessToken,
     required String impersonatedEmail,
   }) async {
-    final accessTokenGen =
-        _accessTokenGen ??= GetAccessTokenWithGcpTokenImplementation();
+    final accessTokenGen = _accessTokenGen ??=
+        GetAccessTokenWithGcpTokenImplementation();
 
     final accessToken = await accessTokenGen.getAccessTokenWithGeneratedToken(
       gcpAccessToken,
@@ -473,7 +473,7 @@ class FirebaseApp {
   /// - If no token but running on GCP → Workload Identity flow via metadata server (GKE/Cloud Run)
   /// - Otherwise → throws exception
 
-// For GKE Workload Identity
+  // For GKE Workload Identity
   static Future<FirebaseApp> initializeAppWithWorkloadIdentity({
     required String targetServiceAccount,
   }) async {
@@ -543,10 +543,12 @@ class FirebaseApp {
   /// Detect if running on GCP (metadata server available)
   static Future<bool> _isRunningOnGCP() async {
     try {
-      final response = await httpClient.get(
-        Uri.parse("http://metadata.google.internal"),
-        headers: {"Metadata-Flavor": "Google"},
-      ).timeout(const Duration(seconds: 1));
+      final response = await httpClient
+          .get(
+            Uri.parse("http://metadata.google.internal"),
+            headers: {"Metadata-Flavor": "Google"},
+          )
+          .timeout(const Duration(seconds: 1));
       return response.statusCode == 200;
     } catch (_) {
       return false;
@@ -568,12 +570,12 @@ class FirebaseApp {
     final stsResponse = await httpClient.post(
       Uri.parse("https://sts.googleapis.com/v1/token"),
       headers: {"Content-Type": "application/x-www-form-urlencoded"},
-      body: 'grant_type=urn:ietf:params:oauth:grant-type:token-exchange'
+      body:
+          'grant_type=urn:ietf:params:oauth:grant-type:token-exchange'
           '&audience=${Uri.encodeComponent(audience)}'
           '&scope=${Uri.encodeComponent("https://www.googleapis.com/auth/cloud-platform")}'
           // '&subject_token_type=urn:ietf:params:oauth:token-type:id_token'
           // '&subject_token=${Uri.encodeComponent(externalToken)}',
-
           // 👇 FIX HERE
           '&requested_token_type=urn:ietf:params:oauth:token-type:access_token'
           '&subject_token_type=urn:ietf:params:oauth:token-type:access_token'
@@ -588,12 +590,15 @@ class FirebaseApp {
     final expiresIn = stsJson["expires_in"] ?? 3600;
 
     // 2. Impersonate service account
-    final impersonatedAccessToken =
-        await _impersonateServiceAccount(stsAccessToken, targetServiceAccount);
+    final impersonatedAccessToken = await _impersonateServiceAccount(
+      stsAccessToken,
+      targetServiceAccount,
+    );
 
     // Save expiry to singleton (so refresh works properly)
-    _instance?.tokenExpiryTime =
-        DateTime.now().add(Duration(seconds: expiresIn));
+    _instance?.tokenExpiryTime = DateTime.now().add(
+      Duration(seconds: expiresIn),
+    );
 
     return impersonatedAccessToken;
   }
@@ -616,11 +621,14 @@ class FirebaseApp {
     final adcAccessToken = adcJson["access_token"];
     final expiresIn = adcJson["expires_in"] ?? 3600;
 
-    final impersonatedAccessToken =
-        await _impersonateServiceAccount(adcAccessToken, targetServiceAccount);
+    final impersonatedAccessToken = await _impersonateServiceAccount(
+      adcAccessToken,
+      targetServiceAccount,
+    );
 
-    _instance?.tokenExpiryTime =
-        DateTime.now().add(Duration(seconds: expiresIn));
+    _instance?.tokenExpiryTime = DateTime.now().add(
+      Duration(seconds: expiresIn),
+    );
 
     return impersonatedAccessToken;
   }

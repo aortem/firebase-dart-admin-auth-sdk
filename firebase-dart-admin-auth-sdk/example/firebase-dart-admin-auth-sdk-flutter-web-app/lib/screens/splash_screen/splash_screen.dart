@@ -35,10 +35,10 @@ class _SplashScreenState extends State<SplashScreen> {
           child: Text(
             'SAMPLE APP',
             style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                  color: Colors.white,
-                  fontWeight: FontWeight.w900,
-                  fontSize: 20,
-                ),
+              color: Colors.white,
+              fontWeight: FontWeight.w900,
+              fontSize: 20,
+            ),
           ),
         ),
       ),

@@ -245,10 +245,10 @@ class User {
       providerUserInfo: json['providerUserInfo'] == null
           ? null
           : json['providerUserInfo'] != null
-              ? (json['providerUserInfo'] as List)
-                  .map((e) => ProviderUserInfo.fromJson(e))
-                  .toList()
-              : null,
+          ? (json['providerUserInfo'] as List)
+                .map((e) => ProviderUserInfo.fromJson(e))
+                .toList()
+          : null,
       validSince: json['validSince'] == null
           ? null
           : DateTime?.fromMillisecondsSinceEpoch(
@@ -325,7 +325,8 @@ class User {
     final token = await getIdToken(forceRefresh);
     return IdTokenResult(
       token: token,
-      expirationTime: _idTokenExpiration?.millisecondsSinceEpoch ??
+      expirationTime:
+          _idTokenExpiration?.millisecondsSinceEpoch ??
           DateTime.now().add(Duration(hours: 1)).millisecondsSinceEpoch,
       issuedAtTime: DateTime.now().millisecondsSinceEpoch,
       signInProvider: 'password', // or 'phone' or 'google.com' etc.

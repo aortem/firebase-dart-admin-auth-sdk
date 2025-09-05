@@ -153,8 +153,8 @@ class MicrosoftSignIn extends ChangeNotifier {
   ////////////////////////////////////////////////
 
   Future<void> loginWithFacebook(BuildContext context) async {
-    final LoginResult result =
-        await FacebookAuth.instance.login(); // Trigger the sign-in flow
+    final LoginResult result = await FacebookAuth.instance
+        .login(); // Trigger the sign-in flow
     log("12345result $result");
     if (result.status == LoginStatus.success) {
       final AccessToken accessToken = result.accessToken!;
