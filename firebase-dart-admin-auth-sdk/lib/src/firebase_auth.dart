@@ -62,6 +62,15 @@ import 'firebase_user/set_language_code.dart';
 import 'id_token_result_model.dart';
 import 'auth/verify_id_token.dart';
 
+/// Enum to specify the type of API request.
+enum ApiType {
+  /// Admin API request (requires service account / elevated privileges)
+  admin,
+
+  /// Client API request (normal Firebase client endpoints)
+  client,
+}
+
 ///Base Firebase auth class that contains all the methods provided by the sdk
 class FirebaseAuth {
   ///THe api key for firebase project
@@ -270,7 +279,7 @@ class FirebaseAuth {
     _recaptchaConfigService = createRecaptchaConfigService();
     fetchSignInMethods = FetchSignInMethodsService(auth: this);
     createUserWithEmailAndPasswordService =
-        CreateUserWithEmailAndPasswordService(this);
+        CreateUserWithEmailAndPasswordService(auth: this);
     connectAuthEmulatorService = ConnectAuthEmulatorService(this);
     getRedirectResultService = GetRedirectResultService(auth: this);
     // recaptchaConfigService = RecaptchaConfigService();
@@ -296,76 +305,146 @@ class FirebaseAuth {
     verifyTokenService = VerifyIdTokenService(auth: this);
   }
 
-  /// Core request performer
+  /// ✅ clean request wrapper with retry + token refresh
   Future<HttpResponse> performRequest(
     String endpoint,
-    Map<String, dynamic> body,
-  ) async {
+    Map<String, dynamic> body, {
+    ApiType? apiType,
+  }) async {
+    // Ensure we have a fresh access token if firebaseApp/serviceAccount used
     String? currentAccessToken = accessToken;
-
-    // ✅ Ensure fresh token before request
     if (firebaseApp != null && serviceAccount != null) {
       currentAccessToken = await firebaseApp!.getValidAccessToken();
       if (currentAccessToken != null && currentAccessToken != accessToken) {
         accessToken = currentAccessToken;
       }
     }
+    final useAdmin =
+        apiType == ApiType.admin ||
+        (apiType == null && currentAccessToken != null && firebaseApp != null);
+    if (useAdmin) {
+      return await _performAdminRequest(endpoint, body, currentAccessToken);
+    } else {
+      return await _performClientRequest(endpoint, body, currentAccessToken);
+    }
+  }
 
+  Future<HttpResponse> _performAdminRequest(
+    String endpoint,
+    Map<String, dynamic> body,
+    String? token, {
+    int maxRetries = 2,
+  }) async {
+    if (projectId == null) {
+      throw FirebaseAuthException(
+        code: 'missing-project-id',
+        message: 'projectId is required for Admin API calls',
+      );
+    }
+    final url = Uri.https(
+      'firebase.googleapis.com',
+      '/v1/projects/$projectId/accounts$endpoint',
+    );
+    int attempt = 0;
+    while (attempt < maxRetries) {
+      attempt++;
+      final resp = await httpClient.post(
+        url,
+        headers: {
+          if (token != null) 'Authorization': 'Bearer $token',
+          'Content-Type': 'application/json',
+        },
+        body: json.encode(body),
+      );
+      if (resp.statusCode == 401 && firebaseApp != null && attempt == 1) {
+        await firebaseApp!.refreshAccessToken();
+        token = firebaseApp!.accessToken;
+        continue;
+      }
+      if (resp.statusCode < 200 || resp.statusCode >= 300) {
+        dynamic decoded;
+        try {
+          decoded = json.decode(resp.body);
+        } catch (_) {
+          decoded = null;
+        }
+        final code = decoded != null && decoded['error'] != null
+            ? decoded['error']['message'] ?? 'admin-api-error'
+            : 'admin-api-error';
+        final message = decoded != null && decoded['error'] != null
+            ? decoded['error']['message']
+            : resp.body;
+        throw FirebaseAuthException(code: code, message: message);
+      }
+      return HttpResponse(
+        statusCode: resp.statusCode,
+        body: json.decode(resp.body),
+        headers: resp.headers,
+      );
+    }
+    throw FirebaseAuthException(
+      code: 'max-retries-exceeded',
+      message: 'Admin request failed after $maxRetries attempts',
+    );
+  }
+
+  Future<HttpResponse> _performClientRequest(
+    String endpoint,
+    Map<String, dynamic> body,
+    String? token, {
+    int maxRetries = 2,
+  }) async {
+    if (apiKey == null || apiKey == 'your_api_key') {
+      throw FirebaseAuthException(
+        code: 'missing-api-key',
+        message: 'API Key is required for client endpoints',
+      );
+    }
     final url = Uri.https(
       'identitytoolkit.googleapis.com',
       '/v1/accounts:$endpoint',
-      {if (apiKey != 'your_api_key') 'key': apiKey},
+      {'key': apiKey},
     );
-
-    int retryCount = 0;
-    const maxRetries = 2;
-
-    while (retryCount < maxRetries) {
-      try {
-        final response = await httpClient.post(
-          url,
-          body: json.encode(body),
-          headers: {
-            if (currentAccessToken != null)
-              'Authorization': 'Bearer $currentAccessToken',
-            'Content-Type': 'application/json',
-          },
-        );
-
-        // ✅ Retry once if token expired
-        if (response.statusCode == 401 &&
-            retryCount == 0 &&
-            firebaseApp != null) {
-          log('⚠️ Got 401, refreshing token...');
+    int attempt = 0;
+    while (attempt < maxRetries) {
+      attempt++;
+      final resp = await httpClient.post(
+        url,
+        headers: {
+          if (token != null) 'Authorization': 'Bearer $token',
+          'Content-Type': 'application/json',
+        },
+        body: json.encode(body),
+      );
+      if (resp.statusCode != 200) {
+        dynamic decoded;
+        try {
+          decoded = json.decode(resp.body);
+        } catch (_) {
+          decoded = null;
+        }
+        final code = decoded != null && decoded['error'] != null
+            ? decoded['error']['message'] ?? 'client-api-error'
+            : 'client-api-error';
+        final message = decoded != null && decoded['error'] != null
+            ? decoded['error']['message']
+            : resp.body;
+        if (resp.statusCode == 401 && firebaseApp != null && attempt == 1) {
           await firebaseApp!.refreshAccessToken();
-          currentAccessToken = firebaseApp!.accessToken;
-          accessToken = currentAccessToken;
-          retryCount++;
+          token = firebaseApp!.accessToken;
           continue;
         }
-
-        if (response.statusCode != 200) {
-          final error = json.decode(response.body)['error'];
-          throw FirebaseAuthException(
-            code: error['message'],
-            message: error['message'],
-          );
-        }
-
-        return HttpResponse(
-          statusCode: response.statusCode,
-          body: json.decode(response.body),
-          headers: response.headers,
-        );
-      } catch (e) {
-        if (retryCount >= maxRetries - 1) rethrow;
-        retryCount++;
+        throw FirebaseAuthException(code: code, message: message);
       }
+      return HttpResponse(
+        statusCode: resp.statusCode,
+        body: json.decode(resp.body),
+        headers: resp.headers,
+      );
     }
-
     throw FirebaseAuthException(
       code: 'max-retries-exceeded',
-      message: 'Failed after $maxRetries attempts',
+      message: 'Client request failed after $maxRetries attempts',
     );
   }
 
@@ -430,15 +509,16 @@ class FirebaseAuth {
   }
 
   ///sign in with credentials
-  Future<Future<Object?>> signInWithCredential(
-    AuthCredential credential,
-  ) async {
+  /// Sign in with credentials
+  Future<Object?> signInWithCredential(AuthCredential credential) async {
     if (credential is EmailAuthCredential) {
       return signInWithEmailAndPassword(credential.email, credential.password);
     } else if (credential is PhoneAuthCredential) {
-      return signInWithPhoneNumber(
-        credential.verificationId,
-        credential.smsCode as ApplicationVerifier,
+      // Use PhoneAuth.confirmCode instead of non-existent signInWithPhoneNumber
+      final phoneAuth = PhoneAuth(this);
+      return await phoneAuth.confirmCode(
+        credential.verificationId, // sessionInfo
+        credential.smsCode, // user-entered SMS code
       );
     } else if (credential is OAuthCredential) {
       return signInWithPopup(credential.providerId as AuthProvider, clientId);
@@ -477,12 +557,22 @@ class FirebaseAuth {
   }
 
   /// Sign in with phone number
-  Future<ConfirmationResult> signInWithPhoneNumber(
+  Future<void> signInWithPhone(
     String phoneNumber,
     ApplicationVerifier appVerifier,
   ) async {
     try {
-      return await phone.signInWithPhoneNumber(phoneNumber, appVerifier);
+      // Step 1: send verification code
+      final sessionInfo = await phone.sendVerificationCode(
+        phoneNumber,
+        appVerifier,
+      );
+
+      // Step 2: confirm code (UI should collect smsCode from user)
+      // final smsCode = await askUserForSmsCode(); // <- your UI logic here
+      final user = await phone.confirmCode(sessionInfo, 'smsCode');
+
+      log('[PhoneAuth] Signed in as ${user.uid}');
     } catch (e) {
       throw FirebaseAuthException(
         code: 'phone-auth-error',

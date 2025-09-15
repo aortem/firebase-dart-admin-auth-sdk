@@ -56,6 +56,10 @@ class FirebaseApp {
     this._serviceAccount,
     this.accessToken,
   );
+
+  // --- token refresh concurrency control ---
+  static Completer<void>? _refreshCompleter;
+
   bool _isTokenValid() {
     if (accessToken == null || tokenExpiryTime == null) return false;
     return DateTime.now().isBefore(
@@ -69,17 +73,22 @@ class FirebaseApp {
   /// Used only in unit tests to reset static state.
   @visibleForTesting
   static void resetForTests() {
-    httpClient = http.Client(); // back to default
-    _instance = null; // if you have a cached singleton
+    httpClient = http.Client();
+    _instance = null;
+    _refreshCompleter = null;
+    firebaseAuth = null;
+    firebaseStorage = null;
   }
 
   /// Refreshes OAuth2 token
   Future<void> refreshAccessToken() async {
-    if (_isRefreshing) {
-      await Future.delayed(Duration(milliseconds: 100));
+    // If already refreshing, wait for it and return
+    if (_refreshCompleter != null) {
+      await _refreshCompleter!.future;
       return;
     }
-    _isRefreshing = true;
+
+    _refreshCompleter = Completer<void>();
 
     try {
       if (_serviceAccount == null) {
@@ -99,8 +108,13 @@ class FirebaseApp {
       tokenExpiryTime = DateTime.now().add(Duration(seconds: expiresIn));
 
       log('✅ Access token refreshed, expires at $tokenExpiryTime');
+    } catch (e) {
+      log('⚠️ refreshAccessToken failed: $e');
+      rethrow;
     } finally {
-      _isRefreshing = false;
+      // Complete the completer and clear it
+      _refreshCompleter?.complete();
+      _refreshCompleter = null;
     }
   }
 
@@ -120,9 +134,7 @@ class FirebaseApp {
   }
 
   /// Method to get the current User
-  User? getCurrentUser() {
-    return _currentUser;
-  }
+  User? getCurrentUser() => _currentUser;
 
   ///Exposed the firebase app singleton
   static FirebaseApp get instance {
@@ -131,6 +143,8 @@ class FirebaseApp {
     }
     return _instance!;
   }
+
+  // --- Initialization methods ---
 
   ///Used to initialize the project with enviroment variables
   ///[apiKey] is the API Key associated with the project
@@ -414,9 +428,10 @@ class FirebaseApp {
       body: jsonEncode({
         'scope': [
           'https://www.googleapis.com/auth/cloud-platform',
-          'https://www.googleapis.com/auth/firebase.database',
+          'https://www.googleapis.com/auth/firebase',
+          'https://www.googleapis.com/auth/identitytoolkit',
           'https://www.googleapis.com/auth/datastore',
-          // Add other scopes as needed
+          'https://www.googleapis.com/auth/firebase.database',
         ],
       }),
     );
@@ -476,23 +491,36 @@ class FirebaseApp {
   // For GKE Workload Identity
   static Future<FirebaseApp> initializeAppWithWorkloadIdentity({
     required String targetServiceAccount,
+    required String firebaseProjectId,
   }) async {
     if (!await _isRunningOnGCP()) {
       throw Exception("Not running on GCP - Workload Identity unavailable");
     }
 
     final accessToken = await _getTokenFromMetadataServer(targetServiceAccount);
-    return _initializeWithAccessToken(accessToken, targetServiceAccount);
+    return _initializeWithAccessToken(
+      accessToken,
+      targetServiceAccount,
+      firebaseProjectId,
+    );
   }
 
   // For Workforce Identity Federation (external IdP like GitHub, Azure AD, etc.)
+  /// See: https://cloud.google.com/iam/docs/workload-identity-federation
   static Future<FirebaseApp> initializeAppWithWorkloadIdentityFederation({
     required String targetServiceAccount,
     required String externalToken,
     required String projectNumber,
     required String workforcePoolId,
     required String providerId,
+    required String firebaseProjectId,
   }) async {
+    if (externalToken.isEmpty) throw ArgumentError('externalToken required');
+    if (projectNumber.isEmpty) throw ArgumentError('projectNumber required');
+    if (workforcePoolId.isEmpty)
+      throw ArgumentError('workforcePoolId required');
+    if (providerId.isEmpty) throw ArgumentError('providerId required');
+
     final accessToken = await _exchangeExternalToken(
       externalToken,
       targetServiceAccount,
@@ -500,45 +528,12 @@ class FirebaseApp {
       workforcePoolId,
       providerId,
     );
-    if (externalToken.isEmpty) throw ArgumentError('externalToken required');
-    if (projectNumber.isEmpty) throw ArgumentError('projectNumber required');
-    if (workforcePoolId.isEmpty)
-      throw ArgumentError('workforcePoolId required');
-    if (providerId.isEmpty) throw ArgumentError('providerId required');
-
-    return _initializeWithAccessToken(accessToken, targetServiceAccount);
+    return _initializeWithAccessToken(
+      accessToken,
+      targetServiceAccount,
+      firebaseProjectId,
+    );
   }
-
-  // static Future<FirebaseApp> initializeAppWithWorkloadIdentity({
-  //   required String targetServiceAccount,
-  //   String? externalToken,
-  //   String? projectNumber,
-  //   String? workforcePoolId,
-  //   String? providerId,
-  // }) async {
-  //   String accessToken;
-
-  //   if (externalToken != null) {
-  //     // External IdP flow
-  //     accessToken = await _exchangeExternalToken(
-  //       externalToken,
-  //       targetServiceAccount,
-  //       projectNumber!,
-  //       workforcePoolId!,
-  //       providerId!,
-  //     );
-  //   } else if (await _isRunningOnGCP()) {
-  //     // GCP Workload Identity flow
-  //     accessToken = await _getTokenFromMetadataServer(targetServiceAccount);
-  //   } else {
-  //     throw Exception(
-  //       "Workload Identity initialization failed: External token not provided and GCP metadata server unavailable",
-  //     );
-  //   }
-
-  //   // Initialize Firebase with obtained token
-  //   return _initializeWithAccessToken(accessToken, targetServiceAccount);
-  // }
 
   /// Detect if running on GCP (metadata server available)
   static Future<bool> _isRunningOnGCP() async {
@@ -565,37 +560,42 @@ class FirebaseApp {
   ) async {
     final audience =
         "//iam.googleapis.com/projects/$projectNumber/locations/global/workforcePools/$workforcePoolId/providers/$providerId";
-
-    // 1. Exchange external IdP token via STS (must use URL-encoded string)
+    final body = <String, String>{
+      'grant_type': 'urn:ietf:params:oauth:grant-type:token-exchange',
+      'audience': audience,
+      'scope': 'https://www.googleapis.com/auth/cloud-platform',
+      'requested_token_type': 'urn:ietf:params:oauth:token-type:access_token',
+      'subject_token_type': 'urn:ietf:params:oauth:token-type:access_token',
+      'subject_token': externalToken,
+    };
     final stsResponse = await httpClient.post(
-      Uri.parse("https://sts.googleapis.com/v1/token"),
-      headers: {"Content-Type": "application/x-www-form-urlencoded"},
-      body:
-          'grant_type=urn:ietf:params:oauth:grant-type:token-exchange'
-          '&audience=${Uri.encodeComponent(audience)}'
-          '&scope=${Uri.encodeComponent("https://www.googleapis.com/auth/cloud-platform")}'
-          // '&subject_token_type=urn:ietf:params:oauth:token-type:id_token'
-          // '&subject_token=${Uri.encodeComponent(externalToken)}',
-          // 👇 FIX HERE
-          '&requested_token_type=urn:ietf:params:oauth:token-type:access_token'
-          '&subject_token_type=urn:ietf:params:oauth:token-type:access_token'
-          '&subject_token=${Uri.encodeComponent(externalToken)}',
+      Uri.parse('https://sts.googleapis.com/v1/token'),
+      headers: {'Content-Type': 'application/x-www-form-urlencoded'},
+      body: body.entries
+          .map(
+            (e) =>
+                '${Uri.encodeComponent(e.key)}=${Uri.encodeComponent(e.value)}',
+          )
+          .join('&'),
     );
 
     if (stsResponse.statusCode != 200) {
-      throw Exception("STS exchange failed: ${stsResponse.body}");
+      throw Exception('STS exchange failed: ${stsResponse.body}');
     }
-    final stsJson = jsonDecode(stsResponse.body);
-    final stsAccessToken = stsJson["access_token"];
-    final expiresIn = stsJson["expires_in"] ?? 3600;
 
-    // 2. Impersonate service account
+    final stsJson = jsonDecode(stsResponse.body) as Map<String, dynamic>;
+    final stsAccessToken = stsJson['access_token'] as String?;
+    final expiresIn = stsJson['expires_in'] as int? ?? 3600;
+
+    if (stsAccessToken == null) {
+      throw Exception('STS response did not contain access_token');
+    }
+
     final impersonatedAccessToken = await _impersonateServiceAccount(
       stsAccessToken,
       targetServiceAccount,
     );
 
-    // Save expiry to singleton (so refresh works properly)
     _instance?.tokenExpiryTime = DateTime.now().add(
       Duration(seconds: expiresIn),
     );
@@ -617,9 +617,13 @@ class FirebaseApp {
     if (adcResponse.statusCode != 200) {
       throw Exception("Failed to get ADC token: ${adcResponse.body}");
     }
-    final adcJson = jsonDecode(adcResponse.body);
-    final adcAccessToken = adcJson["access_token"];
-    final expiresIn = adcJson["expires_in"] ?? 3600;
+    final adcJson = jsonDecode(adcResponse.body) as Map<String, dynamic>;
+    final adcAccessToken = adcJson['access_token'] as String?;
+    final expiresIn = adcJson['expires_in'] as int? ?? 3600;
+
+    if (adcAccessToken == null) {
+      throw Exception('Metadata server did not return an access token');
+    }
 
     final impersonatedAccessToken = await _impersonateServiceAccount(
       adcAccessToken,
@@ -637,16 +641,17 @@ class FirebaseApp {
   static Future<FirebaseApp> _initializeWithAccessToken(
     String accessToken,
     String targetServiceAccount,
+    String firebaseProjectId,
   ) async {
     // Extract projectId from service account email (firebase-admin@<project-id>.iam.gserviceaccount.com)
     final projectId = targetServiceAccount.split('@')[1].split('.')[0];
 
     _instance = FirebaseApp._(
       null,
-      projectId, // projectId dynamically resolved
-      '$projectId.firebaseapp.com', // auth domain
+      firebaseProjectId, // projectId dynamically resolved
+      '$firebaseProjectId.firebaseapp.com', // auth domain
       '', // messaging sender ID (can be set if needed)
-      '$projectId.appspot.com', // bucket name
+      '$firebaseProjectId.appspot.com', // bucket name
       '', // app ID (optional, can be set)
       null,
       accessToken,
@@ -663,13 +668,23 @@ class FirebaseApp {
   //e Auth instance associated with the Project
   ///Throws not initialized if Firebase app is not intialized
   FirebaseAuth getAuth() {
-    if (accessToken == null) assert(_apiKey != null, 'API Key is null');
-    assert(_projectId != null, 'Project ID is null');
-    if (_instance == null) {
-      throw ("FirebaseApp is not initialized. Please call initializeApp() first.");
+    if (accessToken == null && _apiKey == null) {
+      throw Exception(
+        'No credentials available. Provide either an API key (client flows) or an access token/service account (admin flows).',
+      );
     }
+
+    if (_projectId == null) {
+      throw Exception('Project ID is null');
+    }
+
+    if (_instance == null) {
+      throw ('FirebaseApp is not initialized. Please call initializeApp() first.');
+    }
+
+    // Background refresh if necessary and we have a service account
     if (!_isTokenValid() && _serviceAccount != null) {
-      // Kick off background refresh (non-blocking)
+      // Fire-and-forget refresh — callers should use getValidAccessToken() where they need the token immediately
       Future.microtask(() => refreshAccessToken());
     }
 

@@ -1,10 +1,10 @@
 import 'dart:convert';
-import '../exceptions.dart';
+import 'package:firebase_dart_admin_auth_sdk/firebase_dart_admin_auth_sdk.dart';
 
 ///fetchsignin
 class FetchSignInMethodsService {
   ///auth
-  final dynamic auth;
+  final FirebaseAuth auth;
 
   ///fetch signin
   FetchSignInMethodsService({required this.auth});
