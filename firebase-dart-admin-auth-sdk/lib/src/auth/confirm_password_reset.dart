@@ -1,10 +1,10 @@
 import 'dart:convert';
-import 'package:firebase_dart_admin_auth_sdk/src/exceptions.dart';
+import 'package:firebase_dart_admin_auth_sdk/firebase_dart_admin_auth_sdk.dart';
 
 ///confirmpassword service
 class ConfirmPasswordResetService {
   ///firebase auth instance
-  final dynamic auth;
+  final FirebaseAuth auth;
 
   ///confirmpassword service
   ConfirmPasswordResetService({required this.auth});
