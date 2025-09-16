@@ -2,8 +2,28 @@ import 'package:firebase_dart_admin_auth_sdk/firebase_dart_admin_auth_sdk.dart';
 
 ///auth provider
 abstract class AuthProvider {
-  ///provider id
+  /// The provider ID for the authentication provider.
   String get providerId;
+
+  /// Returns an AuthProvider instance based on the given providerId.
+  static AuthProvider fromProviderId(String providerId) {
+    switch (providerId) {
+      case 'google.com':
+        return GoogleAuthProvider();
+      case 'facebook.com':
+        return FacebookAuthProvider();
+      case 'github.com':
+        return GithubAuthProvider();
+      case 'twitter.com':
+        return TwitterAuthProvider();
+      // add more as needed
+      default:
+        throw FirebaseAuthException(
+          code: 'unknown-provider',
+          message: 'Unsupported providerId: $providerId',
+        );
+    }
+  }
 }
 
 ///facebook

@@ -33,6 +33,8 @@ void main() {
       });
 
       final app = await FirebaseApp.initializeAppWithWorkloadIdentity(
+        firebaseProjectId: 'myproj',
+
         targetServiceAccount: 'test-sa@myproj.iam.gserviceaccount.com',
       );
 
@@ -47,6 +49,8 @@ void main() {
 
       expect(
         () => FirebaseApp.initializeAppWithWorkloadIdentity(
+          firebaseProjectId: 'myproj',
+
           targetServiceAccount: 'test-sa@myproj.iam.gserviceaccount.com',
         ),
         throwsA(
