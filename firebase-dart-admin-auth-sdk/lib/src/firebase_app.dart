@@ -10,6 +10,7 @@ import 'package:firebase_dart_admin_auth_sdk/src/firebase_auth.dart';
 import 'package:firebase_dart_admin_auth_sdk/src/firebase_storage.dart';
 import 'package:firebase_dart_admin_auth_sdk/src/service_account.dart';
 import 'package:firebase_dart_admin_auth_sdk/src/user.dart';
+import 'package:firebase_dart_admin_auth_sdk/src/workload_identity_token_provider.dart';
 import 'auth/generate_custom_token.dart';
 import 'auth/get_access_token_with_generated_token.dart';
 
@@ -36,6 +37,7 @@ class FirebaseApp {
   static const Duration tokenRefreshBuffer = Duration(minutes: 5); // new
   ServiceAccount? _serviceAccount;
 
+  /// HTTP client for making requests
   static http.Client httpClient = http.Client();
 
   ///The class to interact with the various firebase auth methods
@@ -45,6 +47,8 @@ class FirebaseApp {
 
   ///The class to interact with the various firebase storage methods
   static FirebaseStorage? firebaseStorage;
+  static bool _cachedIsGCP = false;
+  static bool? _isGCPChecked;
 
   FirebaseApp._(
     this._apiKey,
@@ -78,6 +82,8 @@ class FirebaseApp {
     _refreshCompleter = null;
     firebaseAuth = null;
     firebaseStorage = null;
+    _isGCPChecked = null;
+    _cachedIsGCP = false;
   }
 
   /// Refreshes OAuth2 token
@@ -139,11 +145,12 @@ class FirebaseApp {
   ///Exposed the firebase app singleton
   static FirebaseApp get instance {
     if (_instance == null) {
-      throw ("FirebaseApp is not initialized. Please call initializeApp() first.");
+      throw StateError(
+        "FirebaseApp is not initialized. Call initializeApp() first.",
+      );
     }
     return _instance!;
   }
-
   // --- Initialization methods ---
 
   ///Used to initialize the project with enviroment variables
@@ -279,14 +286,18 @@ class FirebaseApp {
     final accessToken = await accessTokenGen.getAccessTokenWithGeneratedToken(
       jwt,
     );
+    final projectId = serviceAccount['project_id'];
+    if (projectId == null) {
+      throw Exception('Missing project_id in service account JSON');
+    }
 
     return _instance ??= FirebaseApp._(
-      'your_api_key',
-      'your_project_id',
-      'your_auth_domain',
-      'your_messaging_sender_id',
-      'your_bucket_name',
-      'your_app_id',
+      null,
+      projectId, // projectId dynamically resolved
+      '$projectId.firebaseapp.com', // auth domain
+      '', // messaging sender ID (can be set if needed)
+      '$projectId.appspot.com', // bucket name
+      '', // app ID (optional, can be set)
       serviceAccountModel,
       accessToken,
     );
@@ -298,6 +309,7 @@ class FirebaseApp {
   static Future<FirebaseApp> initializeAppWithServiceAccountImpersonationGCP({
     required String gcpAccessToken,
     required String impersonatedEmail,
+    required String firebaseProjectId,
   }) async {
     final accessTokenGen = _accessTokenGen ??=
         GetAccessTokenWithGcpTokenImplementation();
@@ -308,12 +320,12 @@ class FirebaseApp {
     );
 
     return _instance ??= FirebaseApp._(
-      'your_api_key',
-      'your_project_id',
-      'your_auth_domain',
-      'your_messaging_sender_id',
-      'your_bucket_name',
-      'your_app_id',
+      null,
+      firebaseProjectId, // firebaseProjectId dynamically resolved
+      '$firebaseProjectId.firebaseapp.com', // auth domain
+      '', // messaging sender ID (can be set if needed)
+      '$firebaseProjectId.appspot.com', // bucket name
+      '', // app ID (optional, can be set)
       null,
       accessToken,
     );
@@ -493,16 +505,27 @@ class FirebaseApp {
     required String targetServiceAccount,
     required String firebaseProjectId,
   }) async {
-    if (!await _isRunningOnGCP()) {
-      throw Exception("Not running on GCP - Workload Identity unavailable");
-    }
-
-    final accessToken = await _getTokenFromMetadataServer(targetServiceAccount);
-    return _initializeWithAccessToken(
-      accessToken,
-      targetServiceAccount,
-      firebaseProjectId,
+    final provider = WorkloadIdentityTokenProvider(
+      targetServiceAccount: targetServiceAccount,
+      firebaseProjectId: firebaseProjectId,
+      client: httpClient,
     );
+
+    final tokenInfo = await provider.getAccessToken();
+
+    _instance = FirebaseApp._(
+      null,
+      firebaseProjectId,
+      '$firebaseProjectId.firebaseapp.com',
+      '',
+      '$firebaseProjectId.appspot.com',
+      '',
+      null,
+      tokenInfo.accessToken,
+    )..tokenExpiryTime = tokenInfo.expiry;
+
+    log("✅ Firebase initialized with Workload Identity for $firebaseProjectId");
+    return _instance!;
   }
 
   // For Workforce Identity Federation (external IdP like GitHub, Azure AD, etc.)
@@ -517,8 +540,9 @@ class FirebaseApp {
   }) async {
     if (externalToken.isEmpty) throw ArgumentError('externalToken required');
     if (projectNumber.isEmpty) throw ArgumentError('projectNumber required');
-    if (workforcePoolId.isEmpty)
+    if (workforcePoolId.isEmpty) {
       throw ArgumentError('workforcePoolId required');
+    }
     if (providerId.isEmpty) throw ArgumentError('providerId required');
 
     final accessToken = await _exchangeExternalToken(
@@ -535,8 +559,9 @@ class FirebaseApp {
     );
   }
 
-  /// Detect if running on GCP (metadata server available)
   static Future<bool> _isRunningOnGCP() async {
+    if (_isGCPChecked != null) return _cachedIsGCP;
+
     try {
       final response = await httpClient
           .get(
@@ -544,10 +569,12 @@ class FirebaseApp {
             headers: {"Metadata-Flavor": "Google"},
           )
           .timeout(const Duration(seconds: 1));
-      return response.statusCode == 200;
+      _cachedIsGCP = response.statusCode == 200;
     } catch (_) {
-      return false;
+      _cachedIsGCP = false;
     }
+    _isGCPChecked = true;
+    return _cachedIsGCP;
   }
 
   /// Exchange external IdP token for Firebase access token
@@ -673,21 +700,19 @@ class FirebaseApp {
         'No credentials available. Provide either an API key (client flows) or an access token/service account (admin flows).',
       );
     }
-
     if (_projectId == null) {
-      throw Exception('Project ID is null');
+      throw StateError('Project ID is null');
     }
 
-    if (_instance == null) {
-      throw ('FirebaseApp is not initialized. Please call initializeApp() first.');
-    }
-
-    // Background refresh if necessary and we have a service account
     if (!_isTokenValid() && _serviceAccount != null) {
-      // Fire-and-forget refresh — callers should use getValidAccessToken() where they need the token immediately
-      Future.microtask(() => refreshAccessToken());
+      Future.microtask(() async {
+        try {
+          await refreshAccessToken();
+        } catch (e) {
+          log('⚠️ Background token refresh failed: $e');
+        }
+      });
     }
-
     return firebaseAuth ??= FirebaseAuth(
       apiKey: _apiKey,
       projectId: _projectId,
@@ -706,12 +731,12 @@ class FirebaseApp {
   ///[apiKey] is the API Key associated with the project
   ///[projectId] is the ID of the project
   FirebaseStorage getStorage() {
-    assert(_apiKey != null, 'API Key is null');
-    assert(_projectId != null, 'Project ID is null');
     if (_instance == null) {
-      throw ("FirebaseApp is not initialized. Please call initializeApp() first.");
+      throw StateError(
+        "FirebaseApp is not initialized. Call initializeApp() first.",
+      );
     }
-    // Use the getStorage method to obtain a FirebaseStorage instance
+
     return firebaseStorage ??= FirebaseStorage.getStorage(
       apiKey: _apiKey!,
       projectId: _projectId!,

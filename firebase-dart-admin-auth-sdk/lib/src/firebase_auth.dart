@@ -257,7 +257,6 @@ class FirebaseAuth {
     updateUserService = UpdateCurrentUser(auth: this);
     useDeviceLanguage = UseDeviceLanguageService(auth: this);
     verifyPasswordReset = VerifyPasswordResetCodeService(auth: this);
-    applyAction = ApplyActionCode(this);
 
     _reloadUser = ReloadUser(auth: this);
     _sendEmailVerificationCode = SendEmailVerificationCode(auth: this);
@@ -273,8 +272,7 @@ class FirebaseAuth {
     applyAction = ApplyActionCode(this);
     _appleAuth = AppleSignInAuth(this);
     _gcpAuth = GCPAuth(this);
-
-    _recaptchaVerifier = createRecaptchaVerifier('your-site-key');
+    _recaptchaVerifier = createRecaptchaVerifier(appId ?? '');
     _popupRedirectResolver = createPopupRedirectResolver();
     _recaptchaConfigService = createRecaptchaConfigService();
     fetchSignInMethods = FetchSignInMethodsService(auth: this);
@@ -509,7 +507,7 @@ class FirebaseAuth {
   }
 
   ///sign in with credentials
-  /// Sign in with credentials
+
   Future<Object?> signInWithCredential(AuthCredential credential) async {
     if (credential is EmailAuthCredential) {
       return signInWithEmailAndPassword(credential.email, credential.password);
@@ -521,7 +519,9 @@ class FirebaseAuth {
         credential.smsCode, // user-entered SMS code
       );
     } else if (credential is OAuthCredential) {
-      return signInWithPopup(credential.providerId as AuthProvider, clientId);
+      // Map providerId string to actual AuthProvider instance
+      final provider = AuthProvider.fromProviderId(credential.providerId);
+      return signInWithPopup(provider, clientId);
     } else {
       throw FirebaseAuthException(
         code: 'unsupported-credential',
@@ -588,8 +588,8 @@ class FirebaseAuth {
 
   /// Sign out
   Future<void> signOut() async {
-    log("hekko");
-    log("hekko${FirebaseApp.instance.getCurrentUser()}");
+    log('[FirebaseAuth] SignOut: currentUser=${currentUser?.uid}');
+
     if (FirebaseApp.instance.getCurrentUser() == null) {
       throw FirebaseAuthException(
         code: 'user-not-signed-in',
@@ -654,6 +654,13 @@ class FirebaseAuth {
   /// Set device language
   Future<void> deviceLanguage(String languageCode) async {
     try {
+      if (currentUser?.idToken == null) {
+        throw FirebaseAuthException(
+          code: 'no-current-user',
+          message: 'No signed-in user available for this operation',
+        );
+      }
+
       await useDeviceLanguage.useDeviceLanguage(
         currentUser!.idToken!,
         languageCode,

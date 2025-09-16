@@ -33,6 +33,7 @@ void main() {
         projectNumber: '1234567890',
         workforcePoolId: 'pool-1',
         providerId: 'provider-1',
+        firebaseProjectId: 'myproj',
       );
 
       expect(app.accessToken, 'impersonated_token');
@@ -53,6 +54,7 @@ void main() {
           externalToken: 'bad',
           projectNumber: '1234567890',
           workforcePoolId: 'pool-1',
+          firebaseProjectId: 'myproj',
           providerId: 'provider-1',
         ),
         throwsA(predicate((e) => e.toString().contains('STS exchange failed'))),
@@ -66,6 +68,7 @@ void main() {
           targetServiceAccount: 'test-sa@myproj.iam.gserviceaccount.com',
           externalToken: '',
           projectNumber: '',
+          firebaseProjectId: 'myproj',
           workforcePoolId: '',
           providerId: '',
         ),
