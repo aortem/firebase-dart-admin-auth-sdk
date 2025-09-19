@@ -111,8 +111,7 @@ class WorkloadIdentityTokenProvider {
       final creds = client.credentials;
       return AccessTokenInfo(
         creds.accessToken.data,
-        creds.accessToken.expiry?.toUtc() ??
-            DateTime.now().toUtc().add(const Duration(hours: 1)),
+        creds.accessToken.expiry.toUtc(),
       );
     } finally {
       client.close();

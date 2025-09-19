@@ -1,3 +1,5 @@
+// ignore_for_file: unused_field
+
 import 'dart:async';
 import 'dart:convert';
 import 'dart:developer';
@@ -72,7 +74,7 @@ class FirebaseApp {
   }
 
   /// Refreshes OAuth2 token
-  static bool _isRefreshing = false;
+  static final bool _isRefreshing = false;
 
   /// Used only in unit tests to reset static state.
   @visibleForTesting
@@ -575,23 +577,23 @@ class FirebaseApp {
     );
   }
 
-  static Future<bool> _isRunningOnGCP() async {
-    if (_isGCPChecked != null) return _cachedIsGCP;
+  // static Future<bool> _isRunningOnGCP() async {
+  //   if (_isGCPChecked != null) return _cachedIsGCP;
 
-    try {
-      final response = await httpClient
-          .get(
-            Uri.parse("http://metadata.google.internal"),
-            headers: {"Metadata-Flavor": "Google"},
-          )
-          .timeout(const Duration(seconds: 1));
-      _cachedIsGCP = response.statusCode == 200;
-    } catch (_) {
-      _cachedIsGCP = false;
-    }
-    _isGCPChecked = true;
-    return _cachedIsGCP;
-  }
+  //   try {
+  //     final response = await httpClient
+  //         .get(
+  //           Uri.parse("http://metadata.google.internal"),
+  //           headers: {"Metadata-Flavor": "Google"},
+  //         )
+  //         .timeout(const Duration(seconds: 1));
+  //     _cachedIsGCP = response.statusCode == 200;
+  //   } catch (_) {
+  //     _cachedIsGCP = false;
+  //   }
+  //   _isGCPChecked = true;
+  //   return _cachedIsGCP;
+  // }
 
   /// Exchange external IdP token for Firebase access token
   static Future<String> _exchangeExternalToken(
@@ -647,38 +649,38 @@ class FirebaseApp {
   }
 
   /// Get token from GCP metadata server (Workload Identity on GKE/Cloud Run)
-  static Future<String> _getTokenFromMetadataServer(
-    String targetServiceAccount,
-  ) async {
-    final adcResponse = await httpClient.get(
-      Uri.parse(
-        "http://metadata.google.internal/computeMetadata/v1/instance/service-accounts/default/token",
-      ),
-      headers: {"Metadata-Flavor": "Google"},
-    );
+  // static Future<String> _getTokenFromMetadataServer(
+  //   String targetServiceAccount,
+  // ) async {
+  //   final adcResponse = await httpClient.get(
+  //     Uri.parse(
+  //       "http://metadata.google.internal/computeMetadata/v1/instance/service-accounts/default/token",
+  //     ),
+  //     headers: {"Metadata-Flavor": "Google"},
+  //   );
 
-    if (adcResponse.statusCode != 200) {
-      throw Exception("Failed to get ADC token: ${adcResponse.body}");
-    }
-    final adcJson = jsonDecode(adcResponse.body) as Map<String, dynamic>;
-    final adcAccessToken = adcJson['access_token'] as String?;
-    final expiresIn = adcJson['expires_in'] as int? ?? 3600;
+  //   if (adcResponse.statusCode != 200) {
+  //     throw Exception("Failed to get ADC token: ${adcResponse.body}");
+  //   }
+  //   final adcJson = jsonDecode(adcResponse.body) as Map<String, dynamic>;
+  //   final adcAccessToken = adcJson['access_token'] as String?;
+  //   final expiresIn = adcJson['expires_in'] as int? ?? 3600;
 
-    if (adcAccessToken == null) {
-      throw Exception('Metadata server did not return an access token');
-    }
+  //   if (adcAccessToken == null) {
+  //     throw Exception('Metadata server did not return an access token');
+  //   }
 
-    final impersonatedAccessToken = await _impersonateServiceAccount(
-      adcAccessToken,
-      targetServiceAccount,
-    );
+  //   final impersonatedAccessToken = await _impersonateServiceAccount(
+  //     adcAccessToken,
+  //     targetServiceAccount,
+  //   );
 
-    _instance?.tokenExpiryTime = DateTime.now().add(
-      Duration(seconds: expiresIn),
-    );
+  //   _instance?.tokenExpiryTime = DateTime.now().add(
+  //     Duration(seconds: expiresIn),
+  //   );
 
-    return impersonatedAccessToken;
-  }
+  //   return impersonatedAccessToken;
+  // }
 
   /// Final initializer with access token (Fix: no hardcoded values, projectId extracted)
   static Future<FirebaseApp> _initializeWithAccessToken(

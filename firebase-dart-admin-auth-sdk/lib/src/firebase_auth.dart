@@ -1019,9 +1019,9 @@ class FirebaseAuth {
 
         // Set token expiration
         if (userData['expiresIn'] != null) {
-          final expiresIn = userData['expiresIn'] is String
-              ? int.tryParse(userData['expiresIn']) ?? 3600
-              : userData['expiresIn'] as int;
+          // final expiresIn = userData['expiresIn'] is String
+          //     ? int.tryParse(userData['expiresIn']) ?? 3600
+          //     : userData['expiresIn'] as int;
           // This would need to be set via reflection or a setter method
           // For now, the User constructor should handle this
         }
