@@ -1,32 +1,16 @@
 import 'dart:convert';
-import 'dart:developer';
-import 'package:firebase_dart_admin_auth_sdk/firebase_dart_admin_auth_sdk.dart';
+import 'package:firebase_dart_admin_auth_sdk/src/exceptions.dart';
 
-/// Password reset service
+///password reset
 class PasswordResetEmailService {
-  /// Firebase Auth instance
-  final FirebaseAuth auth;
+  ///auth
+  final dynamic auth;
 
-  /// Constructor
+  ///password reset
   PasswordResetEmailService({required this.auth});
 
-  /// Send password reset email
+  ///password reset function
   Future<void> sendPasswordResetEmail(String email) async {
-    try {
-      // Try Admin API first
-      await auth.performRequest('/sendOobCode', {
-        'requestType': 'PASSWORD_RESET',
-        'email': email,
-      }, apiType: ApiType.admin);
-    } catch (e) {
-      log('[PasswordReset] Admin API failed, falling back to client API: $e');
-      // Fallback to client API
-      await _sendPasswordResetEmailClient(email);
-    }
-  }
-
-  /// Fallback client API call
-  Future<void> _sendPasswordResetEmailClient(String email) async {
     try {
       final url = Uri.https(
         'identitytoolkit.googleapis.com',

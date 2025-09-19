@@ -1,15 +1,15 @@
 import 'dart:developer';
 import 'package:firebase_dart_admin_auth_sdk/firebase_dart_admin_auth_sdk.dart';
 
-/// Email/Password Auth
+///emailpasswordauth
 class EmailPasswordAuth {
-  /// Firebase Auth instance
+  ///auth
   final FirebaseAuth auth;
 
-  /// Constructor
+  ///emailpassword
   EmailPasswordAuth(this.auth);
 
-  /// Sign in with email & password
+  ///signin
   Future<UserCredential?> signIn(String email, String password) async {
     try {
       final response = await auth.performRequest('signInWithPassword', {
@@ -17,13 +17,12 @@ class EmailPasswordAuth {
         'password': password,
         'returnSecureToken': true,
       });
-
       print(response.body.toString());
 
       if (response.statusCode == 200) {
+        // Pass apiKey when creating UserCredential
         final userData = response.body;
         final user = User.fromJson(userData, apiKey: auth.apiKey);
-
         final userCredential = UserCredential(
           user: user,
           additionalUserInfo: AdditionalUserInfo(
@@ -46,83 +45,63 @@ class EmailPasswordAuth {
         );
       }
     } catch (e) {
-      if (e is FirebaseAuthException) rethrow;
+      if (e is FirebaseAuthException) {
+        rethrow;
+      }
       throw FirebaseAuthException(code: 'auth-error', message: e.toString());
     }
   }
 
-  /// Sign up with email & password
+  ///signup
   Future<UserCredential?> signUp(String email, String password) async {
     try {
       log('[EmailPasswordAuth.signUp] Starting signup for: $email');
       log('[EmailPasswordAuth.signUp] Auth API Key: ${auth.apiKey}');
 
-      // Try Admin API first
-      final response = await auth.performRequest('/batchCreate', {
-        'users': [
-          {
-            'email': email,
-            'password': password,
-            'emailVerified': false,
-            'disabled': false,
-          },
-        ],
-      }, apiType: ApiType.admin);
-
-      if (response.statusCode == 200) {
-        final userData = response.body['users'][0];
-        final user = User.fromJson(userData, apiKey: auth.apiKey);
-
-        final userCredential = UserCredential(
-          user: user,
-          additionalUserInfo: AdditionalUserInfo(
-            isNewUser: true,
-            providerId: 'password',
-          ),
-          operationType: 'signUp',
-        );
-
-        auth.updateCurrentUser(userCredential.user);
-        FirebaseApp.instance.setCurrentUser(userCredential.user);
-
-        return userCredential;
-      }
-    } catch (e) {
-      log(
-        '[EmailPasswordAuth] Admin API failed, falling back to client API: $e',
-      );
-    }
-
-    // Fallback → Client API
-    return _signUpWithClientAPI(email, password);
-  }
-
-  /// Private client API signup fallback
-  Future<UserCredential?> _signUpWithClientAPI(
-    String email,
-    String password,
-  ) async {
-    try {
       final response = await auth.performRequest('signUp', {
         'email': email,
         'password': password,
         'returnSecureToken': true,
       });
 
-      log(
-        '[EmailPasswordAuth._signUpWithClientAPI] Response status: ${response.statusCode}',
-      );
+      log('[EmailPasswordAuth.signUp] Response status: ${response.statusCode}');
 
       if (response.statusCode == 200) {
         final userData = response.body;
+
+        // Debug the response
+        log(
+          '[EmailPasswordAuth.signUp] Response idToken exists: ${userData['idToken'] != null}',
+        );
+        log(
+          '[EmailPasswordAuth.signUp] Response refreshToken exists: ${userData['refreshToken'] != null}',
+        );
+
+        // Pass apiKey when creating User
         final user = User.fromJson(userData, apiKey: auth.apiKey);
+
+        // Verify user was created correctly
+        log('[EmailPasswordAuth.signUp] Created User:');
+        log('[EmailPasswordAuth.signUp] - uid: ${user.uid}');
+        log('[EmailPasswordAuth.signUp] - email: ${user.email}');
+        log(
+          '[EmailPasswordAuth.signUp] - idToken exists: ${user.idToken != null}',
+        );
+        log(
+          '[EmailPasswordAuth.signUp] - refreshToken exists: ${user.refreshToken != null}',
+        );
+        log(
+          '[EmailPasswordAuth.signUp] - apiKey exists: ${user.apiKey != null}',
+        );
+
+        final additionalUserInfo = AdditionalUserInfo(
+          isNewUser: true,
+          providerId: 'password',
+        );
 
         final userCredential = UserCredential(
           user: user,
-          additionalUserInfo: AdditionalUserInfo(
-            isNewUser: true,
-            providerId: 'password',
-          ),
+          additionalUserInfo: additionalUserInfo,
           operationType: 'signUp',
         );
 
@@ -131,14 +110,17 @@ class EmailPasswordAuth {
 
         return userCredential;
       } else {
+        log('Error signing up: ${response.body}');
         throw FirebaseAuthException(
           code: response.body['error']['message'] ?? 'signup-failed',
           message: response.body['error']['message'] ?? 'Failed to sign up',
         );
       }
     } catch (e) {
-      log('Exception during client API sign up: $e');
-      if (e is FirebaseAuthException) rethrow;
+      log('Exception during sign up: $e');
+      if (e is FirebaseAuthException) {
+        rethrow;
+      }
       throw FirebaseAuthException(code: 'signup-error', message: e.toString());
     }
   }

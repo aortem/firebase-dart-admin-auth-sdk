@@ -86,7 +86,7 @@ class FirebaseApp {
     _cachedIsGCP = false;
   }
 
-  /// Refreshes OAuth2 token
+  /// Refreshes OAuth2 token for Workload Identity
   Future<void> refreshAccessToken() async {
     // If already refreshing, wait for it and return
     if (_refreshCompleter != null) {
@@ -97,28 +97,44 @@ class FirebaseApp {
     _refreshCompleter = Completer<void>();
 
     try {
-      if (_serviceAccount == null) {
-        throw Exception('Cannot refresh token: No service account available');
+      // For Workload Identity, use the token provider
+      if (_serviceAccount == null && accessToken != null) {
+        // This is Workload Identity - refresh via metadata server
+        final provider = WorkloadIdentityTokenProvider(
+          targetServiceAccount: '', // Not needed for refresh
+          firebaseProjectId: _projectId!,
+          client: httpClient,
+        );
+
+        final tokenInfo = await provider.getAccessToken();
+        accessToken = tokenInfo.accessToken;
+        tokenExpiryTime = tokenInfo.expiry;
+
+        log('✅ Workload Identity token refreshed, expires at $tokenExpiryTime');
+      } else if (_serviceAccount != null) {
+        // This is service account - use existing logic
+        final tokenGen = _tokenGen ??= GenerateCustomTokenImplementation();
+        final accessTokenGen = _accessTokenGen ??=
+            GetAccessTokenWithGeneratedTokenImplementation();
+
+        final jwt = await tokenGen.generateServiceAccountJwt(_serviceAccount!);
+        final tokenResponse = await accessTokenGen
+            .getAccessTokenWithGeneratedTokenResponse(jwt);
+
+        accessToken = tokenResponse['access_token'] as String?;
+        final expiresIn = tokenResponse['expires_in'] as int? ?? 3600;
+        tokenExpiryTime = DateTime.now().add(Duration(seconds: expiresIn));
+
+        log('✅ Service Account token refreshed, expires at $tokenExpiryTime');
+      } else {
+        throw Exception(
+          'Cannot refresh token: No authentication method available',
+        );
       }
-
-      final tokenGen = _tokenGen ??= GenerateCustomTokenImplementation();
-      final accessTokenGen = _accessTokenGen ??=
-          GetAccessTokenWithGeneratedTokenImplementation();
-
-      final jwt = await tokenGen.generateServiceAccountJwt(_serviceAccount!);
-      final tokenResponse = await accessTokenGen
-          .getAccessTokenWithGeneratedTokenResponse(jwt);
-
-      accessToken = tokenResponse['access_token'] as String?;
-      final expiresIn = tokenResponse['expires_in'] as int? ?? 3600;
-      tokenExpiryTime = DateTime.now().add(Duration(seconds: expiresIn));
-
-      log('✅ Access token refreshed, expires at $tokenExpiryTime');
     } catch (e) {
       log('⚠️ refreshAccessToken failed: $e');
       rethrow;
     } finally {
-      // Complete the completer and clear it
       _refreshCompleter?.complete();
       _refreshCompleter = null;
     }
@@ -500,7 +516,7 @@ class FirebaseApp {
   /// - If no token but running on GCP → Workload Identity flow via metadata server (GKE/Cloud Run)
   /// - Otherwise → throws exception
 
-  // For GKE Workload Identity
+  /// Initialize Firebase with Workload Identity (for GKE/Cloud Run)
   static Future<FirebaseApp> initializeAppWithWorkloadIdentity({
     required String targetServiceAccount,
     required String firebaseProjectId,
@@ -514,13 +530,13 @@ class FirebaseApp {
     final tokenInfo = await provider.getAccessToken();
 
     _instance = FirebaseApp._(
-      null,
+      null, // No API key needed for Workload Identity
       firebaseProjectId,
       '$firebaseProjectId.firebaseapp.com',
       '',
       '$firebaseProjectId.appspot.com',
       '',
-      null,
+      null, // No service account JSON needed
       tokenInfo.accessToken,
     )..tokenExpiryTime = tokenInfo.expiry;
 
@@ -704,7 +720,7 @@ class FirebaseApp {
       throw StateError('Project ID is null');
     }
 
-    if (!_isTokenValid() && _serviceAccount != null) {
+    if (!_isTokenValid() && (accessToken != null || _serviceAccount != null)) {
       Future.microtask(() async {
         try {
           await refreshAccessToken();
@@ -713,6 +729,7 @@ class FirebaseApp {
         }
       });
     }
+
     return firebaseAuth ??= FirebaseAuth(
       apiKey: _apiKey,
       projectId: _projectId,
@@ -723,7 +740,7 @@ class FirebaseApp {
       serviceAccount: _serviceAccount,
       generateCustomToken: _tokenGen,
       appId: _appId,
-      firebaseApp: this, // 🔥 add reference so FirebaseAuth can refresh itself
+      firebaseApp: this,
     );
   }
 
