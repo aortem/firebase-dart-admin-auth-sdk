@@ -1,33 +1,63 @@
-import 'dart:developer';
 import 'package:firebase_dart_admin_auth_sdk/firebase_dart_admin_auth_sdk.dart';
 
-/// Service to create a new user with email and password.
+///create user connect
 class CreateUserWithEmailAndPasswordService {
-  /// The FirebaseAuth instance.
+  /// constructor
+  CreateUserWithEmailAndPasswordService(this.auth);
+
+  /// FirebaseAuth instance
   final FirebaseAuth auth;
 
-  /// Constructor for CreateUserWithEmailAndPasswordService.
-  CreateUserWithEmailAndPasswordService({required this.auth});
-
-  /// Creates a new user with the given email and password.
-  Future<UserCredential?> createUser(String email, String password) async {
+  /// Creates a new user with the specified email and password.
+  Future<UserCredential> create(
+    String email,
+    String password,
+    FirebaseAuth authInstance,
+  ) async {
     try {
-      log('[CreateUser] Using Admin API to create user: $email');
-      final response = await auth.performRequest('/batchCreate', {
-        'users': [
-          {
-            'email': email,
-            'password': password,
-            'emailVerified': false,
-            'disabled': false,
-          },
-        ],
-      }, apiType: ApiType.admin);
+      //print('[CreateUser] Starting user creation for email: $email');
+      //print('[CreateUser] API Key available: ${authInstance.apiKey != null}');
+
+      final response = await authInstance.performRequest('signUp', {
+        'email': email,
+        'password': password,
+        'returnSecureToken': true,
+      });
+
+      //print('[CreateUser] Response status: ${response.statusCode}');
 
       if (response.statusCode == 200) {
-        final userData = response.body['users'][0];
-        final user = User.fromJson(userData, apiKey: auth.apiKey);
-        return UserCredential(
+        final userData = response.body;
+
+        // Debug logging
+        //print(
+        //  '[CreateUser] Response has idToken: ${userData['idToken'] != null}',
+        //);
+        //print(
+        //  '[CreateUser] Response has refreshToken: ${userData['refreshToken'] != null}',
+        //);
+        //print('[CreateUser] API Key being passed: ${authInstance.apiKey}');
+
+        // Create User with apiKey AND ensure tokens are set
+        final user = User.fromJson(userData, apiKey: authInstance.apiKey);
+
+        // Ensure the tokens are properly set
+        if (userData['idToken'] != null) {
+          user.idToken = userData['idToken'];
+        }
+        if (userData['refreshToken'] != null) {
+          user.refreshToken = userData['refreshToken'];
+        }
+
+        //print('[CreateUser] User object created:');
+        //print('[CreateUser] - uid: ${user.uid}');
+        //print('[CreateUser] - idToken exists: ${user.idToken != null}');
+        //print(
+        //  '[CreateUser] - refreshToken exists: ${user.refreshToken != null}',
+        //);
+        //print('[CreateUser] - apiKey exists: ${user.apiKey != null}');
+
+        final userCredential = UserCredential(
           user: user,
           additionalUserInfo: AdditionalUserInfo(
             isNewUser: true,
@@ -35,39 +65,21 @@ class CreateUserWithEmailAndPasswordService {
           ),
           operationType: 'signUp',
         );
+
+        // Update current user in auth
+        authInstance.updateCurrentUser(user);
+
+        return userCredential;
+      } else {
+        throw FirebaseAuthException(
+          code: response.body['error']['message'],
+          message: response.body['error']['message'],
+        );
       }
     } catch (e) {
-      log('[CreateUser] Admin API failed, falling back to client API: $e');
-      return _createWithClient(email, password);
+      print('[CreateUser] Error during creation: $e');
+      if (e is FirebaseAuthException) rethrow;
+      throw FirebaseAuthException(code: 'signup-error', message: e.toString());
     }
-    return null;
-  }
-
-  Future<UserCredential?> _createWithClient(
-    String email,
-    String password,
-  ) async {
-    final response = await auth.performRequest('signUp', {
-      'email': email,
-      'password': password,
-      'returnSecureToken': true,
-    });
-
-    if (response.statusCode == 200) {
-      final user = User.fromJson(response.body, apiKey: auth.apiKey);
-      return UserCredential(
-        user: user,
-        additionalUserInfo: AdditionalUserInfo(
-          isNewUser: true,
-          providerId: 'password',
-        ),
-        operationType: 'signUp',
-      );
-    }
-    final error = response.body['error'];
-    throw FirebaseAuthException(
-      code: error['message'] ?? 'signup-failed',
-      message: error['message'] ?? 'Failed to sign up',
-    );
   }
 }

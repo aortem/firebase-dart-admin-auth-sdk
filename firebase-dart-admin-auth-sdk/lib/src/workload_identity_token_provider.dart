@@ -61,16 +61,28 @@ class WorkloadIdentityTokenProvider {
   }
 
   Future<AccessTokenInfo> _getTokenFromMetadataServer() async {
+    final scopes = [
+      'https://www.googleapis.com/auth/cloud-platform',
+      'https://www.googleapis.com/auth/firebase',
+      'https://www.googleapis.com/auth/identitytoolkit',
+    ].join(',');
+
+    print('[WorkloadIdentity] Requesting scopes: $scopes'); // ADD
+
     final uri = Uri.parse(
-      'http://metadata.google.internal/computeMetadata/v1/instance/service-accounts/default/token',
+      'http://metadata.google.internal/computeMetadata/v1/instance/service-accounts/default/token?scopes=$scopes',
     );
+
     final resp = await _client
         .get(uri, headers: {'Metadata-Flavor': 'Google'})
         .timeout(const Duration(seconds: 3));
 
     if (resp.statusCode != 200) {
+      print('[WorkloadIdentity] Metadata server failed: ${resp.body}'); // ADD
       throw Exception('Metadata server token fetch failed: ${resp.body}');
     }
+
+    print('[WorkloadIdentity] Token obtained from metadata server'); // ADD
     final body = jsonDecode(resp.body);
     final token = body['access_token'] as String;
     final expiresIn = body['expires_in'] as int? ?? 3600;
@@ -86,14 +98,20 @@ class WorkloadIdentityTokenProvider {
       scopes: [
         'https://www.googleapis.com/auth/cloud-platform',
         'https://www.googleapis.com/auth/firebase',
+        'https://www.googleapis.com/auth/identitytoolkit', // CRITICAL: Added missing scope
       ],
     );
+
+    print('[WorkloadIdentity] Token scopes: ${client.credentials.scopes}');
+    print(
+      '[WorkloadIdentity] Token type: ${client.credentials.accessToken.type}',
+    );
+
     try {
       final creds = client.credentials;
       return AccessTokenInfo(
         creds.accessToken.data,
-        creds.accessToken.expiry?.toUtc() ??
-            DateTime.now().toUtc().add(const Duration(hours: 1)),
+        creds.accessToken.expiry.toUtc(),
       );
     } finally {
       client.close();
