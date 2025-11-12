@@ -1,3 +1,30 @@
+## 0.0.8
+
+### Changed
+
+* **Refactored `CreateUserWithEmailAndPasswordService` internal flow:**
+
+  * Simplified parameter handling; now accepts `email` and `password` directly, with `FirebaseAuth` injected once via constructor.
+  * Removed redundant `authInstance` argument across internal calls.
+  * Aligned response parsing with `performRequest` standard payload format.
+
+### Improved
+
+* Added structured logging around token creation and assignment.
+* Enhanced validation: prevents attempts with missing or malformed credentials.
+* Clearer exception messages for Firebase API errors.
+
+### Added
+
+* Integration test coverage for successful user creation and invalid credentials.
+* Inline documentation for request/response schema.
+* Support for future extension to custom providers (GitHub, Google, etc.) via a unified request handler.
+
+### Removed
+
+* Leftover debug prints from previous release (`// debug: print(...)`).
+* Obsolete helper methods superseded by `performRequest` abstraction.
+
 ## 0.0.7
 
 ### Changed

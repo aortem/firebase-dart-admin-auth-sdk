@@ -1,11 +1,14 @@
-import 'dart:convert';
 import 'package:firebase_dart_admin_auth_sdk/firebase_dart_admin_auth_sdk.dart';
 
 ///create user connect
 class CreateUserWithEmailAndPasswordService {
+  /// constructor
   CreateUserWithEmailAndPasswordService(this.auth);
+
+  /// FirebaseAuth instance
   final FirebaseAuth auth;
 
+  /// Creates a new user with the specified email and password.
   Future<UserCredential> create(
     String email,
     String password,
