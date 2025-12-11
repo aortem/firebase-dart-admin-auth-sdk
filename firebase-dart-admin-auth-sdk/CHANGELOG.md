@@ -1,3 +1,30 @@
+## **0.0.9**
+
+### **Changed**
+
+* **Dart SDK Requirement Bump**
+
+  * Updated all relevant `pubspec.yaml` files to require:
+    **`sdk: ^3.10.3`**
+    This ensures alignment with the latest stable Dart toolchain and improves compatibility with modern packages.
+  * Applies to:
+
+    * Main package `pubspec.yaml`
+    * Example Flutter web app `pubspec.yaml`
+
+* **Dependency Updates**
+
+  * Upgraded internal standard libraries:
+
+    * `ds_standard_features`: **^0.1.4 → ^0.1.5**
+    * `ds_tools_testing`: **^0.1.3 → ^0.1.4**
+  * These updates bring improved platform utilities and more consistent testing helpers.
+
+* **Example App Cleanup**
+
+  * Updated example app dependency declaration to simplify version consistency.
+  * Ensured example no longer pins outdated SDK constraints.
+
 ## 0.0.8
 
 ### Changed
@@ -67,7 +94,7 @@
 
 * **Dependencies / Examples**:
 
-  * Updated example `pubspec.yaml` to require `sdk: ^3.9.2`.
+  * Updated example `pubspec.yaml` to require `sdk: ^3.10.3`.
   * Simplified dependency reference in the example Flutter web app:
 
     * Replaced local path dependency (`firebase_dart_admin_auth_sdk: { path: ... }`) with a versioned dependency string.
