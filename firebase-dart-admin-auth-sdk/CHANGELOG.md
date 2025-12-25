@@ -67,7 +67,7 @@
 
 * **Dependencies / Examples**:
 
-  * Updated example `pubspec.yaml` to require `sdk: ^3.9.2`.
+  * Updated example `pubspec.yaml` to require `sdk: ^3.10.7`.
   * Simplified dependency reference in the example Flutter web app:
 
     * Replaced local path dependency (`firebase_dart_admin_auth_sdk: { path: ... }`) with a versioned dependency string.
