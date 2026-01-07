@@ -127,6 +127,27 @@ void main() async {
   ```
      final auth = FirebaseApp.instance.getAuth();
   ```
+
+## MFA (Admin)
+
+Use these helpers to inspect MFA enrollments and enforce MFA for backend flows.
+
+```dart
+final auth = FirebaseApp.instance.getAuth();
+
+// Enrollments by uid or idToken (provide exactly one).
+final enrollments = await auth.getMfaEnrollments(uid: 'user-uid');
+final hasMfa = await auth.isMfaEnrolled(uid: 'user-uid');
+
+// Verify MFA status based on ID token claims.
+final mfaStatus = await auth.verifyIdTokenMfa(idToken);
+if (!mfaStatus.isMfaVerified) {
+  // reject sensitive operation
+}
+
+// Enforce MFA (throws FirebaseAuthException if not verified).
+await auth.enforceMfa(idToken, requireEnrollment: true);
+```
 ## Documentation
 
 For more refer to Gitbook for prelease [documentation here](https://aortem.gitbook.io/firebase-dart-auth-admin-sdk/).
