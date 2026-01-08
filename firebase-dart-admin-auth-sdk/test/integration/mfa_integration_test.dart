@@ -80,7 +80,8 @@ Future<String?> _resolveIdToken({
   required String? testEmail,
   required String? testPassword,
 }) async {
-  final canUseEmulator = apiKey != null &&
+  final canUseEmulator =
+      apiKey != null &&
       emulatorHost != null &&
       testEmail != null &&
       testPassword != null;
@@ -124,7 +125,9 @@ void main() {
   test(
     'getMfaEnrollments works against Firebase (live or emulator)',
     () async {
-      if (emulatorHost != null && emulatorHost.isNotEmpty && !allowEmulatorLookup) {
+      if (emulatorHost != null &&
+          emulatorHost.isNotEmpty &&
+          !allowEmulatorLookup) {
         return;
       }
       final resolvedToken = await _resolveIdToken(
@@ -139,20 +142,16 @@ void main() {
           projectId ?? _projectIdFromToken(resolvedToken!);
       expect(effectiveProjectId, isNotNull);
 
-      final auth = FirebaseAuth(
-        apiKey: apiKey,
-        projectId: effectiveProjectId,
-      );
+      final auth = FirebaseAuth(apiKey: apiKey, projectId: effectiveProjectId);
       if (emulatorHost != null && emulatorHost.isNotEmpty) {
         auth.setEmulatorUrl('http://$emulatorHost');
       }
 
-      final enrollments = await auth.getMfaEnrollments(
-        idToken: resolvedToken,
-      );
+      final enrollments = await auth.getMfaEnrollments(idToken: resolvedToken);
       expect(enrollments, isNotNull);
     },
-    skip: skip ??
+    skip:
+        skip ??
         ((emulatorHost != null &&
                 emulatorHost.isNotEmpty &&
                 !allowEmulatorLookup)
@@ -160,25 +159,20 @@ void main() {
             : null),
   );
 
-  test(
-    'verifyIdTokenMfa parses MFA claims from a real token',
-    () async {
-      final resolvedToken = await _resolveIdToken(
-        apiKey: apiKey,
-        idToken: idToken,
-        emulatorHost: emulatorHost,
-        testEmail: testEmail,
-        testPassword: testPassword,
-      );
-      expect(resolvedToken, isNotNull);
-      final effectiveProjectId =
-          projectId ?? _projectIdFromToken(resolvedToken!);
-      expect(effectiveProjectId, isNotNull);
+  test('verifyIdTokenMfa parses MFA claims from a real token', () async {
+    final resolvedToken = await _resolveIdToken(
+      apiKey: apiKey,
+      idToken: idToken,
+      emulatorHost: emulatorHost,
+      testEmail: testEmail,
+      testPassword: testPassword,
+    );
+    expect(resolvedToken, isNotNull);
+    final effectiveProjectId = projectId ?? _projectIdFromToken(resolvedToken!);
+    expect(effectiveProjectId, isNotNull);
 
-      final auth = FirebaseAuth(projectId: effectiveProjectId);
-      final result = await auth.verifyIdTokenMfa(resolvedToken!);
-      expect(result.isMfaVerified, isNotNull);
-    },
-    skip: skip,
-  );
+    final auth = FirebaseAuth(projectId: effectiveProjectId);
+    final result = await auth.verifyIdTokenMfa(resolvedToken!);
+    expect(result.isMfaVerified, isNotNull);
+  }, skip: skip);
 }

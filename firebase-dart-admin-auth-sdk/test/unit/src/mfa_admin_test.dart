@@ -8,10 +8,7 @@ String _base64UrlEncodeJson(Map<String, dynamic> data) {
   return base64Url.encode(jsonBytes).replaceAll('=', '');
 }
 
-String _buildTestToken({
-  required String projectId,
-  required bool mfaVerified,
-}) {
+String _buildTestToken({required String projectId, required bool mfaVerified}) {
   final header = _base64UrlEncodeJson({'alg': 'none', 'typ': 'JWT'});
   final now = DateTime.now().millisecondsSinceEpoch ~/ 1000;
   final payload = <String, dynamic>{

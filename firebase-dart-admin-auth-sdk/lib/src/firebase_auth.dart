@@ -1175,7 +1175,11 @@ class FirebaseAuth {
 
     final response = await performRequest(
       'lookup',
-      uid != null ? {'localId': [uid]} : {'idToken': idToken},
+      uid != null
+          ? {
+              'localId': [uid],
+            }
+          : {'idToken': idToken},
     );
 
     final users = response.body['users'];
@@ -1195,8 +1199,10 @@ class FirebaseAuth {
 
     return mfaInfo
         .whereType<Map>()
-        .map((entry) =>
-            MultiFactorEnrollment.fromJson(Map<String, dynamic>.from(entry)))
+        .map(
+          (entry) =>
+              MultiFactorEnrollment.fromJson(Map<String, dynamic>.from(entry)),
+        )
         .toList();
   }
 
@@ -1212,9 +1218,12 @@ class FirebaseAuth {
     final payload = verified['claims'];
     final firebase = verified['firebase'];
 
-    final payloadMap = payload is Map<String, dynamic> ? payload : <String, dynamic>{};
-    final firebaseMap =
-        firebase is Map<String, dynamic> ? firebase : <String, dynamic>{};
+    final payloadMap = payload is Map<String, dynamic>
+        ? payload
+        : <String, dynamic>{};
+    final firebaseMap = firebase is Map<String, dynamic>
+        ? firebase
+        : <String, dynamic>{};
 
     final amrClaim = payloadMap['amr'];
     final amr = amrClaim is List
@@ -1229,7 +1238,9 @@ class FirebaseAuth {
       isMfaVerified: isMfaVerified,
       secondFactor: secondFactor?.toString(),
       amr: amr,
-      authTime: payloadMap['auth_time'] is int ? payloadMap['auth_time'] as int : null,
+      authTime: payloadMap['auth_time'] is int
+          ? payloadMap['auth_time'] as int
+          : null,
       claims: payloadMap,
     );
   }

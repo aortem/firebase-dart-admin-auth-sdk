@@ -41,7 +41,9 @@ void main() {
     });
 
     test('returns empty list when mfaInfo is missing', () async {
-      final auth = _FakeAuth({'users': [{}]});
+      final auth = _FakeAuth({
+        'users': [{}],
+      });
       final enrollments = await auth.getMfaEnrollments(uid: 'user-123');
       expect(enrollments, isEmpty);
     });

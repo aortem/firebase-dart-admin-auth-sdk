@@ -220,11 +220,13 @@ class User {
     final mfaInfo = json['mfaInfo'];
     final enrolledFactors = mfaInfo is List
         ? mfaInfo
-            .whereType<Map>()
-            .map((entry) => MultiFactorEnrollment.fromJson(
-              Map<String, dynamic>.from(entry),
-            ))
-            .toList()
+              .whereType<Map>()
+              .map(
+                (entry) => MultiFactorEnrollment.fromJson(
+                  Map<String, dynamic>.from(entry),
+                ),
+              )
+              .toList()
         : null;
 
     final user = User(
