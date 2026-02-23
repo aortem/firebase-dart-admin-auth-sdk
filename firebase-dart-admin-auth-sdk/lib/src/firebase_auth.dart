@@ -313,10 +313,13 @@ class FirebaseAuth {
       }
     }
 
+    final isOAuth = currentAccessToken != null;
     final url = Uri.https(
       'identitytoolkit.googleapis.com',
-      '/v1/accounts:$endpoint',
-      {if (apiKey != 'your_api_key') 'key': apiKey},
+      isOAuth && endpoint == 'signUp' && projectId != null
+          ? '/v1/projects/$projectId/accounts'
+          : '/v1/accounts:$endpoint',
+      !isOAuth && apiKey != 'your_api_key' ? {'key': apiKey} : null,
     );
 
     int retryCount = 0;
