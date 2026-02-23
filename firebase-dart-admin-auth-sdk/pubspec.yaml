@@ -5,11 +5,7 @@ repository: https://github.com/aortem/firebase-dart-admin-auth-sdk
 license: BSD-3
 
 environment:
-<<<<<<< HEAD
-   sdk: ^3.10.7
-=======
-   sdk: ^3.11.0
->>>>>>> main
+  sdk: ^3.11.0
 
 dependencies:
 #------------------ STANDARD FEATURES---------------------------------
