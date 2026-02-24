@@ -304,18 +304,33 @@ class FirebaseAuth {
     String? currentAccessToken = accessToken;
 
     // ✅ Ensure fresh token before request
-    if (firebaseApp != null && serviceAccount != null) {
+    // Note: Workload Identity has serviceAccount == null but still needs token refresh
+    if (firebaseApp != null) {
       currentAccessToken = await firebaseApp!.getValidAccessToken();
       if (currentAccessToken != null && currentAccessToken != accessToken) {
         accessToken = currentAccessToken;
       }
     }
 
-    final url = Uri.https(
-      'identitytoolkit.googleapis.com',
-      '/v1/accounts:$endpoint',
-      {if (apiKey != 'your_api_key') 'key': apiKey},
-    );
+    // Use project-scoped endpoint for admin/server flows (Bearer token, no API key)
+    // Use client endpoint for client flows (API key present)
+    final bool isAdminFlow =
+        currentAccessToken != null &&
+        (apiKey == null || apiKey == 'your_api_key');
+
+    final Uri url;
+    if (isAdminFlow && projectId != null) {
+      url = Uri.https(
+        'identitytoolkit.googleapis.com',
+        '/v1/projects/$projectId/accounts:$endpoint',
+      );
+    } else {
+      url = Uri.https(
+        'identitytoolkit.googleapis.com',
+        '/v1/accounts:$endpoint',
+        {if (apiKey != null && apiKey != 'your_api_key') 'key': apiKey},
+      );
+    }
 
     int retryCount = 0;
     const maxRetries = 2;
