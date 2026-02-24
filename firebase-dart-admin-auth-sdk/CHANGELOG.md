@@ -1,4 +1,4 @@
-## **0.0.10** (Unreleased)
+## **0.0.10**
 
 ### **Added**
 
@@ -15,8 +15,23 @@
   - Workforce Identity Federation example for external IdP token exchange
   - Complete IAM setup scripts for service account binding
 
+- **MFA (Admin) Support**:
+  - Added `FirebaseAuth` helpers: `getMfaEnrollments`, `isMfaEnrolled`, `verifyIdTokenMfa`, `enforceMfa`
+  - Added MFA models `MultiFactorEnrollment` and `MfaVerificationResult` (and exported)
+  - User parsing now captures `mfaInfo` as `enrolledFactors` and derives `mfaEnabled` when factors exist
+
+- **Workload Identity Example**:
+  - Added `example/poc_workload_identity.dart` showcasing admin API usage with Workload Identity
+
+### **Fixed**
+
+- **Admin API Routing for Server Flows**:
+  - `performRequest` now uses project-scoped endpoints (`/v1/projects/{projectId}/accounts`) when using bearer tokens and no API key
+  - Access token refresh now runs for Workload Identity (no service account) when `firebaseApp` is set
+
 ### **Documentation**
 
+- Added "MFA (Admin)" section with enrollment lookup and enforcement examples
 - Updated README with three new sections under Authentication Methods:
   - "Workload Identity" - for GCP-native environments
   - "Workforce Identity Federation (External IdPs)" - for external identity providers
