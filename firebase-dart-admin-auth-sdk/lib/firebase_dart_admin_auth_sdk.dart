@@ -10,6 +10,8 @@ export 'src/firebase_app.dart';
 export 'src/auth_provider.dart';
 export 'src/application_verifier.dart';
 export 'src/user.dart';
+export 'src/mfa_enrollment.dart';
+export 'src/mfa_verification.dart';
 export 'src/auth/check_action_code.dart';
 export 'src/additional_user_info.dart';
 
