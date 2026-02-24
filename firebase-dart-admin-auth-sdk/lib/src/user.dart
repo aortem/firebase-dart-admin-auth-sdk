@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:firebase_dart_admin_auth_sdk/src/mfa_enrollment.dart';
 import 'package:firebase_dart_admin_auth_sdk/src/provider_user_info.dart';
 import 'id_token_result_model.dart';
 import 'package:ds_standard_features/ds_standard_features.dart' as http;
@@ -61,6 +62,9 @@ class User {
   /// Whether the user is enrolled in multi-factor authentication (MFA).
   final bool mfaEnabled;
 
+  /// Enrolled multi-factor authentication factors for the user.
+  final List<MultiFactorEnrollment>? enrolledFactors;
+
   /// The tenant ID for the user.
   String? tenantId;
 
@@ -90,6 +94,7 @@ class User {
     this.providerUserInfo,
     this.validSince,
     this.mfaEnabled = false,
+    this.enrolledFactors,
     this.idToken,
     this.tenantId,
     String? apiKey,
@@ -204,6 +209,7 @@ class User {
       'isAnonymous': isAnonymous,
       'refreshToken': refreshToken,
       'mfaEnabled': mfaEnabled,
+      'enrolledFactors': enrolledFactors?.map((e) => e.toJson()).toList(),
     };
   }
 
@@ -211,6 +217,18 @@ class User {
   ///
   /// This is useful for parsing JSON responses from Firebase or other services.
   factory User.fromJson(Map<String, dynamic> json, {String? apiKey}) {
+    final mfaInfo = json['mfaInfo'];
+    final enrolledFactors = mfaInfo is List
+        ? mfaInfo
+              .whereType<Map>()
+              .map(
+                (entry) => MultiFactorEnrollment.fromJson(
+                  Map<String, dynamic>.from(entry),
+                ),
+              )
+              .toList()
+        : null;
+
     final user = User(
       uid: json['localId'] ?? json['uid'],
       email: json['email'],
@@ -218,7 +236,10 @@ class User {
       phoneNumber: json['phoneNumber'],
       displayName: json['displayName'],
       photoURL: json['photoUrl'] ?? json['photoURL'],
-      mfaEnabled: json['mfaEnabled'] ?? false,
+      mfaEnabled:
+          json['mfaEnabled'] ??
+          (enrolledFactors != null && enrolledFactors.isNotEmpty),
+      enrolledFactors: enrolledFactors,
       idToken: json['idToken'],
       refreshToken: json['refreshToken'],
       tenantId: json['tenantId'],
@@ -297,7 +318,9 @@ class User {
       passwordUpdatedAt: user.passwordUpdatedAt ?? passwordUpdatedAt,
       providerUserInfo: user.providerUserInfo ?? providerUserInfo,
       validSince: user.validSince ?? validSince,
+      mfaEnabled: user.mfaEnabled,
       apiKey: user._apiKey ?? _apiKey,
+      enrolledFactors: user.enrolledFactors ?? enrolledFactors,
     );
 
     // Copy over the token expiration if we're copying the token

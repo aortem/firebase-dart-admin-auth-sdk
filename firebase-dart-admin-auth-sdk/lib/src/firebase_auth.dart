@@ -30,6 +30,8 @@ import 'package:firebase_dart_admin_auth_sdk/src/auth/verify_before_email_update
 import 'package:firebase_dart_admin_auth_sdk/src/auth/verify_password_reset_code.dart';
 import 'package:firebase_dart_admin_auth_sdk/src/firebase_user/link_with_credentails.dart';
 import 'package:firebase_dart_admin_auth_sdk/src/http_response.dart';
+import 'package:firebase_dart_admin_auth_sdk/src/mfa_enrollment.dart';
+import 'package:firebase_dart_admin_auth_sdk/src/mfa_verification.dart';
 import 'package:firebase_dart_admin_auth_sdk/src/platform_resolver.dart';
 import 'package:firebase_dart_admin_auth_sdk/src/popup_redirect_resolver.dart';
 import 'package:firebase_dart_admin_auth_sdk/src/service_account.dart';
@@ -304,18 +306,33 @@ class FirebaseAuth {
     String? currentAccessToken = accessToken;
 
     // ✅ Ensure fresh token before request
-    if (firebaseApp != null && serviceAccount != null) {
+    // Note: Workload Identity has serviceAccount == null but still needs token refresh
+    if (firebaseApp != null) {
       currentAccessToken = await firebaseApp!.getValidAccessToken();
       if (currentAccessToken != null && currentAccessToken != accessToken) {
         accessToken = currentAccessToken;
       }
     }
 
-    final url = Uri.https(
-      'identitytoolkit.googleapis.com',
-      '/v1/accounts:$endpoint',
-      {if (apiKey != 'your_api_key') 'key': apiKey},
-    );
+    // Use project-scoped endpoint for admin/server flows (Bearer token, no API key)
+    // Use client endpoint for client flows (API key present)
+    final bool isAdminFlow =
+        currentAccessToken != null &&
+        (apiKey == null || apiKey == 'your_api_key');
+
+    final Uri url;
+    if (isAdminFlow && projectId != null) {
+      url = Uri.https(
+        'identitytoolkit.googleapis.com',
+        '/v1/projects/$projectId/accounts:$endpoint',
+      );
+    } else {
+      url = Uri.https(
+        'identitytoolkit.googleapis.com',
+        '/v1/accounts:$endpoint',
+        {if (apiKey != null && apiKey != 'your_api_key') 'key': apiKey},
+      );
+    }
 
     int retryCount = 0;
     const maxRetries = 2;
@@ -391,6 +408,7 @@ class FirebaseAuth {
         providerUserInfo: user.providerUserInfo,
         validSince: user.validSince,
         mfaEnabled: user.mfaEnabled,
+        enrolledFactors: user.enrolledFactors,
         apiKey: apiKey,
       );
     }
@@ -1156,5 +1174,116 @@ class FirebaseAuth {
         message: 'Failed to verify ID token: ${e.toString()}',
       );
     }
+  }
+
+  /// Retrieves enrolled multi-factor authentication factors for a user.
+  Future<List<MultiFactorEnrollment>> getMfaEnrollments({
+    String? uid,
+    String? idToken,
+  }) async {
+    if ((uid == null && idToken == null) || (uid != null && idToken != null)) {
+      throw FirebaseAuthException(
+        code: 'mfa-lookup-argument-error',
+        message: 'Provide exactly one of uid or idToken.',
+      );
+    }
+
+    final response = await performRequest(
+      'lookup',
+      uid != null
+          ? {
+              'localId': [uid],
+            }
+          : {'idToken': idToken},
+    );
+
+    final users = response.body['users'];
+    if (users is! List || users.isEmpty) {
+      return [];
+    }
+
+    final userData = users.first;
+    if (userData is! Map<String, dynamic>) {
+      return [];
+    }
+
+    final mfaInfo = userData['mfaInfo'];
+    if (mfaInfo is! List) {
+      return [];
+    }
+
+    return mfaInfo
+        .whereType<Map>()
+        .map(
+          (entry) =>
+              MultiFactorEnrollment.fromJson(Map<String, dynamic>.from(entry)),
+        )
+        .toList();
+  }
+
+  /// Returns true when the user has at least one enrolled factor.
+  Future<bool> isMfaEnrolled({String? uid, String? idToken}) async {
+    final enrollments = await getMfaEnrollments(uid: uid, idToken: idToken);
+    return enrollments.isNotEmpty;
+  }
+
+  /// Verifies MFA state based on the ID token claims.
+  Future<MfaVerificationResult> verifyIdTokenMfa(String idToken) async {
+    final verified = await verifyIdToken(idToken);
+    final payload = verified['claims'];
+    final firebase = verified['firebase'];
+
+    final payloadMap = payload is Map<String, dynamic>
+        ? payload
+        : <String, dynamic>{};
+    final firebaseMap = firebase is Map<String, dynamic>
+        ? firebase
+        : <String, dynamic>{};
+
+    final amrClaim = payloadMap['amr'];
+    final amr = amrClaim is List
+        ? amrClaim.whereType<String>().toList()
+        : <String>[];
+
+    final secondFactor = firebaseMap['sign_in_second_factor'];
+
+    final isMfaVerified = secondFactor != null || amr.contains('mfa');
+
+    return MfaVerificationResult(
+      isMfaVerified: isMfaVerified,
+      secondFactor: secondFactor?.toString(),
+      amr: amr,
+      authTime: payloadMap['auth_time'] is int
+          ? payloadMap['auth_time'] as int
+          : null,
+      claims: payloadMap,
+    );
+  }
+
+  /// Enforces MFA by throwing when the token is not MFA-verified.
+  Future<MfaVerificationResult> enforceMfa(
+    String idToken, {
+    bool requireEnrollment = false,
+  }) async {
+    final result = await verifyIdTokenMfa(idToken);
+
+    if (!result.isMfaVerified) {
+      throw FirebaseAuthException(
+        code: 'mfa-required',
+        message: 'Second factor verification is required.',
+      );
+    }
+
+    if (requireEnrollment) {
+      final enrolled = await isMfaEnrolled(idToken: idToken);
+      if (!enrolled) {
+        throw FirebaseAuthException(
+          code: 'mfa-not-enrolled',
+          message: 'User has no enrolled multi-factor authentication factors.',
+        );
+      }
+    }
+
+    return result;
   }
 }
