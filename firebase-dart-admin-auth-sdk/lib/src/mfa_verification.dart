@@ -1,21 +1,21 @@
-/// The result of verifying a multi-factor authentication (MFA) challenge.
+/// Represents the result of a multi-factor verification attempt.
 class MfaVerificationResult {
-  /// Whether the MFA factor is verified.
+  /// Whether the multi-factor authentication was successfully verified.
   final bool isMfaVerified;
 
-  /// The second factor used in verification.
+  /// The second factor.
   final String? secondFactor;
 
-  /// The authenticated methods references (AMR).
+  /// List of authentication method references.
   final List<String> amr;
 
   /// The authentication time.
   final int? authTime;
 
-  /// The updated custom claims.
+  /// Additional claims.
   final Map<String, dynamic> claims;
 
-  /// Creates an [MfaVerificationResult].
+  /// Creates a new [MfaVerificationResult] instance.
   MfaVerificationResult({
     required this.isMfaVerified,
     required this.amr,
