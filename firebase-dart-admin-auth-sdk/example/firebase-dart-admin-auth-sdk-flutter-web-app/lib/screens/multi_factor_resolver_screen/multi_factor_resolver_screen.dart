@@ -12,7 +12,7 @@ class MultiFactorResolverScreen extends StatefulWidget {
   const MultiFactorResolverScreen({super.key});
 
   @override
-  MultiFactorResolverScreenState createState() =>
+  State<MultiFactorResolverScreen> createState() =>
       MultiFactorResolverScreenState();
 }
 
