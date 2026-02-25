@@ -5,16 +5,16 @@ import 'package:firebase_dart_admin_auth_sdk/firebase_dart_admin_auth_sdk.dart';
 import 'package:firebase/shared/shared.dart';
 import 'package:provider/provider.dart';
 
-/// A screen for creating a new user with email and password.
+/// A screen to create a new user with email and password.
 class CreateUserScreen extends StatefulWidget {
-  /// Constructs the [CreateUserScreen] widget.
+  /// Creates a [CreateUserScreen].
   const CreateUserScreen({super.key});
 
   @override
-  State<CreateUserScreen> createState() => CreateUserScreenState();
+  CreateUserScreenState createState() => CreateUserScreenState();
 }
 
-/// State for [CreateUserScreen].
+/// The state for [CreateUserScreen].
 class CreateUserScreenState extends State<CreateUserScreen> {
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();

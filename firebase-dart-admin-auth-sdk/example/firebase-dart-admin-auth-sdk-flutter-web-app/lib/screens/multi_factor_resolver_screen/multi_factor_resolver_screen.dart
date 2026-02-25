@@ -6,9 +6,9 @@ import 'package:provider/provider.dart';
 import 'package:firebase_dart_admin_auth_sdk/src/auth/get_multi_factor.dart'
     as multi_factor;
 
-/// A screen for resolving multi-factor authentication.
+/// A screen to resolve multi-factor authentication.
 class MultiFactorResolverScreen extends StatefulWidget {
-  /// Constructs the [MultiFactorResolverScreen] widget.
+  /// Creates a [MultiFactorResolverScreen].
   const MultiFactorResolverScreen({super.key});
 
   @override

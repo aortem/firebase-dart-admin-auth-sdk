@@ -4,17 +4,17 @@ import 'package:flutter/material.dart';
 import 'package:firebase_dart_admin_auth_sdk/firebase_dart_admin_auth_sdk.dart';
 import 'package:provider/provider.dart';
 
-/// A screen for confirming a password reset.
+/// A screen to confirm a password reset with a code from a reset link.
 class ConfirmPasswordResetScreen extends StatefulWidget {
-  /// Constructs the [ConfirmPasswordResetScreen] widget.
+  /// Creates a [ConfirmPasswordResetScreen].
   const ConfirmPasswordResetScreen({super.key});
 
   @override
-  State<ConfirmPasswordResetScreen> createState() =>
+  ConfirmPasswordResetScreenState createState() =>
       ConfirmPasswordResetScreenState();
 }
 
-/// State for [ConfirmPasswordResetScreen].
+/// The state for [ConfirmPasswordResetScreen].
 class ConfirmPasswordResetScreenState
     extends State<ConfirmPasswordResetScreen> {
   final TextEditingController _resetLinkController = TextEditingController();
