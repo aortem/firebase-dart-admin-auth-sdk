@@ -10,7 +10,7 @@ class ConfirmPasswordResetScreen extends StatefulWidget {
   const ConfirmPasswordResetScreen({super.key});
 
   @override
-  State<ConfirmPasswordResetScreen> createState() =>
+  ConfirmPasswordResetScreenState createState() =>
       ConfirmPasswordResetScreenState();
 }
 

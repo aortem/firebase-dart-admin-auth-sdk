@@ -12,7 +12,7 @@ class FetchSignInMethodsScreen extends StatefulWidget {
   const FetchSignInMethodsScreen({super.key});
 
   @override
-  State<FetchSignInMethodsScreen> createState() =>
+  FetchSignInMethodsScreenState createState() =>
       FetchSignInMethodsScreenState();
 }
 

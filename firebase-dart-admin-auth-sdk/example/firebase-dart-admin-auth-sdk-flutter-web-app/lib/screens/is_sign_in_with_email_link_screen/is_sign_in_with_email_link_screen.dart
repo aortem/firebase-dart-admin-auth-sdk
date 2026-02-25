@@ -10,7 +10,7 @@ class IsSignInWithEmailLinkScreen extends StatefulWidget {
   const IsSignInWithEmailLinkScreen({super.key});
 
   @override
-  State<IsSignInWithEmailLinkScreen> createState() =>
+  IsSignInWithEmailLinkScreenState createState() =>
       IsSignInWithEmailLinkScreenState();
 }
 

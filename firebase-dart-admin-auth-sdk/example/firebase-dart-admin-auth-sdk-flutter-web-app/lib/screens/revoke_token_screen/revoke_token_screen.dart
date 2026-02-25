@@ -10,8 +10,7 @@ class RevokeAccessTokenScreen extends StatefulWidget {
   const RevokeAccessTokenScreen({super.key});
 
   @override
-  State<RevokeAccessTokenScreen> createState() =>
-      RevokeAccessTokenScreenState();
+  RevokeAccessTokenScreenState createState() => RevokeAccessTokenScreenState();
 }
 
 /// The state for [RevokeAccessTokenScreen].

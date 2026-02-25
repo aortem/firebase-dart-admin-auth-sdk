@@ -13,7 +13,7 @@ class IdTokenChangedScreen extends StatefulWidget {
   const IdTokenChangedScreen({super.key, required this.auth});
 
   @override
-  State<IdTokenChangedScreen> createState() => IdTokenChangedScreenState();
+  IdTokenChangedScreenState createState() => IdTokenChangedScreenState();
 }
 
 /// The state for [IdTokenChangedScreen].
