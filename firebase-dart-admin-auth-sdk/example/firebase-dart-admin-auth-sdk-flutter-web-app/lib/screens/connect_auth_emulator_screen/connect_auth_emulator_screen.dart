@@ -11,7 +11,7 @@ class ConnectAuthEmulatorScreen extends StatefulWidget {
   const ConnectAuthEmulatorScreen({super.key});
 
   @override
-  ConnectAuthEmulatorScreenState createState() =>
+  State<ConnectAuthEmulatorScreen> createState() =>
       ConnectAuthEmulatorScreenState();
 }
 
