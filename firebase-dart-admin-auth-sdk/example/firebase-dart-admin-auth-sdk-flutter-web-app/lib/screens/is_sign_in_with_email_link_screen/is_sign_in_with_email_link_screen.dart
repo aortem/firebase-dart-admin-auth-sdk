@@ -4,15 +4,18 @@ import 'package:flutter/material.dart';
 import 'package:firebase_dart_admin_auth_sdk/firebase_dart_admin_auth_sdk.dart';
 import 'package:provider/provider.dart';
 
+/// A screen for checking if a link is a valid sign-in with email link.
 class IsSignInWithEmailLinkScreen extends StatefulWidget {
+  /// Constructs the [IsSignInWithEmailLinkScreen] widget.
   const IsSignInWithEmailLinkScreen({super.key});
 
   @override
-  _IsSignInWithEmailLinkScreenState createState() =>
-      _IsSignInWithEmailLinkScreenState();
+  State<IsSignInWithEmailLinkScreen> createState() =>
+      IsSignInWithEmailLinkScreenState();
 }
 
-class _IsSignInWithEmailLinkScreenState
+/// State for [IsSignInWithEmailLinkScreen]
+class IsSignInWithEmailLinkScreenState
     extends State<IsSignInWithEmailLinkScreen> {
   final TextEditingController _linkController = TextEditingController();
   bool? _isValidLink;

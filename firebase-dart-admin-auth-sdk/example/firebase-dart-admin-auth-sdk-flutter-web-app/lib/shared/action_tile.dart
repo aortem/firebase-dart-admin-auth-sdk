@@ -2,10 +2,18 @@
 import 'package:firebase/utils/extensions.dart';
 import 'package:flutter/material.dart';
 
+/// a tile button for actions.
 class ActionTile extends StatelessWidget {
+  /// The title of the tile.
   final String title;
+
+  /// The callback to invoke when the tile is tapped.
   final VoidCallback onTap;
+
+  /// Indicates whether an operation is currently in progress.
   final bool loading;
+
+  /// Constructs the [ActionTile] widget.
   const ActionTile({
     super.key,
     required this.onTap,

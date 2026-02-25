@@ -6,7 +6,9 @@ import 'package:flutter/material.dart';
 
 import 'firebase_presistance.dart';
 
+/// A dropdown widget for selecting the Firebase Auth persistence type.
 class PersistenceSelectorDropdown extends StatefulWidget {
+  /// Constructs the [PersistenceSelectorDropdown] widget.
   const PersistenceSelectorDropdown({super.key});
 
   @override

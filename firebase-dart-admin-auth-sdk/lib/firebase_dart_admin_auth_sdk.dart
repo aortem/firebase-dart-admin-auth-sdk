@@ -19,3 +19,4 @@ export 'src/auth/auth_link_with_phone_number.dart';
 
 export 'src/auth/auth_redirect_link.dart';
 export 'src/firebase_storage.dart';
+export 'src/auth/get_multi_factor.dart';

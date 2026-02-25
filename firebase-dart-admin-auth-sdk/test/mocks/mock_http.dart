@@ -81,13 +81,11 @@ class MockHttpClient implements http.Client {
 
   @override
   Future<http.Response> head(Uri url, {Map<String, String>? headers}) {
-    // TODO: implement head
     throw UnimplementedError();
   }
 
   @override
   Future<http.StreamedResponse> send(http.BaseRequest request) {
-    // TODO: implement send
     throw UnimplementedError();
   }
 }

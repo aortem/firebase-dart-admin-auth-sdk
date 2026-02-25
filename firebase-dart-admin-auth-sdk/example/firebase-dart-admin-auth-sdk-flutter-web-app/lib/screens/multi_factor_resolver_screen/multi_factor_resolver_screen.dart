@@ -1,4 +1,4 @@
-// ignore_for_file: implementation_importspublic_member_api_docs uri_does_not_exist undefined_class undefined_function undefined_identifier undefined_method undefined_getter creation_with_non_type extends_non_class super_formal_parameter_without_associated_named undefined_super_member override_on_non_overriding_member non_type_as_type_argument non_constant_list_element unchecked_use_of_nullable_value
+// ignore_for_file: implementation_imports, public_member_api_docs, uri_does_not_exist, undefined_class, undefined_function, undefined_identifier, undefined_method, undefined_getter, creation_with_non_type, extends_non_class, super_formal_parameter_without_associated_named, undefined_super_member, override_on_non_overriding_member, non_type_as_type_argument, non_constant_list_element, unchecked_use_of_nullable_value
 
 import 'package:flutter/material.dart';
 import 'package:firebase_dart_admin_auth_sdk/firebase_dart_admin_auth_sdk.dart';
@@ -6,7 +6,9 @@ import 'package:provider/provider.dart';
 import 'package:firebase_dart_admin_auth_sdk/src/auth/get_multi_factor.dart'
     as multi_factor;
 
+/// A screen for resolving multi-factor authentication.
 class MultiFactorResolverScreen extends StatefulWidget {
+  /// Constructs the [MultiFactorResolverScreen] widget.
   const MultiFactorResolverScreen({super.key});
 
   @override
@@ -14,9 +16,12 @@ class MultiFactorResolverScreen extends StatefulWidget {
       MultiFactorResolverScreenState();
 }
 
+/// The state for [MultiFactorResolverScreen].
 class MultiFactorResolverScreenState extends State<MultiFactorResolverScreen> {
+  /// The multi-factor resolver.
   multi_factor.MultiFactorResolver? resolver;
 
+  /// Gets the multi-factor resolver.
   Future<void> getMultiFactorResolver() async {
     final auth = Provider.of<FirebaseAuth>(context, listen: false);
     try {
@@ -37,6 +42,7 @@ class MultiFactorResolverScreenState extends State<MultiFactorResolverScreen> {
     }
   }
 
+  /// Resolves the sign-in with the multi-factor assertion.
   Future<void> resolveSignIn() async {
     if (resolver == null) return;
 

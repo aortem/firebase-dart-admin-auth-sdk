@@ -5,9 +5,12 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:firebase_dart_admin_auth_sdk/firebase_dart_admin_auth_sdk.dart';
 
+/// A screen for testing authentication state changes.
 class AuthStateTestScreen extends StatefulWidget {
+  /// The [FirebaseAuth] instance used to monitor authentication state.
   final FirebaseAuth auth;
 
+  /// Constructs the [AuthStateTestScreen] with the given [auth] instance.
   const AuthStateTestScreen({super.key, required this.auth});
 
   @override

@@ -4,14 +4,17 @@ import 'package:flutter/material.dart';
 import 'package:firebase_dart_admin_auth_sdk/firebase_dart_admin_auth_sdk.dart';
 import 'package:provider/provider.dart';
 
+/// A screen for sending a password reset email.
 class PasswordResetScreen extends StatefulWidget {
+  /// Constructs the [PasswordResetScreen] widget.
   const PasswordResetScreen({super.key});
 
   @override
-  _PasswordResetScreenState createState() => _PasswordResetScreenState();
+  State<PasswordResetScreen> createState() => PasswordResetScreenState();
 }
 
-class _PasswordResetScreenState extends State<PasswordResetScreen> {
+/// The state for [PasswordResetScreen].
+class PasswordResetScreenState extends State<PasswordResetScreen> {
   final _emailController = TextEditingController();
   String _message = '';
 

@@ -12,6 +12,7 @@ import 'package:flutter/material.dart';
 import 'package:firebase/screens/apple_sign_in_screen/apple_sign_in_screen.dart';
 import 'package:firebase/screens/gcp_sign_in_screen/gcp_sign_in_screen.dart';
 
+/// Shows a bottom sheet with various sign-in methods.
 void showSignMethodsBottomSheet(BuildContext context) {
   showModalBottomSheet(
     context: context,
@@ -20,7 +21,9 @@ void showSignMethodsBottomSheet(BuildContext context) {
   );
 }
 
+/// A bottom sheet widget displaying sign-in methods.
 class SignInMethodsBottomSheet extends StatelessWidget {
+  /// Constructs the [SignInMethodsBottomSheet] widget.
   const SignInMethodsBottomSheet({super.key});
 
   @override

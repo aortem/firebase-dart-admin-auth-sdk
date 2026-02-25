@@ -4,15 +4,18 @@ import 'package:flutter/material.dart';
 import 'package:firebase_dart_admin_auth_sdk/firebase_dart_admin_auth_sdk.dart';
 import 'package:provider/provider.dart';
 
+/// A screen for revoking the current user's access token.
 class RevokeAccessTokenScreen extends StatefulWidget {
+  /// Constructs the [RevokeAccessTokenScreen] widget.
   const RevokeAccessTokenScreen({super.key});
 
   @override
-  _RevokeAccessTokenScreenState createState() =>
-      _RevokeAccessTokenScreenState();
+  State<RevokeAccessTokenScreen> createState() =>
+      RevokeAccessTokenScreenState();
 }
 
-class _RevokeAccessTokenScreenState extends State<RevokeAccessTokenScreen> {
+/// The state for [RevokeAccessTokenScreen].
+class RevokeAccessTokenScreenState extends State<RevokeAccessTokenScreen> {
   String _result = '';
 
   Future<void> _revokeAccessToken() async {

@@ -6,15 +6,18 @@ import 'package:provider/provider.dart';
 import 'package:firebase/shared/shared.dart';
 import 'package:firebase/utils/extensions.dart';
 
+/// A screen for fetching sign-in methods for a given email address.
 class FetchSignInMethodsScreen extends StatefulWidget {
+  /// Constructs the [FetchSignInMethodsScreen] widget.
   const FetchSignInMethodsScreen({super.key});
 
   @override
-  _FetchSignInMethodsScreenState createState() =>
-      _FetchSignInMethodsScreenState();
+  State<FetchSignInMethodsScreen> createState() =>
+      FetchSignInMethodsScreenState();
 }
 
-class _FetchSignInMethodsScreenState extends State<FetchSignInMethodsScreen> {
+/// State for [FetchSignInMethodsScreen].
+class FetchSignInMethodsScreenState extends State<FetchSignInMethodsScreen> {
   final TextEditingController _emailController = TextEditingController();
 
   @override

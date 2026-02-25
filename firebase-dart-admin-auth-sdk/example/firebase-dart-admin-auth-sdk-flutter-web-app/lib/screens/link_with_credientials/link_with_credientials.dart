@@ -13,7 +13,9 @@ import 'package:google_identity_services_web/loader.dart' as gis;
 import 'package:google_identity_services_web/oauth2.dart';
 import '../home_screen/home_screen.dart';
 
+/// A screen for linking other credentials (e.g. Google, Facebook) to the current user.
 class LinkWithCredentials extends StatefulWidget {
+  /// Constructs the [LinkWithCredentials] widget.
   const LinkWithCredentials({super.key});
 
   @override

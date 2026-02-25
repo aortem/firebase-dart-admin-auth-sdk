@@ -4,7 +4,9 @@
 import 'package:flutter/material.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 
+/// A widget that displays a WebView for Apple authentication.
 class AppleWebViewAuth extends StatefulWidget {
+  /// Constructs the [AppleWebViewAuth] widget.
   const AppleWebViewAuth({super.key});
 
   @override

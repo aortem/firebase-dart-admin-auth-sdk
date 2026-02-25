@@ -3,22 +3,31 @@ import 'package:bot_toast/bot_toast.dart';
 import 'package:firebase_dart_admin_auth_sdk/firebase_dart_admin_auth_sdk.dart';
 import 'package:flutter/material.dart';
 
+/// ViewModel for the [SignInWithPhoneNumberScreen].
 class SignInWithPhoneNumberViewModel extends ChangeNotifier {
+  /// Indicates whether an operation is currently in progress.
   bool loading = false;
+
+  /// Indicates whether the verification code has been sent.
   bool codeSent = false;
+
+  /// The verification ID received from Firebase.
   String? verificationId;
 
+  /// Sets the loading state and notifies listeners.
   void setLoading(bool load) {
     loading = load;
     notifyListeners();
   }
 
+  /// Sets the codeSent state and verificationId, then notifies listeners.
   void setCodeSent(bool sent, String? verId) {
     codeSent = sent;
     verificationId = verId;
     notifyListeners();
   }
 
+  /// Sends a verification code to the provided [phoneNumber].
   Future<void> sendVerificationCode(String phoneNumber) async {
     try {
       setLoading(true);
@@ -34,6 +43,7 @@ class SignInWithPhoneNumberViewModel extends ChangeNotifier {
     setLoading(false);
   }
 
+  /// Verifies the [smsCode] and signs in the user.
   Future<void> verifyCode(String smsCode, VoidCallback onSuccess) async {
     try {
       setLoading(true);

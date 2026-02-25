@@ -5,15 +5,18 @@ import 'package:firebase_dart_admin_auth_sdk/firebase_dart_admin_auth_sdk.dart';
 import 'package:firebase/shared/shared.dart';
 import 'package:provider/provider.dart';
 
+/// A screen for connecting to the Firebase Auth Emulator.
 class ConnectAuthEmulatorScreen extends StatefulWidget {
+  /// Constructs the [ConnectAuthEmulatorScreen] widget.
   const ConnectAuthEmulatorScreen({super.key});
 
   @override
-  _ConnectAuthEmulatorScreenState createState() =>
-      _ConnectAuthEmulatorScreenState();
+  State<ConnectAuthEmulatorScreen> createState() =>
+      ConnectAuthEmulatorScreenState();
 }
 
-class _ConnectAuthEmulatorScreenState extends State<ConnectAuthEmulatorScreen> {
+/// State for [ConnectAuthEmulatorScreen].
+class ConnectAuthEmulatorScreenState extends State<ConnectAuthEmulatorScreen> {
   final TextEditingController _hostController = TextEditingController(
     text: 'localhost',
   );

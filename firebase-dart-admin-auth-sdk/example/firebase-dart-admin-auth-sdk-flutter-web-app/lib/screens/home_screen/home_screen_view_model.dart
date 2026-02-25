@@ -5,7 +5,9 @@ import 'package:firebase/utils/platform_provider.dart';
 import 'package:flutter/foundation.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 
+/// ViewModel for the [HomeScreen].
 class HomeScreenViewModel extends ChangeNotifier {
+  /// Constructs the [HomeScreenViewModel].
   HomeScreenViewModel() {
     _googleSignIn.onCurrentUserChanged.listen((event) async {
       signInAccount = event;
@@ -14,6 +16,7 @@ class HomeScreenViewModel extends ChangeNotifier {
     refreshUser();
   }
 
+  /// Refreshes the current user's information.
   void refreshUser() {
     displayName = _firebaseSdk?.currentUser?.displayName ?? '';
     displayImage = _firebaseSdk?.currentUser?.photoURL;
@@ -22,7 +25,10 @@ class HomeScreenViewModel extends ChangeNotifier {
     notifyListeners();
   }
 
+  /// The Google Sign-In account used for authentication.
   GoogleSignInAccount? signInAccount;
+
+  /// The list of scopes requested for Google Sign-In.
   List<String> scopes = <String>[
     'email',
     'https://www.googleapis.com/auth/contacts.readonly',
@@ -34,16 +40,25 @@ class HomeScreenViewModel extends ChangeNotifier {
   );
   final FirebaseAuth? _firebaseSdk = FirebaseApp.firebaseAuth;
 
+  /// The display name of the current user.
   String displayName = '';
+
+  /// The URL of the current user's profile image.
   String? displayImage;
+
+  /// The number of providers linked to the current user.
   int numberOfLinkedProviders = 0;
 
+  /// Indicates whether an operation is currently in progress.
   bool loading = false;
+
+  /// Sets the loading state to [load] and notifies listeners.
   void setLoading(bool load) {
     loading = load;
     notifyListeners();
   }
 
+  /// Reloads the current user's data from the server.
   Future<void> reloadUser() async {
     try {
       setLoading(true);
@@ -57,13 +72,16 @@ class HomeScreenViewModel extends ChangeNotifier {
     }
   }
 
+  /// Indicates whether a verification email is being sent.
   bool verificationLoading = false;
 
+  /// Sets the verification loading state to [load] and notifies listeners.
   void setVerificationLoading(bool load) {
     verificationLoading = load;
     notifyListeners();
   }
 
+  /// Sends an email verification code to the current user.
   Future<void> sendEmailVerificationCode(VoidCallback onSuccess) async {
     try {
       setVerificationLoading(true);
@@ -79,12 +97,16 @@ class HomeScreenViewModel extends ChangeNotifier {
     }
   }
 
+  /// Indicates whether additional user info is being fetched.
   bool getAdditionalInfoLoading = false;
+
+  /// Sets the additional info loading state to [load] and notifies listeners.
   void setAdditionalInfoLoading(bool load) {
     getAdditionalInfoLoading = load;
     notifyListeners();
   }
 
+  /// Retrieves additional information about the current user.
   Future<void> getAdditionalUserInfo() async {
     try {
       setAdditionalInfoLoading(true);
@@ -99,12 +121,16 @@ class HomeScreenViewModel extends ChangeNotifier {
     }
   }
 
+  /// Indicates whether a provider is being linked.
   bool linkProviderLoading = false;
+
+  /// Sets the link provider loading state to [load] and notifies listeners.
   void setLinkProviderLoading(bool load) {
     linkProviderLoading = load;
     notifyListeners();
   }
 
+  /// Links a Google provider to the current user.
   Future<void> linkProvider() async {
     try {
       setLinkProviderLoading(true);
