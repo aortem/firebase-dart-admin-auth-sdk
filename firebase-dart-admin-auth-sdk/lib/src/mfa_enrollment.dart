@@ -1,10 +1,21 @@
+/// Represents a multi-factor enrollment.
 class MultiFactorEnrollment {
+  /// The factor ID.
   final String factorId;
+
+  /// The display name.
   final String? displayName;
+
+  /// The phone number.
   final String? phoneNumber;
+
+  /// The enrollment timestamp.
   final DateTime? enrolledAt;
+
+  /// The user ID.
   final String? uid;
 
+  /// Creates a new [MultiFactorEnrollment] instance.
   MultiFactorEnrollment({
     required this.factorId,
     this.displayName,
@@ -13,6 +24,7 @@ class MultiFactorEnrollment {
     this.uid,
   });
 
+  /// Creates a [MultiFactorEnrollment] from a JSON object.
   factory MultiFactorEnrollment.fromJson(Map<String, dynamic> json) {
     return MultiFactorEnrollment(
       factorId: json['factorId'] ?? '',
@@ -25,6 +37,7 @@ class MultiFactorEnrollment {
     );
   }
 
+  /// Converts the [MultiFactorEnrollment] to a JSON object.
   Map<String, dynamic> toJson() {
     return {
       'factorId': factorId,

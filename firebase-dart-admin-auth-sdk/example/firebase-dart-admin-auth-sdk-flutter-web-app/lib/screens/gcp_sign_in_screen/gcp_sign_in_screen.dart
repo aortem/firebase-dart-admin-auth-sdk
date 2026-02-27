@@ -6,7 +6,9 @@ import '../../shared/shared.dart';
 import 'package:firebase/utils/extensions.dart';
 import 'gcp_sign_in_view_model.dart';
 
+/// A screen for signing in with Google Cloud Platform (GCP).
 class GCPSignInScreen extends StatefulWidget {
+  /// Constructs the [GCPSignInScreen] widget.
   const GCPSignInScreen({super.key});
 
   @override

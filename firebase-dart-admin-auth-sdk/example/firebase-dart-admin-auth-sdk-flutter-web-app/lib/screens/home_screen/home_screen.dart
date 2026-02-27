@@ -40,7 +40,9 @@ import 'package:firebase/screens/revoke_token_screen/revoke_token_screen.dart';
 import 'package:firebase/screens/on_Id_Token_Changed/on_id_token_changed.dart';
 import 'package:firebase/screens/auth_state_test_screen/auth_state_test_screen.dart';
 
+/// The home screen of the application.
 class HomeScreen extends StatefulWidget {
+  /// Constructs the [HomeScreen] widget.
   const HomeScreen({super.key});
 
   @override
@@ -54,6 +56,7 @@ class _HomeScreenState extends State<HomeScreen> {
   late auth_state.Unsubscribe _authStateUnsubscribe;
   late id_token.Unsubscribe _idTokenUnsubscribe;
 
+  /// The current user's ID token.
   dynamic UserIdToken;
 
   @override

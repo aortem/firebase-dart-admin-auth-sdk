@@ -3,17 +3,23 @@ import 'package:bot_toast/bot_toast.dart';
 import 'package:firebase_dart_admin_auth_sdk/firebase_dart_admin_auth_sdk.dart';
 import 'package:flutter/material.dart';
 
+/// ViewModel for the [SignUpScreen].
 class SignUpViewModel extends ChangeNotifier {
   final FirebaseAuth _auth;
 
+  /// Constructs the [SignUpViewModel] with the given [auth] instance.
   SignUpViewModel(this._auth);
 
+  /// Indicates whether an operation is currently in progress.
   bool loading = false;
+
+  /// Sets the loading state and notifies listeners.
   void setLoading(bool load) {
     loading = load;
     notifyListeners();
   }
 
+  /// Signs up a user with [email] and [password].
   Future<void> signUp(
     String email,
     String password,

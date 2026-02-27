@@ -4,12 +4,21 @@ import 'package:bot_toast/bot_toast.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_dart_admin_auth_sdk/firebase_dart_admin_auth_sdk.dart';
 
+/// Represents the result of a redirect sign-in flow.
 class RedirectResult {
+  /// The signed-in user.
   final User? user;
+
+  /// The authentication credential.
   final AuthCredential? credential;
+
+  /// Additional user information.
   final AdditionalUserInfo? additionalUserInfo;
+
+  /// The type of operation that generated this result.
   final String? operationType;
 
+  /// Constructs a [RedirectResult].
   RedirectResult({
     this.user,
     this.credential,
@@ -17,6 +26,7 @@ class RedirectResult {
     this.operationType,
   });
 
+  /// Creates a [RedirectResult] from a JSON map.
   factory RedirectResult.fromJson(Map<String, dynamic> json) {
     return RedirectResult(
       user: json['user'] != null
@@ -46,13 +56,19 @@ class RedirectResult {
   }
 }
 
+/// ViewModel for the [GetRedirectResultScreen].
 class GetRedirectResultViewModel extends ChangeNotifier {
   bool _loading = false;
   String? _error;
   RedirectResult? _redirectResult;
 
+  /// Indicates whether an operation is currently in progress.
   bool get loading => _loading;
+
+  /// The error message, if any.
   String? get error => _error;
+
+  /// The result of the redirect sign-in.
   RedirectResult? get redirectResult => _redirectResult;
 
   void _setLoading(bool value) {
@@ -60,6 +76,7 @@ class GetRedirectResultViewModel extends ChangeNotifier {
     notifyListeners();
   }
 
+  /// Retrieves the redirect result.
   Future<void> getRedirectResults() async {
     _setLoading(true);
     _error = null;

@@ -4,16 +4,20 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:firebase_dart_admin_auth_sdk/firebase_dart_admin_auth_sdk.dart';
 
+/// A screen to monitor changes to the ID token.
 class IdTokenChangedScreen extends StatefulWidget {
+  /// The [FirebaseAuth] instance to monitor.
   final FirebaseAuth auth;
 
+  /// Creates an [IdTokenChangedScreen].
   const IdTokenChangedScreen({super.key, required this.auth});
 
   @override
-  _IdTokenChangedScreenState createState() => _IdTokenChangedScreenState();
+  State<IdTokenChangedScreen> createState() => IdTokenChangedScreenState();
 }
 
-class _IdTokenChangedScreenState extends State<IdTokenChangedScreen> {
+/// The state for [IdTokenChangedScreen].
+class IdTokenChangedScreenState extends State<IdTokenChangedScreen> {
   String _tokenStatus = 'Monitoring ID token...';
   late StreamSubscription<User?> _subscription;
   DateTime? _lastTokenUpdate;

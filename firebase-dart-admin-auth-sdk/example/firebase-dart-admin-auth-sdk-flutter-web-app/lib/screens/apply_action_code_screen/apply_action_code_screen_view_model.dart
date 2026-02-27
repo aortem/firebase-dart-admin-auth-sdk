@@ -3,14 +3,18 @@ import 'package:bot_toast/bot_toast.dart';
 import 'package:firebase_dart_admin_auth_sdk/firebase_dart_admin_auth_sdk.dart';
 import 'package:flutter/material.dart';
 
+/// ViewModel for the [ApplyActionCodeScreen].
 class ApplyActionCodeScreenViewModel extends ChangeNotifier {
+  /// Indicates whether an operation is currently in progress.
   bool loading = false;
 
+  /// Sets the loading state to [load] and notifies listeners.
   void setLoading(bool load) {
     loading = load;
     notifyListeners();
   }
 
+  /// Applies the given [actionCode] and executes [onSuccess] if successful.
   Future<void> applyActionCode(
     String actionCode,
     VoidCallback onSuccess,

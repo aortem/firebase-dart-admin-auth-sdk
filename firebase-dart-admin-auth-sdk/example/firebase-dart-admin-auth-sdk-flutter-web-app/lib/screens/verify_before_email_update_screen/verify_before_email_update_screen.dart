@@ -6,7 +6,9 @@ import 'package:firebase/utils/extensions.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
+/// A screen for verifying user before email update.
 class VerifyBeforeEmailUpdate extends StatefulWidget {
+  /// Constructs the [VerifyBeforeEmailUpdate] widget.
   const VerifyBeforeEmailUpdate({super.key});
 
   @override

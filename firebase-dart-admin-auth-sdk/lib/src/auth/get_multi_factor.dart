@@ -1,5 +1,7 @@
 import 'package:firebase_dart_admin_auth_sdk/src/exceptions.dart';
 import 'package:firebase_dart_admin_auth_sdk/src/firebase_auth.dart';
+import 'package:firebase_dart_admin_auth_sdk/src/user.dart';
+import 'package:firebase_dart_admin_auth_sdk/src/user_credential.dart';
 
 ///multi factor authentication
 class MultiFactorService {
@@ -99,25 +101,4 @@ class MultiFactorAssertion {
 
   ///multi factor assertion
   MultiFactorAssertion({required this.factorId, required this.secret});
-}
-
-///user credentials
-class UserCredential {
-  ///user
-  final User? user;
-
-  ///user credentials
-  UserCredential({this.user});
-}
-
-///user
-class User {
-  ///uid
-  final String uid;
-
-  ///email
-  final String? email;
-
-  ///user
-  User({required this.uid, this.email});
 }

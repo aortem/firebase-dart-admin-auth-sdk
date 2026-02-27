@@ -5,7 +5,9 @@ import 'package:flutter/material.dart';
 import 'package:file_picker/file_picker.dart';
 // Your Firebase SDK
 
+/// An example screen for Firebase Storage operations.
 class StorageExample extends StatefulWidget {
+  /// Constructs the [StorageExample] widget.
   const StorageExample({super.key});
 
   @override

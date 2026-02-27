@@ -5,7 +5,9 @@ import 'package:firebase/utils/extensions.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
+/// A screen for unlinking authentication providers.
 class UnlinkProviderScreen extends StatelessWidget {
+  /// Constructs the [UnlinkProviderScreen] widget.
   const UnlinkProviderScreen({super.key});
 
   @override

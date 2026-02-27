@@ -41,7 +41,6 @@ class MockCustomTokenGen implements GenerateCustomToken {
 
   @override
   Future<String> generateCustomToken(FcmTokenDto fcmToken, String privateKey) {
-    // TODO: implement generateCustomToken
     throw UnimplementedError();
   }
 
@@ -51,7 +50,6 @@ class MockCustomTokenGen implements GenerateCustomToken {
     String? uid,
     Map<String, dynamic>? additionalClaims,
   }) {
-    // TODO: implement generateSignInJwt
     throw UnimplementedError();
   }
 }
