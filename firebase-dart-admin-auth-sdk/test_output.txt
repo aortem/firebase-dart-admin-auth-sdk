@@ -1,0 +1,15 @@
+00:00 +0: loading test\integration\firebase_integration_test.dart
+00:00 +0: test\unit\auth\auth_state_changed_test.dart: description
+00:04 +1: test\unit\src\firebase_app_token_refresh_test.dart: Access token refresh refreshes when token is expired or inside buffer
+00:05 +2: test\unit\src\firebase_app_wif_test.dart: Workforce Identity Federation (WIF) STS exchange + impersonation success
+00:05 +3: test\unit\src\firebase_app_wif_test.dart: Workforce Identity Federation (WIF) STS exchange + impersonation success
+00:05 +4: test\unit\src\firebase_app_wif_test.dart: Workforce Identity Federation (WIF) STS exchange + impersonation success
+00:05 +5: test\unit\src\firebase_app_wif_test.dart: Workforce Identity Federation (WIF) throws when STS exchange fails
+00:05 +6: test\unit\src\firebase_app_wif_test.dart: Workforce Identity Federation (WIF) throws ArgumentError on missing params
+00:05 +7: test\unit\src\firebase_app_workload_identity_test.dart: Workload Identity (GKE/Cloud Run) initializes via metadata server on GCP
+[WorkloadIdentity] Requesting scopes: https://www.googleapis.com/auth/cloud-platform,https://www.googleapis.com/auth/firebase,https://www.googleapis.com/auth/identitytoolkit
+[WorkloadIdentity] Token obtained from metadata server
+00:05 +8: test\unit\src\firebase_app_workload_identity_test.dart: Workload Identity (GKE/Cloud Run) throws if not running on GCP
+[WorkloadIdentity] Requesting scopes: https://www.googleapis.com/auth/cloud-platform,https://www.googleapis.com/auth/firebase,https://www.googleapis.com/auth/identitytoolkit
+[WorkloadIdentityTokenProvider] Metadata fetch failed: Exception: Unexpected GET http://metadata.google.internal/computeMetadata/v1/instance/service-accounts/default/token?scopes=https://www.googleapis.com/auth/cloud-platform,https://www.googleapis.com/auth/firebase,https://www.googleapis.com/auth/identitytoolkit. Falling back to ADC.
+00:07 +9: All tests passed!

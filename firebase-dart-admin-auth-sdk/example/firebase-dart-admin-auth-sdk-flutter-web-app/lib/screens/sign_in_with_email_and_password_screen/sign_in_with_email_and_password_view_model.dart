@@ -3,13 +3,18 @@ import 'package:bot_toast/bot_toast.dart';
 import 'package:firebase_dart_admin_auth_sdk/firebase_dart_admin_auth_sdk.dart';
 import 'package:flutter/material.dart';
 
+/// ViewModel for the [SignInWithEmailAndPasswordScreen].
 class SignInWithEmailAndPasswordViewModel extends ChangeNotifier {
+  /// Indicates whether an operation is currently in progress.
   bool loading = false;
+
+  /// Sets the loading state and notifies listeners.
   void setLoading(bool load) {
     loading = load;
     notifyListeners();
   }
 
+  /// Signs in with [email] and [password].
   Future<void> signIn(
     String email,
     String password,

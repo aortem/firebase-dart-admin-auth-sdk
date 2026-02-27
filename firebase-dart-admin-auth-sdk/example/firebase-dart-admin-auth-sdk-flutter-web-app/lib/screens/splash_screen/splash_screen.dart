@@ -2,7 +2,9 @@
 import 'package:firebase/screens/sign_up_screen/sign_up_screen.dart';
 import 'package:flutter/material.dart';
 
+/// The splash screen of the application.
 class SplashScreen extends StatefulWidget {
+  /// Constructs the [SplashScreen] widget.
   const SplashScreen({super.key});
 
   @override

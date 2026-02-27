@@ -10,7 +10,9 @@ import 'package:google_identity_services_web/loader.dart' as gis;
 import 'package:google_identity_services_web/oauth2.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
 
+/// A screen for signing in with a popup.
 class SignInWithPopupScreen extends StatefulWidget {
+  /// Constructs the [SignInWithPopupScreen] widget.
   const SignInWithPopupScreen({super.key});
 
   @override

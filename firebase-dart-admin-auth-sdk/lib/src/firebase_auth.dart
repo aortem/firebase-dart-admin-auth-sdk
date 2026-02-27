@@ -30,8 +30,6 @@ import 'package:firebase_dart_admin_auth_sdk/src/auth/verify_before_email_update
 import 'package:firebase_dart_admin_auth_sdk/src/auth/verify_password_reset_code.dart';
 import 'package:firebase_dart_admin_auth_sdk/src/firebase_user/link_with_credentails.dart';
 import 'package:firebase_dart_admin_auth_sdk/src/http_response.dart';
-import 'package:firebase_dart_admin_auth_sdk/src/mfa_enrollment.dart';
-import 'package:firebase_dart_admin_auth_sdk/src/mfa_verification.dart';
 import 'package:firebase_dart_admin_auth_sdk/src/platform_resolver.dart';
 import 'package:firebase_dart_admin_auth_sdk/src/popup_redirect_resolver.dart';
 import 'package:firebase_dart_admin_auth_sdk/src/service_account.dart';

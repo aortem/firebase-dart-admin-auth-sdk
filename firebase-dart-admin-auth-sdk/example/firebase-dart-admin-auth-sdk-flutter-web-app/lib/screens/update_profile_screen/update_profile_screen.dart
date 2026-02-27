@@ -5,7 +5,9 @@ import 'package:firebase/utils/extensions.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
+/// A screen for updating the user's profile information.
 class UpdateProfileScreen extends StatefulWidget {
+  /// Constructs the [UpdateProfileScreen] widget.
   const UpdateProfileScreen({super.key});
 
   @override

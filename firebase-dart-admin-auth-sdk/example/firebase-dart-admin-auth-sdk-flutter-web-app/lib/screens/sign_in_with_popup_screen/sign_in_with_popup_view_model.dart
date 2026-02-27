@@ -3,13 +3,21 @@ import 'dart:async';
 import 'package:flutter/foundation.dart';
 import 'package:firebase_dart_admin_auth_sdk/firebase_dart_admin_auth_sdk.dart';
 
+/// ViewModel for the [SignInWithPopupScreen].
 class SignInWithPopupViewModel extends ChangeNotifier {
   final FirebaseAuth _auth;
+
+  /// The current user.
   User? user;
+
+  /// Inidicates whether sign-in is in progress.
   bool isLoading = false;
+
+  /// Error message if sign-in fails.
   String? errorMessage;
   StreamSubscription<User?>? _authStateSubscription;
 
+  /// Constructs the [SignInWithPopupViewModel] with the given [auth] instance.
   SignInWithPopupViewModel(this._auth) {
     _setupAuthListener();
   }
@@ -27,6 +35,7 @@ class SignInWithPopupViewModel extends ChangeNotifier {
     );
   }
 
+  /// Signs in with Google using a popup.
   Future<void> signInWithGoogle() async {
     await _signInWithPopup(
       GoogleAuthProvider(),
@@ -34,6 +43,7 @@ class SignInWithPopupViewModel extends ChangeNotifier {
     );
   }
 
+  /// Signs in with Facebook using a popup.
   Future<void> signInWithFacebook() async {
     await _signInWithPopup(
       FacebookAuthProvider(),

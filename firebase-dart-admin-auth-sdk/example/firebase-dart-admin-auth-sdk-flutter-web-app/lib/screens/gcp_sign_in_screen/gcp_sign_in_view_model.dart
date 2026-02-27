@@ -4,17 +4,21 @@ import 'package:firebase_dart_admin_auth_sdk/firebase_dart_admin_auth_sdk.dart';
 import 'package:flutter/material.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 
+/// ViewModel for the [GCPSignInScreen].
 class GCPSignInViewModel extends ChangeNotifier {
+  /// Indicates whether an operation is currently in progress.
   bool loading = false;
   final GoogleSignIn _googleSignIn = GoogleSignIn(
     scopes: ['email', 'https://www.googleapis.com/auth/cloud-platform'],
   );
 
+  /// Sets the loading state to [load] and notifies listeners.
   void setLoading(bool load) {
     loading = load;
     notifyListeners();
   }
 
+  /// method to sign in with Google
   Future<void> signIn(VoidCallback onSuccess) async {
     try {
       setLoading(true);
@@ -46,6 +50,7 @@ class GCPSignInViewModel extends ChangeNotifier {
     setLoading(false);
   }
 
+  /// method to sign out
   Future<void> signOut() async {
     try {
       setLoading(true);

@@ -14,6 +14,8 @@ import 'package:provider/provider.dart';
 final GoogleSignIn _googleSignIn = GoogleSignIn(
   scopes: ['email', 'https://www.googleapis.com/auth/cloud-platform'],
 );
+
+/// Helper function to get an access token from Google Sign In
 Future<String> getAuthTokenFromGoogleSignIn() async {
   try {
     // Sign in the user
@@ -95,7 +97,9 @@ void main() async {
   }
 }
 
+/// The root widget of the application.
 class MyApp extends StatelessWidget {
+  /// Constructs the [MyApp] widget.
   const MyApp({super.key});
 
   @override

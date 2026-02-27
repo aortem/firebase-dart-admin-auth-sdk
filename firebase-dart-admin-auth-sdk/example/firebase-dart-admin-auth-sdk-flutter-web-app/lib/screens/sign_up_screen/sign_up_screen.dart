@@ -9,7 +9,9 @@ import 'package:provider/provider.dart';
 
 import 'sign_up_view_model.dart';
 
+/// A screen for signing up a new user.
 class SignUpScreen extends StatefulWidget {
+  /// Constructs the [SignUpScreen] widget.
   const SignUpScreen({super.key});
 
   @override

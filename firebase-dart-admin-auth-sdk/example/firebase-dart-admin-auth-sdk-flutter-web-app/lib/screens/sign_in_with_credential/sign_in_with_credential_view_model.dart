@@ -17,9 +17,12 @@ import 'package:google_identity_services_web/id.dart';
 import 'package:google_identity_services_web/loader.dart' as gis;
 import 'package:google_identity_services_web/oauth2.dart';
 
+/// Global key for the navigator.
 final navigatorKey = GlobalKey<NavigatorState>();
 
+/// ViewModel for [SignInWithCredential] handling Microsoft, Google, and Facebook sign-in.
 class MicrosoftSignIn extends ChangeNotifier {
+  /// Scopes for Google Sign In.
   List<String> scopes = <String>[
     'email',
     'https://www.googleapis.com/auth/contacts.readonly',
@@ -27,7 +30,10 @@ class MicrosoftSignIn extends ChangeNotifier {
 
   late final GoogleSignIn _googleSignIn = GoogleSignIn(scopes: scopes);
 
+  /// Indicates whether an operation is currently in progress.
   bool loading = false;
+
+  /// Sets the loading state and notifies listeners.
   void setLoading(bool load) {
     loading = load;
     notifyListeners();
@@ -153,6 +159,7 @@ class MicrosoftSignIn extends ChangeNotifier {
   }
   ////////////////////////////////////////////////
 
+  /// Initiates the Facebook sign-in flow.
   Future<void> loginWithFacebook(BuildContext context) async {
     final LoginResult result = await FacebookAuth.instance
         .login(); // Trigger the sign-in flow
@@ -194,6 +201,7 @@ class MicrosoftSignIn extends ChangeNotifier {
     }
   }
 
+  /// Configuration for Microsoft OAuth.
   static final Config config = Config(
     tenant: 'common',
     clientId: 'c51012fe-405f-4516-a838-5cf23fd5640c',
@@ -205,8 +213,11 @@ class MicrosoftSignIn extends ChangeNotifier {
       log('onPageFinished: $url');
     },
   );
+
+  /// The [AadOAuth] instance for Microsoft authentication.
   final AadOAuth oauth = AadOAuth(config);
 
+  /// Initiates the Microsoft sign-in flow.
   void signInWithMicrosoft(bool redirect, BuildContext context) async {
     config.webUseRedirect = redirect;
     final result = await oauth.login();
@@ -231,10 +242,12 @@ class MicrosoftSignIn extends ChangeNotifier {
     }
   }
 
+  /// Shows an error dialog with the given [ex]ception.
   void showError(dynamic ex, BuildContext context) {
     showMessage(ex.toString(), context);
   }
 
+  /// Shows a dialog with the given [text].
   void showMessage(String text, BuildContext context) {
     var alert = AlertDialog(
       content: Text(text),
