@@ -1,7 +1,7 @@
 ﻿= Package Overview
 :page-layout: default
 
-Firebase Dart Admin Auth SDK is published as firebase_dart_admin_auth_sdk at version v0.0.10.
+Firebase Dart Admin Auth SDK is published as firebase_dart_admin_auth_sdk at version v0.0.11.
 
 == Source of Truth
 
