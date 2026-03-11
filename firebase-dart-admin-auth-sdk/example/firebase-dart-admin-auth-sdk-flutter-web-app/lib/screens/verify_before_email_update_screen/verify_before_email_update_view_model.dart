@@ -3,15 +3,20 @@ import 'package:bot_toast/bot_toast.dart';
 import 'package:firebase_dart_admin_auth_sdk/firebase_dart_admin_auth_sdk.dart';
 import 'package:flutter/material.dart';
 
+/// ViewModel for the [VerifyBeforeEmailUpdate] screen.
 class VerifyBeforeEmailUpdateViewModel extends ChangeNotifier {
   final FirebaseAuth? _firebaseSdk = FirebaseApp.firebaseAuth;
+
+  /// Indicates whether an operation is currently in progress.
   bool loading = false;
 
+  /// Sets the loading state and notifies listeners.
   void setLoading(bool load) {
     loading = load;
     notifyListeners();
   }
 
+  /// Verifies current user before updating to [newEmail].
   Future<void> verifyBeforeEmailUpdate(
     String newEmail, {
     ActionCodeSettings? actionCode,

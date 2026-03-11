@@ -2,9 +2,12 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_dart_admin_auth_sdk/firebase_dart_admin_auth_sdk.dart';
 
+/// A screen for initializing reCAPTCHA configuration.
 class InitializeRecaptchaConfigScreen extends StatelessWidget {
+  /// The [FirebaseAuth] instance.
   final FirebaseAuth auth;
 
+  /// Constructs the [InitializeRecaptchaConfigScreen] with the given [auth] instance.
   const InitializeRecaptchaConfigScreen({super.key, required this.auth});
 
   Future<void> _initializeRecaptchaConfig(BuildContext context) async {

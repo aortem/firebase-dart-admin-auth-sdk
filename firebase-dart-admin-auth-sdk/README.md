@@ -32,7 +32,7 @@ You can manually edit your `pubspec.yaml `file this:
 
 ```yaml
 dependencies:
-  firebase_dart_admin_auth_sdk: ^0.0.8
+  firebase_dart_admin_auth_sdk: ^0.0.11
 ```
 
 You can run a `flutter pub get` for Flutter respectively to complete installation.
@@ -292,6 +292,84 @@ if (!mfaStatus.isMfaVerified) {
 
 // Enforce MFA (throws FirebaseAuthException if not verified).
 await auth.enforceMfa(idToken, requireEnrollment: true);
+```
+
+## MFA / 2FA Sign-In and Enrollment
+
+The SDK now supports the client-side Firebase Identity Toolkit MFA flow directly.
+
+### Handle MFA-required sign-in
+
+```dart
+final auth = FirebaseApp.instance.getAuth();
+
+try {
+  await auth.signInWithEmailAndPassword('user@example.com', 'super-secret');
+} on MultiFactorError catch (error) {
+  final resolver = await auth.getMultiFactorResolver(error);
+
+  // For SMS factors, start the challenge first.
+  final smsChallenge = await resolver.startSignInChallenge(
+    enrollmentId: error.hints.first.enrollmentId!,
+    phoneSignInInfo: StartPhoneMfaSignInInfo(
+      recaptchaToken: 'browser-recaptcha-token',
+    ),
+  );
+
+  final signInResult = await resolver.resolveSignIn(
+    MultiFactorAssertion.phone(
+      sessionInfo: smsChallenge.sessionInfo!,
+      verificationCode: '123456',
+    ),
+  );
+
+  print(signInResult.user.uid);
+}
+```
+
+### Enroll SMS MFA
+
+```dart
+final auth = FirebaseApp.instance.getAuth();
+final currentIdToken = await auth.currentUser!.getIdToken();
+
+final start = await auth.startMfaEnrollment(
+  idToken: currentIdToken,
+  phoneEnrollmentInfo: StartPhoneMfaEnrollmentInfo(
+    phoneNumber: '+15551234567',
+    recaptchaToken: 'browser-recaptcha-token',
+  ),
+);
+
+await auth.finalizeMfaEnrollment(
+  idToken: currentIdToken,
+  displayName: 'Personal phone',
+  phoneVerificationInfo: FinalizePhoneMfaEnrollmentInfo(
+    sessionInfo: start.sessionInfo!,
+    code: '123456',
+  ),
+);
+```
+
+### Enroll TOTP MFA
+
+```dart
+final auth = FirebaseApp.instance.getAuth();
+final currentIdToken = await auth.currentUser!.getIdToken();
+
+final start = await auth.startMfaEnrollment(
+  idToken: currentIdToken,
+  totp: true,
+);
+
+await auth.finalizeMfaEnrollment(
+  idToken: currentIdToken,
+  displayName: 'Authenticator app',
+  totpVerificationInfo: FinalizeTotpMfaEnrollmentInfo(
+    sessionInfo: start.totpSessionInfo!,
+    verificationCode: '123456',
+  ),
+);
 ```
 
 ## Documentation

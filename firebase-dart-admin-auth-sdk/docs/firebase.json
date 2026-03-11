@@ -1,0 +1,11 @@
+{
+  "hosting": {
+    "target": "fire-base-dart-admin-auth-sdk-docs",
+    "public": "build/site",
+    "ignore": [
+      "firebase.json",
+      "**/.*",
+      "**/node_modules/**"
+    ]
+  }
+}

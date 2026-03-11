@@ -3,15 +3,21 @@ import 'package:bot_toast/bot_toast.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_dart_admin_auth_sdk/firebase_dart_admin_auth_sdk.dart';
 
+/// ViewModel for the [FetchSignInMethodsScreen].
 class FetchSignInMethodsViewModel extends ChangeNotifier {
+  /// Indicates whether an operation is currently in progress.
   bool loading = false;
+
+  /// The list of sign-in methods fetched for the email.
   List<String>? result;
 
+  /// Sets the loading state to [load] and notifies listeners.
   void setLoading(bool load) {
     loading = load;
     notifyListeners();
   }
 
+  /// Fetches the sign-in methods for the given [email].
   Future<void> fetchSignInMethods(String email) async {
     if (email.isEmpty) {
       BotToast.showText(text: 'Please enter an email');

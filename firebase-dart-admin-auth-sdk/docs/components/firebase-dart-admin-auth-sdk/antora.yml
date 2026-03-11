@@ -1,0 +1,5 @@
+name: firebase-dart-admin-auth-sdk
+title: Firebase Dart Admin Auth SDK
+version: v0.0.10
+nav:
+- modules/ROOT/nav.adoc

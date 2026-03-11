@@ -8,7 +8,9 @@ import 'package:flutter/material.dart';
 import '../../shared/button.dart';
 import '../../shared/input_field.dart';
 
+/// A screen for linking a phone number to the current user.
 class LinkPhoneNumberScreen extends StatefulWidget {
+  /// Constructs the [LinkPhoneNumberScreen] widget.
   const LinkPhoneNumberScreen({super.key});
 
   @override

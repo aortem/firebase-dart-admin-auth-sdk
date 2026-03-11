@@ -1,0 +1,25 @@
+﻿= Package Overview
+:page-layout: default
+
+Firebase Dart Admin Auth SDK is published as firebase_dart_admin_auth_sdk at version v0.0.10.
+
+== Source of Truth
+
+* Pubspec: apps/sdks/firebase-dart-admin-auth-sdk/firebase-dart-admin-auth-sdk/pubspec.yaml
+* README: apps/sdks/firebase-dart-admin-auth-sdk/firebase-dart-admin-auth-sdk/README.md
+* Changelog: apps/sdks/firebase-dart-admin-auth-sdk/firebase-dart-admin-auth-sdk/CHANGELOG.md
+
+== Directory Layout
+
+* Repository root: apps/sdks/firebase-dart-admin-auth-sdk
+* Package root: apps/sdks/firebase-dart-admin-auth-sdk/firebase-dart-admin-auth-sdk
+* Documentation: apps/sdks/firebase-dart-admin-auth-sdk/firebase-dart-admin-auth-sdk/docs
+* Library sources: apps/sdks/firebase-dart-admin-auth-sdk/firebase-dart-admin-auth-sdk/lib
+* Examples: apps/sdks/firebase-dart-admin-auth-sdk/firebase-dart-admin-auth-sdk/example
+* Tests: apps/sdks/firebase-dart-admin-auth-sdk/firebase-dart-admin-auth-sdk/test
+* Local dev tools: apps/sdks/firebase-dart-admin-auth-sdk/firebase-dart-admin-auth-sdk/local_dev_tools
+
+== Primary Source Areas
+
+* Public entrypoint: apps/sdks/firebase-dart-admin-auth-sdk/firebase-dart-admin-auth-sdk/lib/firebase_dart_admin_auth_sdk.dart
+* apps/sdks/firebase-dart-admin-auth-sdk/firebase-dart-admin-auth-sdk/lib/src

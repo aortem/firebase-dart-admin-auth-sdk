@@ -1140,6 +1140,54 @@ class FirebaseAuth {
     }
   }
 
+  /// Starts MFA enrollment for SMS or TOTP.
+  Future<multi_factor.MfaEnrollmentStartResponse> startMfaEnrollment({
+    required String idToken,
+    String? tenantId,
+    multi_factor.StartPhoneMfaEnrollmentInfo? phoneEnrollmentInfo,
+    bool totp = false,
+  }) async {
+    try {
+      return await multiFactorService.startMfaEnrollment(
+        idToken: idToken,
+        tenantId: tenantId,
+        phoneEnrollmentInfo: phoneEnrollmentInfo,
+        totp: totp,
+      );
+    } catch (e) {
+      if (e is FirebaseAuthException) rethrow;
+      throw FirebaseAuthException(
+        code: 'mfa-enrollment-start-error',
+        message: 'Failed to start MFA enrollment: ${e.toString()}',
+      );
+    }
+  }
+
+  /// Finalizes MFA enrollment for SMS or TOTP.
+  Future<multi_factor.MfaEnrollmentFinalizeResponse> finalizeMfaEnrollment({
+    required String idToken,
+    String? displayName,
+    String? tenantId,
+    multi_factor.FinalizePhoneMfaEnrollmentInfo? phoneVerificationInfo,
+    multi_factor.FinalizeTotpMfaEnrollmentInfo? totpVerificationInfo,
+  }) async {
+    try {
+      return await multiFactorService.finalizeMfaEnrollment(
+        idToken: idToken,
+        displayName: displayName,
+        tenantId: tenantId,
+        phoneVerificationInfo: phoneVerificationInfo,
+        totpVerificationInfo: totpVerificationInfo,
+      );
+    } catch (e) {
+      if (e is FirebaseAuthException) rethrow;
+      throw FirebaseAuthException(
+        code: 'mfa-enrollment-finalize-error',
+        message: 'Failed to finalize MFA enrollment: ${e.toString()}',
+      );
+    }
+  }
+
   ///sign in with apple
   Future<UserCredential> signInWithApple(String idToken, {String? nonce}) {
     return _appleAuth.signInWithApple(idToken, nonce: nonce);

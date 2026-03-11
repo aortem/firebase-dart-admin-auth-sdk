@@ -1,3 +1,25 @@
+## **0.0.11**
+
+### **Added**
+
+- **Client MFA / 2FA support**:
+  - Added structured `MultiFactorError` parsing for MFA-required sign-in challenges
+  - Added real `MultiFactorResolver.resolveSignIn()` support using Identity Toolkit `accounts/mfaSignIn:finalize`
+  - Added `MultiFactorResolver.startSignInChallenge()` for SMS challenge start via `accounts/mfaSignIn:start`
+  - Added `FirebaseAuth.startMfaEnrollment()` and `FirebaseAuth.finalizeMfaEnrollment()` wrappers for SMS and TOTP enrollment flows
+
+### **Changed**
+
+- `EmailPasswordAuth.signIn()` now detects MFA-required responses and throws `MultiFactorError` instead of a generic auth exception
+- Consolidated MFA resolver types into a single implementation and removed duplicate internal MFA class definitions
+- Updated MFA enrollment parsing to capture `mfaEnrollmentId` and infer factor type from Firebase `mfaInfo`
+
+### **Fixed**
+
+- Replaced the `mock-uid` MFA resolver stub with a real Identity Toolkit sign-in finalize request
+- Restored executable MFA unit tests for admin helpers, enrollment parsing, and challenge-response flows
+- Replaced the commented-out MFA integration test file with a valid skipped integration placeholder
+
 ## **0.0.10**
 
 ### **Added**
@@ -44,7 +66,7 @@
 
 - **Dart SDK Requirement Bump**
   - Updated all relevant `pubspec.yaml` files to require:
-    **`sdk: ^3.10.7`**
+    **`sdk: ^3.11.0`**
     This ensures alignment with the latest stable Dart toolchain and improves compatibility with modern packages.
   - Applies to:
     - Main package `pubspec.yaml`
@@ -125,7 +147,7 @@
   - Updated README instructions to reflect `Dart 3.9.0` requirement.
 
 - **Dependencies / Examples**:
-  - Updated example `pubspec.yaml` to require `sdk: ^3.10.7`.
+  - Updated example `pubspec.yaml` to require `sdk: ^3.11.0`.
   - Simplified dependency reference in the example Flutter web app:
     - Replaced local path dependency (`firebase_dart_admin_auth_sdk: { path: ... }`) with a versioned dependency string.
 

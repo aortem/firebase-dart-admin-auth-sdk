@@ -1,0 +1,35 @@
+﻿= Releases
+:navtitle: Releases
+:description: Release tracking for Firebase Dart Admin Auth SDK.
+:sectnums:
+
+This page tracks the current public package version documented for Firebase Dart Admin Auth SDK.
+'''
+
+== v0.0.11
+
+=== Overview
+The current public package version for `firebase_dart_admin_auth_sdk` is `v0.0.11`.
+
+=== Release Sources
+
+* Pubspec: apps/sdks/firebase-dart-admin-auth-sdk/firebase-dart-admin-auth-sdk/pubspec.yaml
+* Changelog: apps/sdks/firebase-dart-admin-auth-sdk/firebase-dart-admin-auth-sdk/CHANGELOG.md
+
+=== Highlights
+
+* Added client MFA / 2FA support for sign-in challenge handling and resolver completion.
+* Added `FirebaseAuth.startMfaEnrollment()` and `FirebaseAuth.finalizeMfaEnrollment()` wrappers for SMS and TOTP enrollment flows.
+* Added `MultiFactorResolver.startSignInChallenge()` and real `resolveSignIn()` support backed by Identity Toolkit MFA endpoints.
+* Updated MFA enrollment parsing to preserve `mfaEnrollmentId` and infer factor type from Firebase `mfaInfo`.
+
+=== Fixes
+
+* Replaced the previous MFA resolver stubbed sign-in flow with real Identity Toolkit finalize requests.
+* Restored MFA unit test coverage for admin helpers, enrollment parsing, and challenge-response flows.
+* Removed duplicate internal MFA type definitions in favor of a single consolidated implementation.
+
+=== Notes
+
+* Keep this page aligned with the version declared in `pubspec.yaml`.
+* Refer to `CHANGELOG.md` for the full release history.

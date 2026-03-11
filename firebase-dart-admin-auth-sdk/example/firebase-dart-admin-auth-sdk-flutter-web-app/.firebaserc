@@ -5,8 +5,8 @@
   "targets": {
     "fire-base-dart-admin-auth-sdk": {
       "hosting": {
-        "firebase-admin-auth-sdk-flutter_web_app-usman": [
-          "fire-base-dart-admin-auth-sdk-flutter-web-app-usman"
+        "firebase-admin-auth-sdk-flutter_web_app-aortem": [
+          "fire-base-dart-admin-auth-sdk-flutter-web-app-aortem"
         ]
       }
     }

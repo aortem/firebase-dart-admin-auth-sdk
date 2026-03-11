@@ -1,0 +1,47 @@
+﻿= Getting Started
+:page-layout: default
+
+This page covers the quickest path to installing and navigating Firebase Dart Admin Auth SDK.
+
+== Install the Package
+
+Add the package to your pubspec.yaml:
+
+[source,yaml]
+----
+dependencies:
+  firebase_dart_admin_auth_sdk: ^0.0.10
+----
+
+Then run:
+
+[source,bash]
+----
+dart pub get
+----
+
+== Import the Library
+
+[source,dart]
+----
+import 'package:firebase_dart_admin_auth_sdk/firebase_dart_admin_auth_sdk.dart';
+----
+
+== Start with the Package Sources
+
+* Pubspec: apps/sdks/firebase-dart-admin-auth-sdk/firebase-dart-admin-auth-sdk/pubspec.yaml
+* README: apps/sdks/firebase-dart-admin-auth-sdk/firebase-dart-admin-auth-sdk/README.md
+* Examples: apps/sdks/firebase-dart-admin-auth-sdk/firebase-dart-admin-auth-sdk/example
+* Tests: apps/sdks/firebase-dart-admin-auth-sdk/firebase-dart-admin-auth-sdk/test
+
+== Build the Docs
+
+From apps/sdks/firebase-dart-admin-auth-sdk/firebase-dart-admin-auth-sdk/docs:
+
+[source,bash]
+----
+npm install
+npx antora antora-playbook.yml
+----
+
+The generated site is written to build/site.

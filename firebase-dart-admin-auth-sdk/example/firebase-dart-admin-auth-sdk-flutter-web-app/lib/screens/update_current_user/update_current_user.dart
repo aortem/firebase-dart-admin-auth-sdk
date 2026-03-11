@@ -2,18 +2,23 @@
 import 'package:firebase_dart_admin_auth_sdk/firebase_dart_admin_auth_sdk.dart';
 import 'package:flutter/material.dart';
 
+/// A screen for updating user details.
 class UpdateUserScreen extends StatefulWidget {
+  /// Constructs the [UpdateUserScreen] widget.
   const UpdateUserScreen({super.key});
   @override
   State<UpdateUserScreen> createState() => UpdateUserScreenState();
 }
 
+/// State class for [UpdateUserScreen].
 class UpdateUserScreenState extends State<UpdateUserScreen> {
   final _formKey = GlobalKey<FormState>();
   final TextEditingController _displayNameController = TextEditingController();
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
   final TextEditingController _phoneNumberController = TextEditingController();
+
+  /// The Firebase app instance.
   final FirebaseApp auth = FirebaseApp.instance;
 
   @override

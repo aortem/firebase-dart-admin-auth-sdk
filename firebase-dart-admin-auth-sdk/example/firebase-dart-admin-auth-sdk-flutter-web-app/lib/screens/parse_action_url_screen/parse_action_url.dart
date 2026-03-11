@@ -5,7 +5,9 @@ import 'package:flutter/material.dart';
 import '../../shared/button.dart';
 import '../../shared/input_field.dart';
 
+/// A screen for parsing action codes from a URL.
 class ParseActionUrl extends StatefulWidget {
+  /// Constructs the [ParseActionUrl] widget.
   const ParseActionUrl({super.key});
 
   @override

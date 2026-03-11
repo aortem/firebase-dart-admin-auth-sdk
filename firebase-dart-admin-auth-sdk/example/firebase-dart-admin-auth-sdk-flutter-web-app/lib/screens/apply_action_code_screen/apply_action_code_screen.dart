@@ -6,7 +6,9 @@ import 'package:firebase/utils/extensions.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
+/// A screen for applying an action code.
 class ApplyActionCodeScreen extends StatefulWidget {
+  /// Constructs the [ApplyActionCodeScreen] widget.
   const ApplyActionCodeScreen({super.key});
 
   @override

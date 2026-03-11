@@ -1,4 +1,5 @@
 import 'dart:developer';
+import 'dart:convert';
 import 'package:firebase_dart_admin_auth_sdk/firebase_dart_admin_auth_sdk.dart';
 
 ///emailpasswordauth
@@ -12,16 +13,44 @@ class EmailPasswordAuth {
   ///signin
   Future<UserCredential?> signIn(String email, String password) async {
     try {
-      final response = await auth.performRequest('signInWithPassword', {
-        'email': email,
-        'password': password,
-        'returnSecureToken': true,
-      });
-      print(response.body.toString());
+      final apiKey = (auth.apiKey ?? '').trim();
+      if (apiKey.isEmpty || apiKey == 'your_api_key') {
+        throw FirebaseAuthException(
+          code: 'api-key-required',
+          message:
+              'FirebaseAuth.signInWithEmailAndPassword requires a Firebase web API key.',
+        );
+      }
+
+      final response = await auth.httpClient.post(
+        Uri.https(
+          'identitytoolkit.googleapis.com',
+          '/v1/accounts:signInWithPassword',
+          {'key': apiKey},
+        ),
+        headers: {'Content-Type': 'application/json'},
+        body: jsonEncode({
+          'email': email,
+          'password': password,
+          'returnSecureToken': true,
+        }),
+      );
+      final responseBody = response.body.isEmpty
+          ? <String, dynamic>{}
+          : Map<String, dynamic>.from(jsonDecode(response.body) as Map);
+
+      final challenge = tryParseMultiFactorError(
+        responseBody,
+        code: 'multi-factor-auth-required',
+        message:
+            'Second factor required. Use getMultiFactorResolver() to continue the sign-in flow.',
+      );
+      if (challenge != null) {
+        throw challenge;
+      }
 
       if (response.statusCode == 200) {
-        // Pass apiKey when creating UserCredential
-        final userData = response.body;
+        final userData = responseBody;
         final user = User.fromJson(userData, apiKey: auth.apiKey);
         final userCredential = UserCredential(
           user: user,
@@ -38,14 +67,18 @@ class EmailPasswordAuth {
 
         return userCredential;
       } else {
-        final error = response.body['error'];
+        final error = responseBody['error'];
         throw FirebaseAuthException(
-          code: error['message'] ?? 'unknown-error',
-          message: error['message'] ?? 'An unknown error occurred',
+          code: error is Map<String, dynamic>
+              ? error['message'] ?? 'unknown-error'
+              : 'unknown-error',
+          message: error is Map<String, dynamic>
+              ? error['message'] ?? 'An unknown error occurred'
+              : 'An unknown error occurred',
         );
       }
     } catch (e) {
-      if (e is FirebaseAuthException) {
+      if (e is FirebaseAuthException || e is MultiFactorError) {
         rethrow;
       }
       throw FirebaseAuthException(code: 'auth-error', message: e.toString());

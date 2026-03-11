@@ -6,7 +6,9 @@ import 'get_redirect_result_view_model.dart';
 import 'package:firebase/shared/shared.dart';
 import 'package:firebase/utils/extensions.dart';
 
+/// A screen for retrieving the result of a sign-in redirect.
 class GetRedirectResultScreen extends StatefulWidget {
+  /// Constructs the [GetRedirectResultScreen] widget.
   const GetRedirectResultScreen({super.key});
 
   @override
