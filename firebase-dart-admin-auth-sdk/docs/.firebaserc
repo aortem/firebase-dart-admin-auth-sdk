@@ -5,8 +5,8 @@
   "targets": {
     "aortem-prod": {
       "hosting": {
-        "fire-base-dart-admin-auth-sdk-docs": [
-          "fire-base-dart-admin-auth-sdk-docs"
+        "fire-base-dart-auth-sdk-docs": [
+          "fire-base-dart-auth-sdk-docs"
         ]
       }
     }
