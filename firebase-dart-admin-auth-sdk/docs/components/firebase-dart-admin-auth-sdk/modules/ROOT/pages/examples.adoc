@@ -1,0 +1,24 @@
+﻿= Examples
+:page-layout: default
+
+Examples and sample apps for Firebase Dart Admin Auth SDK live under:
+
+* apps/sdks/firebase-dart-admin-auth-sdk/firebase-dart-admin-auth-sdk/example
+* apps/sdks/firebase-dart-admin-auth-sdk/firebase-dart-admin-auth-sdk/README.md
+* apps/sdks/firebase-dart-admin-auth-sdk/firebase-dart-admin-auth-sdk/example/README.md
+
+== Current Example Directories
+
+* apps/sdks/firebase-dart-admin-auth-sdk/firebase-dart-admin-auth-sdk/example/firebase-dart-admin-auth-sdk-compose-app
+* apps/sdks/firebase-dart-admin-auth-sdk/firebase-dart-admin-auth-sdk/example/firebase-dart-admin-auth-sdk-flutter-desktop-app
+* apps/sdks/firebase-dart-admin-auth-sdk/firebase-dart-admin-auth-sdk/example/firebase-dart-admin-auth-sdk-flutter-games-app
+* apps/sdks/firebase-dart-admin-auth-sdk/firebase-dart-admin-auth-sdk/example/firebase-dart-admin-auth-sdk-flutter-mobile-app
+* apps/sdks/firebase-dart-admin-auth-sdk/firebase-dart-admin-auth-sdk/example/firebase-dart-admin-auth-sdk-flutter-web-app
+* apps/sdks/firebase-dart-admin-auth-sdk/firebase-dart-admin-auth-sdk/example/firebase-dart-admin-auth-sdk-react-app
+* apps/sdks/firebase-dart-admin-auth-sdk/firebase-dart-admin-auth-sdk/example/firebase-dart-admin-auth-sdk-svelte-app
+* apps/sdks/firebase-dart-admin-auth-sdk/firebase-dart-admin-auth-sdk/example/firebase-dart-admin-auth-sdk-vue-app
+
+== Notes
+
+* Use the current example directory names as the source of truth for available sample apps.
+* Expand this page with narrative walkthroughs as examples are finalized.

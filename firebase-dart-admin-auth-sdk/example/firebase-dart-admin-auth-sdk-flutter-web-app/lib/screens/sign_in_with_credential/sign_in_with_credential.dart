@@ -7,9 +7,12 @@ import 'package:provider/provider.dart';
 
 import 'sign_in_with_credential_view_model.dart';
 
+/// Global key for the navigator.
 final navigatorKey = GlobalKey<NavigatorState>();
 
+/// A screen for signing in with various credentials (Google, Facebook, Microsoft).
 class SignInWithCredential extends StatelessWidget {
+  /// Constructs the [SignInWithCredential] widget.
   const SignInWithCredential({super.key});
 
   @override

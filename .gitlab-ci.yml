@@ -7,6 +7,10 @@ stages:
 
 # The pipeline covers a series of triggers to ensure full testing and coverage
 
+workflow:
+  rules:
+    - when: always
+
 # Debug Stage
 debug_merge_request:
   stage: setup
@@ -29,32 +33,25 @@ debug_merge_request:
     - echo "Pipeline Metadata..."
     - echo "CI_PIPELINE_SOURCE is $CI_PIPELINE_SOURCE"
   rules:
-    - if: '$CI_PIPELINE_SOURCE'  # Forces execution in ALL scenarios
+    - changes:
+        - firebase-dart-admin-auth-sdk/backend/**/*
+        - firebase-dart-admin-auth-sdk/docs/**/*
+        - firebase-dart-admin-auth-sdk/example/**/*
+        - tools/**/*
+        - "*"
+        - "**/*"
       when: always
+    - when: never
 
-# Validate Conditional Triggers
-validation_trigger:
+# Validation Conditional Triggers for Docs
+validation_trigger_docs:
   stage: validation
   trigger:
-    include: tools/pipelines/backend/child-ci-setup-validation.yml
+    include: tools/pipelines/firebase-hosting/child-ci-production-docs.yml
   rules:
-    # Condition 1: Branch is not main, qa, or development
-    - if: '$CI_COMMIT_REF_NAME != "main" && $CI_COMMIT_REF_NAME != "qa" && $CI_COMMIT_REF_NAME != "development"'
+    - changes:
+        - firebase-dart-admin-auth-sdk/docs/**/*
       when: always
-
-    # Condition 2: Triggered by a push event
-    - if: '$CI_PIPELINE_SOURCE == "push"'
-      when: always
-
-    # Condition 3: Triggered by a merge request event (source branch is not "development")
-    - if: '$CI_PIPELINE_SOURCE == "merge_request_event" && $CI_MERGE_REQUEST_SOURCE_BRANCH_NAME != "development"'
-      when: always
-
-    # Condition 4: Triggered by a merge request event (source branch is "development", "qa", or "main")
-    - if: '$CI_MERGE_REQUEST_SOURCE_BRANCH_NAME == "development" || $CI_MERGE_REQUEST_SOURCE_BRANCH_NAME == "qa" || $CI_MERGE_REQUEST_SOURCE_BRANCH_NAME == "main"'
-      when: always
-
-    # Fallback: Skip if no condition matches
     - when: never
 
 # # Unit Test Conditional Triggers

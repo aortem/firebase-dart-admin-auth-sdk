@@ -3,22 +3,29 @@ import 'package:bot_toast/bot_toast.dart';
 import 'package:firebase_dart_admin_auth_sdk/firebase_dart_admin_auth_sdk.dart';
 import 'package:flutter/material.dart';
 
+/// ViewModel for the [SendSignInWithEmailLinkScreen].
 class SendSignInWithEmailLinkScreenViewModel extends ChangeNotifier {
+  /// Inidcates whether an operation is currently in progress.
   bool loading = false;
+
+  /// Indicates whether the sign-in is currently in progress.
   bool signingIn = false;
 
   final FirebaseAuth? _firebaseSdk = FirebaseApp.firebaseAuth;
 
+  /// Sets the loading state and notifies listeners.
   void setLoading(bool load) {
     loading = load;
     notifyListeners();
   }
 
+  /// Sets the signingIn state and notifies listeners.
   void setSigningIn(bool value) {
     signingIn = value;
     notifyListeners();
   }
 
+  /// Sends a sign-in link to the provided [email].
   Future<void> sendSignInLinkToEmail(String email) async {
     try {
       setLoading(true);
@@ -33,6 +40,7 @@ class SendSignInWithEmailLinkScreenViewModel extends ChangeNotifier {
     }
   }
 
+  /// Signs in with the given [email] and [emailLink].
   Future<void> signInWithEmailLink(
     String email,
     String emailLink,

@@ -3,7 +3,9 @@ import 'package:flutter/material.dart';
 import 'package:firebase_dart_admin_auth_sdk/firebase_dart_admin_auth_sdk.dart';
 import 'package:provider/provider.dart';
 
+/// A screen for checking an action code (e.g., password reset).
 class CheckActionCodeScreen extends StatefulWidget {
+  /// Constructs the [CheckActionCodeScreen] widget.
   const CheckActionCodeScreen({super.key});
 
   @override

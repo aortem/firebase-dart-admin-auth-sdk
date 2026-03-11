@@ -5,7 +5,9 @@ import 'package:firebase/utils/extensions.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
+/// A screen for updating the user's password.
 class UpdatePasswordScreen extends StatefulWidget {
+  /// Constructs the [UpdatePasswordScreen] widget.
   const UpdatePasswordScreen({super.key});
 
   @override

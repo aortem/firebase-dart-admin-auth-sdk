@@ -6,7 +6,9 @@ import 'package:firebase/utils/extensions.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
+/// A screen for sending a sign-in email link.
 class SendSignInWithEmailLinkScreen extends StatefulWidget {
+  /// Constructs the [SendSignInWithEmailLinkScreen] widget.
   const SendSignInWithEmailLinkScreen({super.key});
 
   @override

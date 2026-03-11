@@ -9,9 +9,12 @@ import 'package:flutter/material.dart';
 import '../../shared/button.dart';
 import '../../shared/input_field.dart';
 
+/// A screen for verifying a password reset code.
 class VerifyPasswordResetCode extends StatelessWidget {
+  /// Constructs the [VerifyPasswordResetCode] widget.
   VerifyPasswordResetCode({super.key});
 
+  /// Controller for the password reset code input field.
   final TextEditingController verifyPasswordRestController =
       TextEditingController();
 

@@ -6,7 +6,9 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'sign_in_with_email_and_password_view_model.dart';
 
+/// A screen for signing in with email and password.
 class SignInWithEmailAndPasswordScreen extends StatefulWidget {
+  /// Constructs the [SignInWithEmailAndPasswordScreen] widget.
   const SignInWithEmailAndPasswordScreen({super.key});
 
   @override

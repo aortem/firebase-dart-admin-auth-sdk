@@ -59,7 +59,7 @@ class UserCredential {
   /// };
   /// UserCredential userCredential = UserCredential.fromJson(jsonData);
   /// ```
-  factory UserCredential.fromJson(Map<String, dynamic> json) {
+  factory UserCredential.fromJson(Map<String, dynamic> json, {String? apiKey}) {
     AuthCredential? credential;
     if (json['credential'] != null) {
       final credentialData = json['credential'] as Map<String, dynamic>;
@@ -90,6 +90,7 @@ class UserCredential {
     return UserCredential(
       user: User.fromJson(
         json,
+        apiKey: apiKey,
       ), // Assumes `User.fromJson` is defined in the 'user.dart' file
       additionalUserInfo: json['additionalUserInfo'] != null
           ? AdditionalUserInfo.fromJson(json['additionalUserInfo'])

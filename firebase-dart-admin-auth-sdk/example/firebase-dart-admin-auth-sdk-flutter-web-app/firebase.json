@@ -1,6 +1,6 @@
 {
   "hosting": {
-    "target": "firebase-admin-auth-sdk-flutter_web_app-usman",
+    "target": "firebase-admin-auth-sdk-flutter_web_app-aortem",
     "public": "build/web",
     "ignore": [
       "firebase.json",
