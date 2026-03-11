@@ -456,8 +456,6 @@ class MultiFactorAssertion {
     );
   }
 }
-<<<<<<< HEAD
-
 /// Request payload for starting SMS factor enrollment.
 class StartPhoneMfaEnrollmentInfo {
   /// Phone number to enroll.
@@ -647,5 +645,3 @@ class MfaEnrollmentFinalizeResponse {
     );
   }
 }
-=======
->>>>>>> a3fd8a320734a06226a83173862eeef6e9b5a58c
