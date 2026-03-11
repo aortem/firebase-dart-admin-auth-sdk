@@ -61,9 +61,7 @@ Future<Map<String, dynamic>> _postJson(
   }
 
   final error = decoded['error'];
-  final errorMap = error is Map<String, dynamic>
-      ? error
-      : <String, dynamic>{};
+  final errorMap = error is Map<String, dynamic> ? error : <String, dynamic>{};
   throw FirebaseAuthException(
     code: _normalizeAuthMessage(
       errorMap['message']?.toString(),
@@ -109,11 +107,7 @@ MultiFactorError? tryParseMultiFactorError(
   if (payload == null) {
     return null;
   }
-  return MultiFactorError.fromResponse(
-    payload,
-    code: code,
-    message: message,
-  );
+  return MultiFactorError.fromResponse(payload, code: code, message: message);
 }
 
 /// Multi-factor authentication service.
@@ -201,7 +195,10 @@ class MultiFactorService {
       'accounts/mfaEnrollment:finalize',
       request,
     );
-    return MfaEnrollmentFinalizeResponse.fromJson(response, apiKey: auth.apiKey);
+    return MfaEnrollmentFinalizeResponse.fromJson(
+      response,
+      apiKey: auth.apiKey,
+    );
   }
 }
 
@@ -306,7 +303,8 @@ class MultiFactorError extends FirebaseAuthException {
     required this.session,
     required this.rawResponse,
     super.code = 'multi-factor-auth-required',
-    super.message = 'Multi-factor authentication is required to complete sign-in.',
+    super.message =
+        'Multi-factor authentication is required to complete sign-in.',
   });
 
   /// Builds the error from the Identity Toolkit MFA challenge payload.
@@ -319,7 +317,10 @@ class MultiFactorError extends FirebaseAuthException {
     final hints = rawHints is List
         ? rawHints
               .whereType<Map>()
-              .map((entry) => MultiFactorInfo.fromJson(Map<String, dynamic>.from(entry)))
+              .map(
+                (entry) =>
+                    MultiFactorInfo.fromJson(Map<String, dynamic>.from(entry)),
+              )
               .toList()
         : <MultiFactorInfo>[];
 
@@ -331,10 +332,7 @@ class MultiFactorError extends FirebaseAuthException {
         tenantId: response['tenantId']?.toString(),
       ),
       rawResponse: Map<String, dynamic>.from(response),
-      code: _normalizeAuthMessage(
-        code,
-        fallback: 'multi-factor-auth-required',
-      ),
+      code: _normalizeAuthMessage(code, fallback: 'multi-factor-auth-required'),
       message: _normalizeAuthMessage(
         message,
         fallback:
@@ -383,7 +381,8 @@ class MultiFactorInfo {
         : 'unknown';
 
     final displayName = json['displayName']?.toString().trim();
-    final phone = json['phoneInfo']?.toString() ??
+    final phone =
+        json['phoneInfo']?.toString() ??
         json['unobfuscatedPhoneInfo']?.toString();
     final emailInfo = json['emailInfo'];
     final emailAddress = emailInfo is Map<String, dynamic>
@@ -393,8 +392,7 @@ class MultiFactorInfo {
     return MultiFactorInfo(
       factorId: factorId,
       enrollmentId: json['mfaEnrollmentId']?.toString(),
-      displayName:
-          (displayName == null || displayName.isEmpty)
+      displayName: (displayName == null || displayName.isEmpty)
           ? (phone ?? emailAddress ?? factorId)
           : displayName,
       phoneNumber: phone,
@@ -450,12 +448,10 @@ class MultiFactorAssertion {
 
   /// Builds a TOTP assertion from the authenticator code.
   factory MultiFactorAssertion.totp({required String verificationCode}) {
-    return MultiFactorAssertion(
-      factorId: 'totp',
-      secret: verificationCode,
-    );
+    return MultiFactorAssertion(factorId: 'totp', secret: verificationCode);
   }
 }
+
 /// Request payload for starting SMS factor enrollment.
 class StartPhoneMfaEnrollmentInfo {
   /// Phone number to enroll.
@@ -500,7 +496,11 @@ class StartPhoneMfaSignInInfo {
   final String? iosSecret;
 
   /// Creates phone sign-in info.
-  StartPhoneMfaSignInInfo({this.recaptchaToken, this.iosReceipt, this.iosSecret});
+  StartPhoneMfaSignInInfo({
+    this.recaptchaToken,
+    this.iosReceipt,
+    this.iosSecret,
+  });
 
   /// Serializes request JSON.
   Map<String, dynamic> toJson() => {
@@ -583,10 +583,7 @@ class FinalizePhoneMfaEnrollmentInfo {
   });
 
   /// Serializes JSON.
-  Map<String, dynamic> toJson() => {
-    'sessionInfo': sessionInfo,
-    'code': code,
-  };
+  Map<String, dynamic> toJson() => {'sessionInfo': sessionInfo, 'code': code};
 }
 
 /// Payload used to finalize TOTP enrollment.

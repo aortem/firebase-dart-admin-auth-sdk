@@ -5,6 +5,7 @@ class MultiFactorEnrollment {
 
   /// Firebase enrollment identifier for the factor.
   final String? enrollmentId;
+
   /// The display name.
   final String? displayName;
 
@@ -13,6 +14,7 @@ class MultiFactorEnrollment {
 
   /// Email address for email-based factors.
   final String? emailAddress;
+
   /// The enrollment timestamp.
   final DateTime? enrolledAt;
 
@@ -63,8 +65,7 @@ class MultiFactorEnrollment {
       'mfaEnrollmentId': enrollmentId,
       'displayName': displayName,
       'phoneInfo': phoneNumber,
-      if (emailAddress != null)
-        'emailInfo': {'emailAddress': emailAddress},
+      if (emailAddress != null) 'emailInfo': {'emailAddress': emailAddress},
       'enrolledAt': enrolledAt?.toIso8601String(),
       'uid': uid,
     };
