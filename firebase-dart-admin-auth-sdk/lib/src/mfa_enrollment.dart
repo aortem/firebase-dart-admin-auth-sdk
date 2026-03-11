@@ -1,20 +1,29 @@
 /// Represents a multi-factor enrollment.
 class MultiFactorEnrollment {
+<<<<<<< HEAD
   /// The factor type (`phone`, `totp`, `email`) when it can be inferred.
   final String factorId;
 
   /// Firebase enrollment identifier for the factor.
   final String? enrollmentId;
 
+=======
+  /// The factor ID.
+  final String factorId;
+
+>>>>>>> a3fd8a320734a06226a83173862eeef6e9b5a58c
   /// The display name.
   final String? displayName;
 
   /// The phone number.
   final String? phoneNumber;
 
+<<<<<<< HEAD
   /// Email address for email-based factors.
   final String? emailAddress;
 
+=======
+>>>>>>> a3fd8a320734a06226a83173862eeef6e9b5a58c
   /// The enrollment timestamp.
   final DateTime? enrolledAt;
 
