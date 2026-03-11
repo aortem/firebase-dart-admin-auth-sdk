@@ -27,9 +27,16 @@ class MultiFactorResolverScreenState extends State<MultiFactorResolverScreen> {
     try {
       final mockError = multi_factor.MultiFactorError(
         hints: [
-          multi_factor.MultiFactorInfo(factorId: 'phone', displayName: 'Phone'),
+          multi_factor.MultiFactorInfo(
+            factorId: 'totp',
+            displayName: 'Authenticator app',
+            enrollmentId: 'mock-totp-enrollment',
+          ),
         ],
-        session: multi_factor.MultiFactorSession(id: 'mock-session-id'),
+        session: multi_factor.MultiFactorSession(
+          pendingCredential: 'mock-session-id',
+        ),
+        rawResponse: const {},
       );
       final obtainedResolver = await auth.getMultiFactorResolver(mockError);
       setState(() {
@@ -48,12 +55,12 @@ class MultiFactorResolverScreenState extends State<MultiFactorResolverScreen> {
 
     try {
       final mockAssertion = multi_factor.MultiFactorAssertion(
-        factorId: 'phone',
+        factorId: 'totp',
         secret: '123456',
       );
       final userCredential = await resolver!.resolveSignIn(mockAssertion);
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Signed in as: ${userCredential.user?.email}')),
+        SnackBar(content: Text('Signed in as: ${userCredential.user.email}')),
       );
     } catch (e) {
       ScaffoldMessenger.of(

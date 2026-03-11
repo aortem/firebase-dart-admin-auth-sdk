@@ -1,0 +1,15 @@
+site:
+  title: Firebase Dart Admin Auth SDK Docs
+  start_page: firebase-dart-admin-auth-sdk::index.adoc
+  url: https://firebase-dart-admin-auth-sdk-docs.web.app/
+
+content:
+  sources:
+    - url: ../..
+      branches: HEAD
+      start_path: firebase-dart-admin-auth-sdk/docs/components/firebase-dart-admin-auth-sdk
+
+ui:
+  bundle:
+    url: ./ui/antora-ui-custom/ui-bundle
+    snapshot: true

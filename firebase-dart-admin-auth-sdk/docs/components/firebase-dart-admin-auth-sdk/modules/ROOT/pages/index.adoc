@@ -1,0 +1,35 @@
+﻿= Firebase Dart Admin Auth SDK Documentation
+:page-layout: default
+:sectanchors:
+:toc: macro
+:toc-title: On This Page
+
+A Dart SDK for Firebase Admin Authentication, enabling secure server-side authentication and user management for Dart-based backend applications.
+
+This documentation set is the standard public reference for firebase_dart_admin_auth_sdk and is kept aligned with the package version declared in pubspec.yaml.
+
+toc::[]
+
+== What This Site Covers
+
+* xref:getting-started.adoc[Getting Started] for installation, imports, and local docs builds
+* xref:package-overview.adoc[Package Overview] for package structure and source-of-truth paths
+* xref:examples.adoc[Examples] for sample app locations in the repository
+* xref:api-reference.adoc[API Reference] for exported library entrypoints and source areas
+* xref:releases.adoc[Releases] for the current public version and changelog path
+
+== Current Public Package
+
+* Package: firebase_dart_admin_auth_sdk
+* Version: v0.0.10
+* Repository root: apps/sdks/firebase-dart-admin-auth-sdk
+* Package root: apps/sdks/firebase-dart-admin-auth-sdk/firebase-dart-admin-auth-sdk
+* Docs root: apps/sdks/firebase-dart-admin-auth-sdk/firebase-dart-admin-auth-sdk/docs
+
+== Suggested Reading Order
+
+. xref:getting-started.adoc[Getting Started]
+. xref:package-overview.adoc[Package Overview]
+. xref:examples.adoc[Examples]
+. xref:api-reference.adoc[API Reference]
+. xref:releases.adoc[Releases]

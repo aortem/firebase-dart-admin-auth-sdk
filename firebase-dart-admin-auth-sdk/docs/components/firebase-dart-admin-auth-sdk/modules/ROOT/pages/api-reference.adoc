@@ -1,0 +1,22 @@
+﻿= API Reference
+:page-layout: default
+
+This page maps the public package entrypoint to the current source tree.
+
+== Package API
+
+* Package: firebase_dart_admin_auth_sdk
+* Version: v0.0.10
+* Package root: apps/sdks/firebase-dart-admin-auth-sdk/firebase-dart-admin-auth-sdk
+* Import path: package:firebase_dart_admin_auth_sdk/firebase_dart_admin_auth_sdk.dart
+* Entrypoint file: apps/sdks/firebase-dart-admin-auth-sdk/firebase-dart-admin-auth-sdk/lib/firebase_dart_admin_auth_sdk.dart
+
+== Source Areas
+
+* apps/sdks/firebase-dart-admin-auth-sdk/firebase-dart-admin-auth-sdk/lib/src
+
+== Supporting Sources
+
+* Tests: apps/sdks/firebase-dart-admin-auth-sdk/firebase-dart-admin-auth-sdk/test
+* README: apps/sdks/firebase-dart-admin-auth-sdk/firebase-dart-admin-auth-sdk/README.md
+* Changelog: apps/sdks/firebase-dart-admin-auth-sdk/firebase-dart-admin-auth-sdk/CHANGELOG.md

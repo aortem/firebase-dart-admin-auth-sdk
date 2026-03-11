@@ -1,0 +1,21 @@
+﻿= Releases
+:navtitle: Releases
+:description: Release tracking for Firebase Dart Admin Auth SDK.
+:sectnums:
+
+This page tracks the current public package version documented for Firebase Dart Admin Auth SDK.
+'''
+
+== v0.0.10
+
+=== Overview
+The current public package version for firebase_dart_admin_auth_sdk is v0.0.10.
+
+=== Release Sources
+
+* Pubspec: apps/sdks/firebase-dart-admin-auth-sdk/firebase-dart-admin-auth-sdk/pubspec.yaml
+* Changelog: apps/sdks/firebase-dart-admin-auth-sdk/firebase-dart-admin-auth-sdk/CHANGELOG.md
+
+=== Notes
+* Keep this page aligned with the version declared in pubspec.yaml.
+* Detailed release history and change notes remain in CHANGELOG.md until fuller curated release notes are added here.
