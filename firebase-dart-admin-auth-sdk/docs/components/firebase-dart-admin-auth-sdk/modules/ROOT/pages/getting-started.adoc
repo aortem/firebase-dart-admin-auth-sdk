@@ -10,7 +10,7 @@ Add the package to your pubspec.yaml:
 [source,yaml]
 ----
 dependencies:
-  firebase_dart_admin_auth_sdk: ^0.0.10
+  firebase_dart_admin_auth_sdk: ^0.0.11
 ----
 
 Then run:
