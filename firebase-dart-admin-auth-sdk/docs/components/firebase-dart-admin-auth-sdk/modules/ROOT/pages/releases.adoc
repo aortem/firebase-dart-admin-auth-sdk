@@ -6,11 +6,6 @@
 This page summarizes the stable package release history for Firebase Dart Admin Auth SDK and keeps the public docs aligned with the published SDK versions.
 '''
 
-=== Release Sources
-
-* Pubspec: apps/sdks/firebase-dart-admin-auth-sdk/firebase-dart-admin-auth-sdk/pubspec.yaml
-* Changelog: apps/sdks/firebase-dart-admin-auth-sdk/firebase-dart-admin-auth-sdk/CHANGELOG.md
-
 == v0.0.12
 
 === Overview
