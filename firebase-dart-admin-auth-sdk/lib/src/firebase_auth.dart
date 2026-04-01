@@ -641,6 +641,40 @@ class FirebaseAuth {
     return _updatePassword.updatePassword(newPassowrd, currentUser?.idToken);
   }
 
+  /// Updates a user's password using admin/server credentials and the user's UID.
+  ///
+  /// This is intended for stateless backend flows where no `currentUser`
+  /// session exists. It requires the auth instance to be initialized with
+  /// server-capable credentials such as a service account or workload identity.
+  Future<void> updateUserPasswordByUid(String uid, String newPassword) async {
+    final normalizedUid = uid.trim();
+    if (normalizedUid.isEmpty) {
+      throw FirebaseAuthException(
+        code: 'invalid-uid',
+        message: 'UID is required.',
+      );
+    }
+    if (newPassword.isEmpty) {
+      throw FirebaseAuthException(
+        code: 'invalid-password',
+        message: 'Password cannot be empty.',
+      );
+    }
+
+    try {
+      await performRequest('update', {
+        'localId': normalizedUid,
+        'password': newPassword,
+      });
+    } catch (e) {
+      if (e is FirebaseAuthException) rethrow;
+      throw FirebaseAuthException(
+        code: 'update-password-by-uid-error',
+        message: 'Failed to update password for user $normalizedUid.',
+      );
+    }
+  }
+
   // New methods with complete functionality Sprint 2 #16 to #21
 
   /// Sends a password reset email to the specified email address.
@@ -823,6 +857,38 @@ class FirebaseAuth {
       throw FirebaseAuthException(
         code: 'user-delete-error',
         message: 'Failed to delete user.',
+      );
+    }
+  }
+
+  /// Deletes a Firebase user using admin/server credentials and the user's UID.
+  ///
+  /// This is intended for stateless backend flows where no `currentUser`
+  /// session exists. It requires the auth instance to be initialized with
+  /// server-capable credentials such as a service account or workload identity.
+  Future<void> deleteUserByUid(String uid) async {
+    final normalizedUid = uid.trim();
+    if (normalizedUid.isEmpty) {
+      throw FirebaseAuthException(
+        code: 'invalid-uid',
+        message: 'UID is required.',
+      );
+    }
+
+    try {
+      await performRequest('delete', {'localId': normalizedUid});
+
+      if (currentUser?.uid == normalizedUid) {
+        currentUser = null;
+        FirebaseApp.instance.setCurrentUser(null);
+        authStateChangedController.add(null);
+        idTokenChangedController.add(null);
+      }
+    } catch (e) {
+      if (e is FirebaseAuthException) rethrow;
+      throw FirebaseAuthException(
+        code: 'delete-user-by-uid-error',
+        message: 'Failed to delete user $normalizedUid.',
       );
     }
   }
