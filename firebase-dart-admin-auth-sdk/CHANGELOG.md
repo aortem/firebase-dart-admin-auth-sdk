@@ -1,3 +1,4 @@
+## [0.0.12]
 ### Added
 - Added explicit admin/server UID-based user mutation helpers on `FirebaseAuth`:
   - `deleteUserByUid(String uid)`
@@ -393,4 +394,3 @@ HotFix:
 
 ## [0.0.1-pre]
 - Initial pre-release version of the Firebase Dart Admin Auth SDK.
-
