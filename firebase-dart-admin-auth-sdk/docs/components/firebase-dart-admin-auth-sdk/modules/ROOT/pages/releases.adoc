@@ -1,35 +1,238 @@
-﻿= Releases
+= Releases
 :navtitle: Releases
-:description: Release tracking for Firebase Dart Admin Auth SDK.
+:description: Release highlights and package history for Firebase Dart Admin Auth SDK.
 :sectnums:
 
-This page tracks the current public package version documented for Firebase Dart Admin Auth SDK.
+This page summarizes the stable package release history for Firebase Dart Admin Auth SDK and keeps the public docs aligned with the published SDK versions.
 '''
+
+== v0.0.12
+
+=== Overview
+This release adds explicit admin and server-side UID-based user mutation helpers for stateless backend flows.
+
+=== Highlights
+* Added backend-safe UID-based delete support
+* Added backend-safe UID-based password update support
+* Kept client and session-bound mutation flows clearly separated
+
+=== Improvements
+* Added `deleteUserByUid(String uid)` for admin and server flows that do not rely on a `currentUser` session.
+* Added `updateUserPasswordByUid(String uid, String newPassword)` for direct backend password rotation by UID.
+* Preserved the existing session-bound methods so frontend and authenticated-user flows continue to behave as before.
+
+=== Fixes
+* Added unit coverage for the new UID-based delete and password update helpers.
 
 == v0.0.11
 
 === Overview
-The current public package version for `firebase_dart_admin_auth_sdk` is `v0.0.11`.
-
-=== Release Sources
-
-* Pubspec: apps/sdks/firebase-dart-admin-auth-sdk/firebase-dart-admin-auth-sdk/pubspec.yaml
-* Changelog: apps/sdks/firebase-dart-admin-auth-sdk/firebase-dart-admin-auth-sdk/CHANGELOG.md
+This release expands client MFA and 2FA support with real challenge handling, resolver completion, and enrollment helpers.
 
 === Highlights
+* Client MFA and 2FA sign-in challenge support
+* Real resolver completion backed by Identity Toolkit MFA endpoints
+* SMS and TOTP enrollment wrappers on `FirebaseAuth`
 
-* Added client MFA / 2FA support for sign-in challenge handling and resolver completion.
-* Added `FirebaseAuth.startMfaEnrollment()` and `FirebaseAuth.finalizeMfaEnrollment()` wrappers for SMS and TOTP enrollment flows.
-* Added `MultiFactorResolver.startSignInChallenge()` and real `resolveSignIn()` support backed by Identity Toolkit MFA endpoints.
-* Updated MFA enrollment parsing to preserve `mfaEnrollmentId` and infer factor type from Firebase `mfaInfo`.
+=== Improvements
+* Added structured `MultiFactorError` parsing for MFA-required sign-in flows.
+* Added `MultiFactorResolver.startSignInChallenge()` and real `resolveSignIn()` handling.
+* Added `FirebaseAuth.startMfaEnrollment()` and `FirebaseAuth.finalizeMfaEnrollment()` for SMS and TOTP enrollment.
+* Improved MFA enrollment parsing to preserve `mfaEnrollmentId` and infer factor type from `mfaInfo`.
 
 === Fixes
+* Replaced the previous MFA resolver stubbed sign-in flow with real finalize requests.
+* Restored executable MFA unit tests and a valid skipped integration placeholder.
+* Removed duplicate internal MFA type definitions in favor of a consolidated implementation.
 
-* Replaced the previous MFA resolver stubbed sign-in flow with real Identity Toolkit finalize requests.
-* Restored MFA unit test coverage for admin helpers, enrollment parsing, and challenge-response flows.
-* Removed duplicate internal MFA type definitions in favor of a single consolidated implementation.
+== v0.0.10
+
+=== Overview
+This release strengthens server-side Firebase authentication support with Workload Identity guidance, admin MFA helpers, and project-scoped admin API routing improvements.
+
+=== Highlights
+* Workload Identity and Workforce Identity Federation documentation
+* Admin MFA inspection and enforcement helpers
+* Better routing for bearer-token admin API flows
+
+=== Improvements
+* Added README guidance for Workload Identity on GKE, Cloud Run, and GCE.
+* Added Workforce Identity Federation setup guidance for external identity providers.
+* Added `getMfaEnrollments`, `isMfaEnrolled`, `verifyIdTokenMfa`, and `enforceMfa`.
+* Added an example showing admin API usage with Workload Identity.
+
+=== Fixes
+* `performRequest` now uses project-scoped admin endpoints for server flows using bearer tokens without an API key.
+* Access token refresh now also works for Workload Identity flows when `firebaseApp` is present.
+
+== v0.0.9
+
+=== Overview
+This release aligns the SDK and sample app with the modern Dart toolchain and refreshed internal dependency versions.
+
+=== Highlights
+* Dart SDK requirement bumped to `^3.11.0`
+* Internal package dependency refresh
+* Example app dependency cleanup
+
+=== Improvements
+* Updated the main package and example app to the newer Dart SDK baseline.
+* Upgraded `ds_standard_features` and `ds_tools_testing`.
+* Simplified example dependency declarations to reduce version drift.
+
+== v0.0.8
+
+=== Overview
+This release refines the internal create-user flow so account creation is more consistent with the shared request pipeline.
+
+=== Highlights
+* Cleaner `CreateUserWithEmailAndPasswordService` internals
+* Better validation and logging
+* Expanded test and documentation support
+
+=== Improvements
+* Simplified parameter handling and aligned response parsing with `performRequest`.
+* Improved validation and exception clarity for malformed credentials and Firebase API failures.
+* Added integration coverage and inline request and response documentation.
+
+=== Fixes
+* Removed obsolete helper logic and leftover debug paths superseded by the shared request abstraction.
+
+== v0.0.7
+
+=== Overview
+This release continues the account-creation refactor by routing the signup flow through the shared request mechanism and improving internal construction of the returned user model.
+
+=== Highlights
+* Signup flow now uses `performRequest`
+* Cleaner internal constructor usage
+* Improved debugging support during account creation
+
+=== Improvements
+* Replaced manual HTTP request building with `authInstance.performRequest('signUp', ...)`.
+* Improved internal `User` object construction and token assignment.
+* Added clearer debug logging around email, API key, and token handling.
+
+== v0.0.6
+
+=== Overview
+This release raises the package baseline for newer Dart versions and refreshes installation and example guidance.
+
+=== Highlights
+* Updated Dart version guidance
+* Refreshed example package configuration
+* Updated public installation documentation
+
+=== Improvements
+* Raised the minimum documented Dart version and aligned examples with the newer SDK baseline.
+* Simplified the example dependency declaration.
+* Updated the README installation snippet to the current package version at the time of release.
+
+== v0.0.5
+
+=== Overview
+This release focuses on dependency maintenance for the core SDK and testing toolchain.
+
+=== Highlights
+* Refreshed standard dependency versions
+* Refreshed testing dependency versions
+
+=== Improvements
+* Updated `ds_standard_features` to `^0.1.0`.
+* Updated `ds_tools_testing` to `^0.0.9`.
+
+== v0.0.4
+
+=== Overview
+This release continues dependency maintenance and adds the lints package to tighten local development quality checks.
+
+=== Highlights
+* Core dependency updates
+* Testing dependency updates
+* Added `lints`
+
+=== Improvements
+* Updated `ds_standard_features` to `^0.0.8`.
+* Updated `ds_tools_testing` to `^0.0.5`.
+* Added `lints: ^6.0.0` to support stricter quality checks.
+
+== v0.0.3
+
+=== Overview
+This release refreshes internal HTTP utility dependencies and cleans up the example application layout.
+
+=== Highlights
+* Updated HTTP utility dependency
+* Split example apps by platform
+* Removed generated example build artifacts
+
+=== Improvements
+* Bumped `ds_standard_features` to a newer version.
+* Split the sample app into dedicated web and mobile example directories.
+* Removed generated build output from examples to keep the package leaner.
+
+== v0.0.2
+
+=== Overview
+This release stabilizes the first versioned package line with a Dart version bump, formatter cleanup, and license updates.
+
+=== Highlights
+* Dart version bump
+* Formatting cleanup
+* License update
+
+=== Improvements
+* Bumped the Dart baseline to `3.9.0`.
+* Applied formatting cleanup to satisfy the Dart formatter.
+* Updated the BSD-3 license materials.
+
+== v0.0.1
+
+=== Overview
+This release establishes the first stable package version with the core authentication and credential-linking foundation for the SDK.
+
+=== Highlights
+* Initial stable package baseline
+* Early credential-linking and sign-in flow refactors
+* Initial supporting UI and model cleanup
+
+=== Improvements
+* Refactored unused code and comments in `link_with_credientials.dart`.
+* Introduced a dedicated sign-in with credential view model for improved separation of concerns.
+* Added a sign-in with popup screen and related auth flow groundwork.
+* Refined core `FirebaseAuth` and multi-factor related internals.
+
+== Pre-release History
+
+=== Overview
+Earlier pre-stable package builds are part of the SDK history and remain documented in the changelog while the stable sections above track the published `0.0.x` line.
+
+=== Included Pre-release Tags
+* `0.0.3-pre`
+* `0.0.2-pre`
+* `0.0.1-pre+22`
+* `0.0.1-pre+21`
+* `0.0.1-pre+20`
+* `0.0.1-pre+19`
+* `0.0.1-pre+18`
+* `0.0.1-pre+17`
+* `0.0.1-pre+16`
+* `0.0.1-pre+15`
+* `0.0.1-pre+14`
+* `0.0.1-pre+13`
+* `0.0.1-pre+12`
+* `0.0.1-pre+10`
+* `0.0.1-pre+9`
+* `0.0.1-pre+8`
+* `0.0.1-pre+7`
+* `0.0.1-pre+6`
+* `0.0.1-pre+5`
+* `0.0.1-pre+4`
+* `0.0.1-pre+3`
+* `0.0.1-pre+2`
+* `0.0.1-pre+1`
+* `0.0.1-pre`
 
 === Notes
-
 * Keep this page aligned with the version declared in `pubspec.yaml`.
-* Refer to `CHANGELOG.md` for the full release history.
+* Use `CHANGELOG.md` as the source of truth for exhaustive historical change notes, especially for the pre-release series.

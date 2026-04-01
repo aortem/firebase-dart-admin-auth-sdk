@@ -1,29 +1,32 @@
-## **0.0.11**
+## [0.0.12]
+### Added
+- Added explicit admin/server UID-based user mutation helpers on `FirebaseAuth`:
+  - `deleteUserByUid(String uid)`
+  - `updateUserPasswordByUid(String uid, String newPassword)`
 
-### **Added**
+### Changed
+- Kept existing session-bound methods (`deleteFirebaseUser`, `updatePassword`) unchanged so client/session flows and admin/server flows remain clearly separated
 
+## [0.0.11]
+### Added
 - **Client MFA / 2FA support**:
   - Added structured `MultiFactorError` parsing for MFA-required sign-in challenges
   - Added real `MultiFactorResolver.resolveSignIn()` support using Identity Toolkit `accounts/mfaSignIn:finalize`
   - Added `MultiFactorResolver.startSignInChallenge()` for SMS challenge start via `accounts/mfaSignIn:start`
   - Added `FirebaseAuth.startMfaEnrollment()` and `FirebaseAuth.finalizeMfaEnrollment()` wrappers for SMS and TOTP enrollment flows
 
-### **Changed**
-
+### Changed
 - `EmailPasswordAuth.signIn()` now detects MFA-required responses and throws `MultiFactorError` instead of a generic auth exception
 - Consolidated MFA resolver types into a single implementation and removed duplicate internal MFA class definitions
 - Updated MFA enrollment parsing to capture `mfaEnrollmentId` and infer factor type from Firebase `mfaInfo`
 
-### **Fixed**
-
+### Fixed
 - Replaced the `mock-uid` MFA resolver stub with a real Identity Toolkit sign-in finalize request
 - Restored executable MFA unit tests for admin helpers, enrollment parsing, and challenge-response flows
 - Replaced the commented-out MFA integration test file with a valid skipped integration placeholder
 
-## **0.0.10**
-
-### **Added**
-
+## [0.0.10]
+### Added
 - **Workload Identity Documentation**:
   - Added comprehensive README section for Workload Identity support
   - Documented initialization via `initializeAppWithWorkloadIdentity()` for GKE, Cloud Run, and GCE
@@ -45,14 +48,12 @@
 - **Workload Identity Example**:
   - Added `example/poc_workload_identity.dart` showcasing admin API usage with Workload Identity
 
-### **Fixed**
-
+### Fixed
 - **Admin API Routing for Server Flows**:
   - `performRequest` now uses project-scoped endpoints (`/v1/projects/{projectId}/accounts`) when using bearer tokens and no API key
   - Access token refresh now runs for Workload Identity (no service account) when `firebaseApp` is set
 
-### **Documentation**
-
+### Documentation
 - Added "MFA (Admin)" section with enrollment lookup and enforcement examples
 - Updated README with three new sections under Authentication Methods:
   - "Workload Identity" - for GCP-native environments
@@ -60,10 +61,8 @@
   - Prerequisites and setup instructions for both approaches
 - Clarified authentication hierarchy: Environment Variables (Web) → Service Account (Mobile) → Workload Identity (GCP) → WIF (External)
 
-## **0.0.9**
-
-### **Changed**
-
+## [0.0.9]
+### Changed
 - **Dart SDK Requirement Bump**
   - Updated all relevant `pubspec.yaml` files to require:
     **`sdk: ^3.11.0`**
@@ -83,8 +82,7 @@
   - Updated example app dependency declaration to simplify version consistency.
   - Ensured example no longer pins outdated SDK constraints.
 
-## 0.0.8
-
+## [0.0.8]
 ### Changed
 
 - **Refactored `CreateUserWithEmailAndPasswordService` internal flow:**
@@ -109,8 +107,7 @@
 - Leftover debug prints from previous release (`// debug: print(...)`).
 - Obsolete helper methods superseded by `performRequest` abstraction.
 
-## 0.0.7
-
+## [0.0.7]
 ### Changed
 
 - **Refactored `CreateUserWithEmailAndPasswordService`**:
@@ -138,8 +135,7 @@
 - Custom HTTP request building with `Uri.https` and manual headers.
 - Inline JSON serialization and error decoding — now centralized in `performRequest`.
 
-## 0.0.6
-
+## [0.0.6]
 ### Changed
 
 - **Dart SDK**:
@@ -154,24 +150,21 @@
 - **Documentation**:
   - Updated README installation snippet to reference `firebase_dart_admin_auth_sdk: ^0.0.6` (was `^0.0.1-pre+15`).
 
-## 0.0.5
-
+## [0.0.5]
 ### Changed
 
 - **Dependencies**:
   - Updated `ds_standard_features` to `^0.1.0`.
   - Updated `ds_tools_testing` dev dependency to `^0.0.9`
 
-## 0.0.4
-
+## [0.0.4]
 ### Changed
 
 - **Dependencies**:
   - Updated `ds_standard_features` to `^0.0.8`.
   - Updated `ds_tools_testing` dev dependency to `^0.0.5` and added `lints: ^6.0.0`.
 
-## 0.0.3
-
+## [0.0.3]
 ### Changed
 
 - Bump `ds_standard_features` dependency from `^0.0.4` to `^0.0.7` to pull in the latest HTTP utilities.
@@ -181,14 +174,12 @@
 - Split the Flutter mobile sample app into web and mobile (`example/firebase-dart-admin-auth-sdk-flutter-mobile-app`).
 - Purged generated build artifacts (e.g. `build/`, intermediate CMake files) from the example directories to keep the package lean.
 
-## 0.0.2
-
+## [0.0.2]
 - Bump Dart Version to 3.9.0
 - Formatting Changes To Satify Dart Formatter
 - Update BSD-3 License
 
-## 0.0.1
-
+## [0.0.1]
 - fix and refactor unused code and comments in link_with_credientials.dart.
 - refactor signInWithGoogle() logic into a new sign_in_with_credential_view_model.dart for better separation of concerns.
 - add sign_in_with_credential_view_model.dart: Introduced a new view model with a comprehensive and platform-adaptive signInWithGoogle() method for both web and mobile.
@@ -198,8 +189,7 @@
 - minor updates to multi_factor_resolver.dart.
 - dependency Updates Updated one dependency in pubspec.yaml.
 
-## 0.0.3-pre
-
+## [0.0.3-pre]
 - Eliminated redundant import statements
 - Removed duplicate lines for BotToast, firebase_dart_admin_auth_sdk, flutter/material.dart, and flutter_facebook_auth.
 - Added a web-specific branch that uses the Google Identity Services (via gis, id, and oauth2) for handling Google OAuth.
@@ -211,8 +201,7 @@
 - Incorporated navigation to the HomeScreen after a successful link with credentials.
 - Added BotToast feedback to confirm when an account has been successfully linked.
 
-## 0.0.2-pre
-
+## [0.0.2-pre]
 **🐛 Bug Fixes**
 
 - firebase‑sdk: resolve dart analyze errors
@@ -240,47 +229,38 @@
 - add dart doc commnets
 - add logo
 
-## 0.0.1-pre+22
-
+## [0.0.1-pre+22]
 - yaml update
 
-## 0.0.1-pre+21
-
+## [0.0.1-pre+21]
 - update SDK to 3.9.0
 
-## 0.0.1-pre+20
-
+## [0.0.1-pre+20]
 - update SDK to 3.7.0
 
-## 0.0.1-pre+19
-
+## [0.0.1-pre+19]
 - additional update to firebase.verifyidtoken method
 
-## 0.0.1-pre+18
-
+## [0.0.1-pre+18]
 - add firebase.verifyidtoken method
 
-## 0.0.1-pre+17
-
+## [0.0.1-pre+17]
 HotFix:
 
 - Impersonate Service Account Without keys update.
 - Reverting to the previous method name FirebaseApp.`initializeAppWithServiceAccountImpersonationGCP`
 
-## 0.0.1-pre+16
-
+## [0.0.1-pre+16]
 - Create a service account without using the key impersonation method
 - Authenticate using the service account email and project ID
 - Obtain ADC (Application Default Credentials) from Google Cloud for authentication
 - Remove all incorrect code and previous methods related to this function
 
-## 0.0.1-pre+15
-
+## [0.0.1-pre+15]
 - support service account without impersonation key
 - remove node modules
 
-## 0.0.1-pre+14
-
+## [0.0.1-pre+14]
 - Update Yaml file for core dependencies
 - add service account impersonation via gap
 - update the api call of the following:
@@ -295,16 +275,13 @@ HotFix:
   - send password reset email
   - send verification code
 
-## 0.0.1-pre+13
-
+## [0.0.1-pre+13]
 - Update SDK version to 3.6.0
 
-## 0.0.1-pre+12
-
+## [0.0.1-pre+12]
 - Update SDK version formatting
 
-## 0.0.3
-
+## [0.0.3]
 - add sign in with redirect & link with credentials & verify password reset code
 - add Micorsoft Integration
 - update documentation: Added `auth_redirect_link'.
@@ -314,21 +291,18 @@ HotFix:
 - auth_link_with_phone_number_stub.dart
 - auth_redirect_link_stub.dart
 
-## 0.0.1-pre+10
-
+## [0.0.1-pre+10]
 - Add debug initialization in sample app for better testing
 - Add Sign In With Facebook To Sample App.
 - Add Remaining Signin Methods to the Sample App
 - Introduce unit and integration testing
 - Update remaining doc dart issues for code clarity
 
-## 0.0.1-pre+9
-
+## [0.0.1-pre+9]
 - Update changelog format of previous release
 - Update service account format
 
-## 0.0.1-pre+8
-
+## [0.0.1-pre+8]
 - Add Linter rules for public_members and better code transperancy
 - Add initalization with Service Account Impersonation and proper documentation
 - Update Gradle Build files and dependencies
@@ -337,12 +311,10 @@ HotFix:
 - Implement FirebaseAuth.verifyPasswordResetCode in Sample App
 - Improve Dart Doc Comments
 
-## 0.0.1-pre+7
-
+## [0.0.1-pre+7]
 - Added README.md for example folder naming conventions.
 
-## 0.0.1-pre+6
-
+## [0.0.1-pre+6]
 - Updated pub.dev README and feature check list for -pre+6 release
 - FirebaseUser.linkWithPopup implemented in Sample App
 - FirebaseUser.linkWithCredential implemented in Sample App
@@ -353,8 +325,7 @@ HotFix:
 - FirebaseApp.initializeAuth implemented in Sample App
 - Moved example folder for the sample app to proper location for dart conventions.
 
-## 0.0.1-pre+5
-
+## [0.0.1-pre+5]
 - FirebaseStorage.getStorage added to Sample App
 - FirebaseAuth.setPersistence added to Sample App
 - FirebaseAuth.initializeRecaptchaConfig Method implemented in Sample App
@@ -362,8 +333,7 @@ HotFix:
 - FirebaseAuth.isSignInWithEmailLink Method implemented in Sample App
 - FirebaseAuth.checkActionCode added to Sample App
 
-## 0.0.1-pre+4
-
+## [0.0.1-pre+4]
 - Sample App Package Name Fix
 - Service Account Firebase initialization method on Sample App fixed
 - FirebaseAuth.createUserWithEmailAndPassword feature implemented in Sample App
@@ -396,8 +366,7 @@ HotFix:
 - FirebaseAuth.onIdTokenChanged Method implemented in Sample App
 - FirebaseAuth.onAuthStateChanged Method implemented in Sample App
 
-## 0.0.1-pre+3
-
+## [0.0.1-pre+3]
 - Update sendPasswordResetEmail
 - Update revokeAccessToken
 - Update onIdTokenChanged
@@ -405,8 +374,7 @@ HotFix:
 - Update isSignInWithEmailLink
 - Update dispose method
 
-## 0.0.1-pre+2
-
+## [0.0.1-pre+2]
 - Add sendPasswordResetEmail
 - Add revokeAccessToken
 - Add onIdTokenChanged
@@ -414,8 +382,7 @@ HotFix:
 - Add isSignInWithEmailLink
 - Add dispose method
 
-## 0.0.1-pre+1
-
+## [0.0.1-pre+1]
 - Add new authentication methods to FirebaseAuth class
 - Implement signInWithCustomToken, signInWithCredential, sendSignInLinkToEmail, and signInWithEmailLink
 - Update test suite with new tests for added functions
@@ -425,6 +392,5 @@ HotFix:
 - Ensure compatibility with latest Firebase Auth API changes
 - Update Documentation and support subscriptions.
 
-## 0.0.1-pre
-
+## [0.0.1-pre]
 - Initial pre-release version of the Firebase Dart Admin Auth SDK.
