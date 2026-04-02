@@ -6,6 +6,23 @@
 This page summarizes the stable package release history for Firebase Dart Admin Auth SDK and keeps the public docs aligned with the published SDK versions.
 '''
 
+== v0.0.13
+
+=== Overview
+This release adds admin and server-side Firebase user lookup by UID for flows that need canonical user profile data after ID token verification.
+
+=== Highlights
+* Added backend-safe lookup of Firebase users by UID
+* Supports admin SSO and similar flows when an ID token omits the email claim
+
+=== Improvements
+* Added `getUserByUid(String uid)` on `FirebaseAuth`.
+* Returns a parsed `User` model when a matching Firebase Auth user exists.
+* Preserves existing behavior for session-bound and UID-based mutation helpers.
+
+=== Fixes
+* Added unit coverage for UID-based lookup behavior and empty-result handling.
+
 == v0.0.12
 
 === Overview
