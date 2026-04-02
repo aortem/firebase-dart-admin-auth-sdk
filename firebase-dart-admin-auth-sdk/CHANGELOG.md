@@ -1,3 +1,10 @@
+## [0.0.13]
+### Added
+- Added `FirebaseAuth.getUserByUid(String uid)` for admin/server-side user lookup by Firebase UID.
+
+### Fixed
+- Enables backend flows that must resolve canonical user email/profile data from Firebase when an ID token does not include an email claim.
+
 ## [0.0.12]
 ### Added
 - Added explicit admin/server UID-based user mutation helpers on `FirebaseAuth`:

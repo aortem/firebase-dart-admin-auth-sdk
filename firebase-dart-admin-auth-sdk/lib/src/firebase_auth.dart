@@ -675,6 +675,43 @@ class FirebaseAuth {
     }
   }
 
+  /// Retrieves a Firebase user by UID using admin/server credentials.
+  ///
+  /// Returns `null` when no matching user exists.
+  Future<User?> getUserByUid(String uid) async {
+    final normalizedUid = uid.trim();
+    if (normalizedUid.isEmpty) {
+      throw FirebaseAuthException(
+        code: 'invalid-uid',
+        message: 'UID is required.',
+      );
+    }
+
+    try {
+      final response = await performRequest('lookup', {
+        'localId': [normalizedUid],
+      });
+
+      final users = response.body['users'];
+      if (users is! List || users.isEmpty) {
+        return null;
+      }
+
+      final firstUser = users.first;
+      if (firstUser is! Map<String, dynamic>) {
+        return null;
+      }
+
+      return User.fromJson(firstUser, apiKey: apiKey);
+    } catch (e) {
+      if (e is FirebaseAuthException) rethrow;
+      throw FirebaseAuthException(
+        code: 'get-user-by-uid-error',
+        message: 'Failed to fetch user $normalizedUid.',
+      );
+    }
+  }
+
   // New methods with complete functionality Sprint 2 #16 to #21
 
   /// Sends a password reset email to the specified email address.
