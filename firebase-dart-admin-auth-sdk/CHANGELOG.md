@@ -1,3 +1,26 @@
+## [0.1.0]
+### Added
+- Added `FirebaseApp.initializeAppWithServerCredentials(...)` as the preferred backend/admin initializer.
+
+### Changed
+- Standardized server-side auth guidance around keyless runtime credentials first, with optional service account impersonation.
+- `initializeAppWithWorkloadIdentity(...)` now stays GCP-metadata-specific instead of silently broadening into generic ADC behavior.
+- `FirebaseApp.getAuth()` and `FirebaseApp.getStorage()` now cache per app instance instead of reusing one static auth/storage object across initializations.
+
+### Fixed
+- `FirebaseApp.getStorage()` now fails explicitly for unsupported server-credentials storage usage instead of crashing on a null API key.
+- Cleaned up backend initialization semantics so different apps/projects can coexist in one process more safely.
+
+### Documentation
+- Rewrote the README to treat this package as a backend/admin package, not a mobile app credential transport.
+
+## [0.0.13]
+### Added
+- Added `FirebaseAuth.getUserByUid(String uid)` for admin/server-side user lookup by Firebase UID.
+
+### Fixed
+- Enables backend flows that must resolve canonical user email/profile data from Firebase when an ID token does not include an email claim.
+
 ## [0.0.12]
 ### Added
 - Added explicit admin/server UID-based user mutation helpers on `FirebaseAuth`:
