@@ -21,7 +21,7 @@ toc::[]
 == Current Public Package
 
 * Package: firebase_dart_admin_auth_sdk
-* Version: v0.0.12
+* Version: v0.0.13
 * Repository root: apps/sdks/firebase-dart-admin-auth-sdk
 * Package root: apps/sdks/firebase-dart-admin-auth-sdk/firebase-dart-admin-auth-sdk
 * Docs root: apps/sdks/firebase-dart-admin-auth-sdk/firebase-dart-admin-auth-sdk/docs

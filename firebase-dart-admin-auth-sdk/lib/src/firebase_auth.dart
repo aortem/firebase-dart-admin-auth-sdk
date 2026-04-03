@@ -30,8 +30,6 @@ import 'package:firebase_dart_admin_auth_sdk/src/auth/verify_before_email_update
 import 'package:firebase_dart_admin_auth_sdk/src/auth/verify_password_reset_code.dart';
 import 'package:firebase_dart_admin_auth_sdk/src/firebase_user/link_with_credentails.dart';
 import 'package:firebase_dart_admin_auth_sdk/src/http_response.dart';
-import 'package:firebase_dart_admin_auth_sdk/src/mfa_enrollment.dart';
-import 'package:firebase_dart_admin_auth_sdk/src/mfa_verification.dart';
 import 'package:firebase_dart_admin_auth_sdk/src/platform_resolver.dart';
 import 'package:firebase_dart_admin_auth_sdk/src/popup_redirect_resolver.dart';
 import 'package:firebase_dart_admin_auth_sdk/src/service_account.dart';
@@ -671,6 +669,43 @@ class FirebaseAuth {
       throw FirebaseAuthException(
         code: 'update-password-by-uid-error',
         message: 'Failed to update password for user $normalizedUid.',
+      );
+    }
+  }
+
+  /// Retrieves a Firebase user by UID using admin/server credentials.
+  ///
+  /// Returns `null` when no matching user exists.
+  Future<User?> getUserByUid(String uid) async {
+    final normalizedUid = uid.trim();
+    if (normalizedUid.isEmpty) {
+      throw FirebaseAuthException(
+        code: 'invalid-uid',
+        message: 'UID is required.',
+      );
+    }
+
+    try {
+      final response = await performRequest('lookup', {
+        'localId': [normalizedUid],
+      });
+
+      final users = response.body['users'];
+      if (users is! List || users.isEmpty) {
+        return null;
+      }
+
+      final firstUser = users.first;
+      if (firstUser is! Map<String, dynamic>) {
+        return null;
+      }
+
+      return User.fromJson(firstUser, apiKey: apiKey);
+    } catch (e) {
+      if (e is FirebaseAuthException) rethrow;
+      throw FirebaseAuthException(
+        code: 'get-user-by-uid-error',
+        message: 'Failed to fetch user $normalizedUid.',
       );
     }
   }

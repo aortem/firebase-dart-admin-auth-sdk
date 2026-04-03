@@ -6,6 +6,44 @@
 This page summarizes the stable package release history for Firebase Dart Admin Auth SDK and keeps the public docs aligned with the published SDK versions.
 '''
 
+== v0.1.0
+
+=== Overview
+This release resets the package around a cleaner backend-first contract with keyless server credentials as the preferred initialization model.
+
+=== Highlights
+* Added a preferred backend initializer for server credentials
+* Standardized keyless runtime identity and impersonation guidance
+* Tightened workload identity semantics so GCP-only setup remains explicit
+
+=== Improvements
+* Added `FirebaseApp.initializeAppWithServerCredentials(...)` as the recommended backend entry point.
+* Kept direct runtime identity and target service account impersonation under one server-side contract.
+* Updated auth and storage caching to be instance-scoped instead of relying on one shared static auth and storage object.
+* Reframed the README and package guidance around backend and admin use, not privileged client distribution.
+
+=== Fixes
+* `FirebaseApp.getStorage()` now fails explicitly for unsupported server-credentials storage usage instead of crashing on a null API key.
+* Reduced cross-project and cross-app reuse risk by keeping cached SDK objects on the `FirebaseApp` instance.
+* Kept `initializeAppWithWorkloadIdentity(...)` strict to metadata-backed GCP environments instead of silently expanding into generic ADC behavior.
+
+== v0.0.13
+
+=== Overview
+This release adds admin and server-side Firebase user lookup by UID for flows that need canonical user profile data after ID token verification.
+
+=== Highlights
+* Added backend-safe lookup of Firebase users by UID
+* Supports admin SSO and similar flows when an ID token omits the email claim
+
+=== Improvements
+* Added `getUserByUid(String uid)` on `FirebaseAuth`.
+* Returns a parsed `User` model when a matching Firebase Auth user exists.
+* Preserves existing behavior for session-bound and UID-based mutation helpers.
+
+=== Fixes
+* Added unit coverage for UID-based lookup behavior and empty-result handling.
+
 == v0.0.12
 
 === Overview
