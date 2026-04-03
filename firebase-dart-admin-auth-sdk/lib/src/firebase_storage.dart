@@ -1,6 +1,4 @@
 import 'package:ds_standard_features/ds_standard_features.dart' as http;
-import 'package:firebase_dart_admin_auth_sdk/src/firebase_app.dart';
-
 /// A class that interacts with Firebase Storage for uploading files.
 /// This class handles uploading files to Firebase Storage using Firebase credentials
 /// like the project ID, API key, and storage bucket name.
@@ -35,16 +33,7 @@ class FirebaseStorage {
     required String projectId, // Project ID required for Firebase storage
     required String bucketName, // The storage bucket's name
   }) {
-    // Ensure that FirebaseApp is properly initialized
-    final firebaseApp = FirebaseApp.instance;
-
-    // Fetch FirebaseApp's projectId, apiKey, and bucketName for the storage instance
-
-    final projectId = firebaseApp.getAuth().projectId;
-    final apiKey = firebaseApp.getAuth().apiKey;
-    final bucketName = firebaseApp.getAuth().bucketName;
-    // Return a new instance of FirebaseStorage using the private constructor
-    return FirebaseStorage._(projectId!, apiKey!, bucketName!);
+    return FirebaseStorage._(projectId, apiKey, bucketName);
   }
 
   /// Uploads a file to Firebase Storage.

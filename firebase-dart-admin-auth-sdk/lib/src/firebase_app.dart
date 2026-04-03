@@ -11,6 +11,7 @@ import 'package:ds_standard_features/ds_standard_features.dart'
 import 'package:firebase_dart_admin_auth_sdk/src/firebase_auth.dart';
 import 'package:firebase_dart_admin_auth_sdk/src/firebase_storage.dart';
 import 'package:firebase_dart_admin_auth_sdk/src/service_account.dart';
+import 'package:firebase_dart_admin_auth_sdk/src/server_credentials_token_provider.dart';
 import 'package:firebase_dart_admin_auth_sdk/src/user.dart';
 import 'package:firebase_dart_admin_auth_sdk/src/workload_identity_token_provider.dart';
 import 'auth/generate_custom_token.dart';
@@ -43,14 +44,13 @@ class FirebaseApp {
   static http.Client httpClient = http.Client();
 
   ///The class to interact with the various firebase auth methods
-  static FirebaseAuth? firebaseAuth;
+  FirebaseAuth? _firebaseAuth;
   static GetAccessTokenWithGeneratedToken? _accessTokenGen;
   static GenerateCustomToken? _tokenGen;
 
   ///The class to interact with the various firebase storage methods
-  static FirebaseStorage? firebaseStorage;
-  static bool _cachedIsGCP = false;
-  static bool? _isGCPChecked;
+  FirebaseStorage? _firebaseStorage;
+  final Object? _accessTokenProvider;
 
   FirebaseApp._(
     this._apiKey,
@@ -61,6 +61,7 @@ class FirebaseApp {
     this._appId,
     this._serviceAccount,
     this.accessToken,
+    this._accessTokenProvider,
   );
 
   // --- token refresh concurrency control ---
@@ -82,10 +83,6 @@ class FirebaseApp {
     httpClient = http.Client();
     _instance = null;
     _refreshCompleter = null;
-    firebaseAuth = null;
-    firebaseStorage = null;
-    _isGCPChecked = null;
-    _cachedIsGCP = false;
   }
 
   /// Refreshes OAuth2 token for Workload Identity
@@ -99,6 +96,24 @@ class FirebaseApp {
     _refreshCompleter = Completer<void>();
 
     try {
+      final accessTokenProvider = _accessTokenProvider;
+
+      if (accessTokenProvider is ServerCredentialsTokenProvider) {
+        final tokenInfo = await accessTokenProvider.getAccessToken();
+        accessToken = tokenInfo.accessToken;
+        tokenExpiryTime = tokenInfo.expiry;
+        log('Server credentials token refreshed, expires at $tokenExpiryTime');
+        return;
+      }
+
+      if (accessTokenProvider is WorkloadIdentityTokenProvider) {
+        final tokenInfo = await accessTokenProvider.getAccessToken();
+        accessToken = tokenInfo.accessToken;
+        tokenExpiryTime = tokenInfo.expiry;
+        log('Workload Identity token refreshed, expires at $tokenExpiryTime');
+        return;
+      }
+
       // For Workload Identity, use the token provider
       if (_serviceAccount == null && accessToken != null) {
         // This is Workload Identity - refresh via metadata server
@@ -200,6 +215,7 @@ class FirebaseApp {
       appId,
       null,
       null,
+      null,
     );
   }
 
@@ -250,6 +266,7 @@ class FirebaseApp {
           appId,
           serviceAccountModel,
           accessToken,
+          null,
         );
       } else {
         _instance!
@@ -318,6 +335,7 @@ class FirebaseApp {
       '', // app ID (optional, can be set)
       serviceAccountModel,
       accessToken,
+      null,
     );
   }
 
@@ -346,6 +364,7 @@ class FirebaseApp {
       '', // app ID (optional, can be set)
       null,
       accessToken,
+      null,
     );
   }
 
@@ -518,6 +537,38 @@ class FirebaseApp {
   /// - If no token but running on GCP → Workload Identity flow via metadata server (GKE/Cloud Run)
   /// - Otherwise → throws exception
 
+  /// Initialize Firebase for backend/admin use with keyless server credentials.
+  static Future<FirebaseApp> initializeAppWithServerCredentials({
+    required String firebaseProjectId,
+    String? targetServiceAccount,
+    String? bucketName,
+  }) async {
+    final provider = ServerCredentialsTokenProvider(
+      targetServiceAccount: targetServiceAccount,
+      client: httpClient,
+    );
+
+    final tokenInfo = await provider.getAccessToken();
+
+    _instance = FirebaseApp._(
+      null,
+      firebaseProjectId,
+      '$firebaseProjectId.firebaseapp.com',
+      '',
+      bucketName ?? '$firebaseProjectId.appspot.com',
+      '',
+      null,
+      tokenInfo.accessToken,
+      provider,
+    )..tokenExpiryTime = tokenInfo.expiry;
+
+    log(
+      'Firebase initialized with server credentials for $firebaseProjectId'
+      '${targetServiceAccount == null ? '' : ' via $targetServiceAccount'}',
+    );
+    return _instance!;
+  }
+
   /// Initialize Firebase with Workload Identity (for GKE/Cloud Run)
   static Future<FirebaseApp> initializeAppWithWorkloadIdentity({
     required String targetServiceAccount,
@@ -540,6 +591,7 @@ class FirebaseApp {
       '',
       null, // No service account JSON needed
       tokenInfo.accessToken,
+      provider,
     )..tokenExpiryTime = tokenInfo.expiry;
 
     log("✅ Firebase initialized with Workload Identity for $firebaseProjectId");
@@ -700,6 +752,7 @@ class FirebaseApp {
       '', // app ID (optional, can be set)
       null,
       accessToken,
+      null,
     );
 
     _instance!.tokenExpiryTime = DateTime.now().add(const Duration(hours: 1));
@@ -732,7 +785,7 @@ class FirebaseApp {
       });
     }
 
-    return firebaseAuth ??= FirebaseAuth(
+    return _firebaseAuth ??= FirebaseAuth(
       apiKey: _apiKey,
       projectId: _projectId,
       authDomain: _authdomain,
@@ -756,10 +809,23 @@ class FirebaseApp {
       );
     }
 
-    return firebaseStorage ??= FirebaseStorage.getStorage(
-      apiKey: _apiKey!,
-      projectId: _projectId!,
-      bucketName: _bucketName!,
+    if (_apiKey == null || _apiKey.isEmpty) {
+      throw UnsupportedError(
+        'FirebaseStorage currently requires an API key-backed app '
+        'initialization. Server-credentials storage is not supported by '
+        'this package yet.',
+      );
+    }
+    if (_projectId == null || _projectId.isEmpty || _bucketName == null) {
+      throw StateError(
+        'FirebaseStorage requires projectId and bucketName configuration.',
+      );
+    }
+
+    return _firebaseStorage ??= FirebaseStorage.getStorage(
+      apiKey: _apiKey,
+      projectId: _projectId,
+      bucketName: _bucketName,
     );
   }
 }
