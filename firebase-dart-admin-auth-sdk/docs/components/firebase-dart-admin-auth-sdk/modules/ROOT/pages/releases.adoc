@@ -6,6 +6,25 @@
 This page summarizes the stable package release history for Firebase Dart Admin Auth SDK and keeps the public docs aligned with the published SDK versions.
 '''
 
+== v0.1.1
+
+=== Overview
+This release prepares the package for the next publish with sample-app cleanup, a new desktop admin example, and a compatible dependency refresh for the publishable package.
+
+=== Highlights
+* Added a maintained Flutter desktop admin sample
+* Kept the maintained Flutter web sample building cleanly
+* Refreshed core package dependencies to newer compatible versions
+
+=== Improvements
+* Added `example/firebase-dart-admin-auth-sdk-flutter-desktop-app` as a local desktop admin tool sample using `initializeAppWithServiceAccount(...)`.
+* Trimmed the sample matrix so only fitting backend/admin examples remain documented as maintained.
+* Updated `googleapis_auth` and `jwt_generator` to newer compatible releases in the publishable package.
+
+=== Fixes
+* Restored sample compatibility with the legacy `FirebaseApp.firebaseAuth` accessor used by the maintained Flutter web sample.
+* Cleaned up the desktop sample shell so it analyzes and tests cleanly with responsive layout behavior.
+
 == v0.1.0
 
 === Overview

@@ -1,3 +1,16 @@
+## [0.1.1]
+### Changed
+- Refreshed the publishable package dependencies to newer compatible releases, including `googleapis_auth` and `jwt_generator`.
+- Added a maintained Flutter desktop admin sample for local service-account initialization and UID-based lookup workflows.
+- Tightened the sample-app matrix so the repository only advertises examples that fit the backend/admin direction of this package.
+
+### Fixed
+- Restored sample compatibility via the legacy `FirebaseApp.firebaseAuth` accessor so the maintained Flutter web example builds cleanly.
+- Cleaned up the desktop sample layout and tests so the sample shell analyzes and tests cleanly in constrained viewports.
+
+### Documentation
+- Updated example and release documentation to reflect the maintained desktop and web samples for `0.1.1`.
+
 ## [0.1.0]
 ### Added
 - Added `FirebaseApp.initializeAppWithServerCredentials(...)` as the preferred backend/admin initializer.
