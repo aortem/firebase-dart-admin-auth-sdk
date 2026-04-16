@@ -184,6 +184,10 @@ class FirebaseApp {
     }
     return _instance!;
   }
+
+  /// Legacy convenience accessor kept for sample-app compatibility.
+  static FirebaseAuth? get firebaseAuth => _instance?.getAuth();
+
   // --- Initialization methods ---
 
   ///Used to initialize the project with enviroment variables
