@@ -1,7 +1,7 @@
 site:
   title: Firebase Dart Admin Auth SDK Docs
   start_page: firebase-dart-admin-auth-sdk::index.adoc
-  url: https://firebase-dart-admin-auth-sdk-docs.web.app/
+  url: https://fire-base-dart-admin-auth-sdk-docs.web.app/
 
 content:
   sources:

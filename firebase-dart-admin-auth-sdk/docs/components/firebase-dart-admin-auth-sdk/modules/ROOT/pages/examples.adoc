@@ -1,24 +1,38 @@
-﻿= Examples
+= Examples
 :page-layout: default
 
-Examples and sample apps for Firebase Dart Admin Auth SDK live under:
+Examples and sample app directories for Firebase Dart Admin Auth SDK live
+under:
 
 * apps/sdks/firebase-dart-admin-auth-sdk/firebase-dart-admin-auth-sdk/example
 * apps/sdks/firebase-dart-admin-auth-sdk/firebase-dart-admin-auth-sdk/README.md
 * apps/sdks/firebase-dart-admin-auth-sdk/firebase-dart-admin-auth-sdk/example/README.md
 
-== Current Example Directories
+Because this package is primarily a backend/admin SDK, frontend frameworks
+should call backend services instead of embedding privileged Firebase admin
+credentials directly in the UI.
 
-* apps/sdks/firebase-dart-admin-auth-sdk/firebase-dart-admin-auth-sdk/example/firebase-dart-admin-auth-sdk-compose-app
-* apps/sdks/firebase-dart-admin-auth-sdk/firebase-dart-admin-auth-sdk/example/firebase-dart-admin-auth-sdk-flutter-desktop-app
-* apps/sdks/firebase-dart-admin-auth-sdk/firebase-dart-admin-auth-sdk/example/firebase-dart-admin-auth-sdk-flutter-games-app
-* apps/sdks/firebase-dart-admin-auth-sdk/firebase-dart-admin-auth-sdk/example/firebase-dart-admin-auth-sdk-flutter-mobile-app
-* apps/sdks/firebase-dart-admin-auth-sdk/firebase-dart-admin-auth-sdk/example/firebase-dart-admin-auth-sdk-flutter-web-app
-* apps/sdks/firebase-dart-admin-auth-sdk/firebase-dart-admin-auth-sdk/example/firebase-dart-admin-auth-sdk-react-app
-* apps/sdks/firebase-dart-admin-auth-sdk/firebase-dart-admin-auth-sdk/example/firebase-dart-admin-auth-sdk-svelte-app
-* apps/sdks/firebase-dart-admin-auth-sdk/firebase-dart-admin-auth-sdk/example/firebase-dart-admin-auth-sdk-vue-app
+== Maintained Examples
+
+* `example/poc_workload_identity.dart`
+  Backend/admin example for workload-identity initialization.
+* `example/firebase-dart-admin-auth-sdk-flutter-desktop-app`
+  Desktop admin tool sample that uses
+  `initializeAppWithServiceAccount(...)` for local development workflows.
+* `example/firebase-dart-admin-auth-sdk-flutter-web-app`
+  Maintained Flutter Web sample that uses
+  `initializeAppWithEnvironmentVariables(...)` for client-style auth flows.
+
+== Reserved Sample-App Directories
+
+The following directories currently exist only as reserved names and status
+notes. They are not runnable sample apps in this repository revision.
+
+* `example/firebase-dart-admin-auth-sdk-flutter-games-app`
+* `example/firebase-dart-admin-auth-sdk-flutter-mobile-app`
 
 == Notes
 
-* Use the current example directory names as the source of truth for available sample apps.
-* Expand this page with narrative walkthroughs as examples are finalized.
+* Use `example/README.md` as the source of truth for current example status.
+* Treat the Flutter Web sample as a demo app, not a pattern for shipping
+  privileged admin credentials to end users.
