@@ -1,141 +1,50 @@
-# firebase-dart-admin-sample-app
+# Firebase Dart Admin Auth SDK Flutter Web Example
 
-## Description
+This is the only maintained UI sample app currently shipped under `example/`.
 
-A sample app to showcase the process of installing, setting up and using the firebase-dart-admin-auth-sdk
+It demonstrates how the package is wired into a Flutter Web application using
+`FirebaseApp.initializeAppWithEnvironmentVariables(...)` for client-style auth
+flows.
 
-## Table of Contents
+This sample is useful for local exploration of the package surface, but it is
+not the recommended place to carry privileged Firebase admin credentials. For
+production admin flows, keep the SDK on a backend service and call that backend
+from the UI.
 
-- [Installation](#installation)
-- [Usage](#usage)
+For backend-first initialization examples, see:
 
-## Installation
+- `../poc_workload_identity.dart`
+- `../../README.md`
 
-- Add the absolute path of the firebase-dart-admin-auth-sdk to the sample app's pubspec.yaml file
-  ```yaml
-  dependencies:
-  firebase_dart_admin_auth_sdk:
-    path: /Users/user/Documents/GitLab/firebase-dart-admin-auth-sdk/firebase-dart-admin-auth-sdk
-  ```
+## Local Setup
 
-## Usage
+1. Open `lib/main.dart`.
+2. Replace the placeholder Firebase values such as `YOUR_API_KEY` and
+   `YOUR_PROJECT_ID`.
+3. Run `flutter pub get`.
+4. Run the app with `flutter run -d chrome`.
 
-    Depending on the platform firebase-dart-admin-auth-sdk can be initialized via three methods
+## Initialization Path Used in This Sample
 
-**Web:**
-For Web we use Enviroment Variable
-
-```
-import 'package:flutter/material.dart';
-import 'package:firebase_dart_admin_auth_sdk/firebase_dart_admin_auth_sdk.dart';
-
-    void main() async
-    {
-
-        FirebaseApp.initializeAppWithEnvironmentVariables(apiKey:'api_key',projectId: 'project_id',);
-
-        FirebaseApp.instance.getAuth();
-
-        runApp(const MyApp());
-    }
-
+```dart
+await FirebaseApp.initializeAppWithEnvironmentVariables(
+  apiKey: 'YOUR_API_KEY',
+  authdomain: 'YOUR_AUTH_DOMAIN',
+  projectId: 'YOUR_PROJECT_ID',
+  messagingSenderId: 'YOUR_SENDER_ID',
+  bucketName: 'YOUR_BUCKET_NAME',
+  appId: 'YOUR_APP_ID',
+);
 ```
 
-- Import the firebase-dart-admin-auth-sdk and the material app
-  ```
-  import 'package:flutter/material.dart';
-  import 'package:firebase_dart_admin_auth_sdk/firebase_dart_admin_auth_sdk.dart';
-  ```
-- In the main function call the 'FirebaseApp.initializeAppWithEnvironmentVariables' and pass in your api key and project id
+After initialization, the sample obtains the auth client with:
 
-  ```
-    FirebaseApp.initializeAppWithEnvironmentVariables(apiKey:'api_key',projectId: 'project_id',);
-  ```
+```dart
+final auth = FirebaseApp.instance.getAuth();
+```
 
-- Aftwards call the 'FirebaseApp.instance.getAuth()'
-  ```
-    FirebaseApp.instance.getAuth();
-  ```
-- Then call the 'runApp(const MyApp())' method
+## Scope
 
-  ```
-      runApp(const MyApp())
-
-  ```
-
-**Mobile:**
-For mobile we can use either [Service Account](#serviceaccount) or [Service account impersonation](#ServiceAccountImpersonation)
-
-## ServiceAccount
-
-    ```
-    import 'package:flutter/material.dart';
-    import 'package:firebase_dart_admin_auth_sdk/firebase_dart_admin_auth_sdk.dart';
-
-    void main() async
-    {
-        FirebaseApp.initializeAppWithServiceAccount(serviceAccountKeyFilePath: 'path_to_json_file');
-
-        FirebaseApp.instance.getAuth();
-        runApp(const MyApp());
-    }
-    ```
-
-- Import the firebase-dart-admin-auth-sdk and the material app
-
-  ```
-  import 'package:flutter/material.dart';
-  import 'package:firebase_dart_admin_auth_sdk/firebase_dart_admin_auth_sdk.dart';
-  ```
-
-- In the main function call the 'FirebaseApp.initializeAppWithServiceAccount' function and pass the path to your the json file
-  ```
-   FirebaseApp.initializeAppWithServiceAccount(serviceAccountKeyFilePath: 'path_to_json_file');
-  ```
-- Aftwards call the 'FirebaseApp.instance.getAuth()'
-  ```
-    FirebaseApp.instance.getAuth();
-  ```
-- Then call the 'runApp(const MyApp())' method
-
-  ```
-      runApp(const MyApp())
-
-  ```
-
-## ServiceAccountImpersonation
-
-    ```
-    import 'package:flutter/material.dart';
-    import 'package:firebase_dart_admin_auth_sdk/firebase_dart_admin_auth_sdk.dart';
-
-    void main() async
-    {
-        FirebaseApp.initializeAppWithServiceAccountImpersonation(serviceAccountEmail: service_account_email, userEmail: user_email)
-
-        FirebaseApp.instance.getAuth();
-        runApp(const MyApp());
-    }
-    ```
-
-- Import the firebase-dart-admin-auth-sdk and the material app
-
-  ```
-  import 'package:flutter/material.dart';
-  import 'package:firebase_dart_admin_auth_sdk/firebase_dart_admin_auth_sdk.dart';
-  ```
-
-- In the main function call the 'FirebaseApp.initializeAppWithServiceAccountImpersonation' function and pass the service_account_email and user_email
-  ```
-    FirebaseApp.initializeAppWithServiceAccountImpersonation(serviceAccountEmail: serviceAccountEmail,userEmail:userEmail,)
-  ```
-- Aftwards call the 'FirebaseApp.instance.getAuth()'
-  ```
-    FirebaseApp.instance.getAuth();
-  ```
-- Then call the 'runApp(const MyApp())' method
-
-  ```
-      runApp(const MyApp())
-
-  ```
+- Maintained: Flutter Web sample app
+- Not maintained here: mobile, desktop, games, React, Vue, Svelte, and Compose
+  sample apps
