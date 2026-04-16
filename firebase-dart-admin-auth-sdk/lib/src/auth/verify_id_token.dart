@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:developer' as developer;
 import 'package:firebase_dart_admin_auth_sdk/firebase_dart_admin_auth_sdk.dart';
+import 'package:firebase_dart_admin_auth_sdk/src/project_id_utils.dart';
 
 /// Service for verifying Firebase Authentication tokens.
 class VerifyIdTokenService {
@@ -46,10 +47,14 @@ class VerifyIdTokenService {
       // Decode and validate payload
       final payload = _decodeTokenPart(tokenParts[1]);
       _debugLog('Token payload decoded successfully');
+      final normalizedProjectId = normalizeProjectId(auth.projectId);
+      final expectedIssuer =
+          'https://securetoken.google.com/$normalizedProjectId';
+      final tokenIssuer = payload['iss']?.toString().trim();
+      final tokenAudience = normalizeProjectId(payload['aud']?.toString());
 
       // Validate issuer
-      if (payload['iss'] !=
-          'https://securetoken.google.com/${auth.projectId}') {
+      if (tokenIssuer != expectedIssuer) {
         _debugLog('Invalid token issuer');
         throw FirebaseAuthException(
           code: 'invalid-issuer',
@@ -58,7 +63,7 @@ class VerifyIdTokenService {
       }
 
       // Validate audience
-      if (payload['aud'] != auth.projectId) {
+      if (tokenAudience != normalizedProjectId) {
         _debugLog('Invalid token audience');
         throw FirebaseAuthException(
           code: 'invalid-audience',

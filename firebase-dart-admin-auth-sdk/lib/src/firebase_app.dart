@@ -10,6 +10,7 @@ import 'package:ds_standard_features/ds_standard_features.dart'
 
 import 'package:firebase_dart_admin_auth_sdk/src/firebase_auth.dart';
 import 'package:firebase_dart_admin_auth_sdk/src/firebase_storage.dart';
+import 'package:firebase_dart_admin_auth_sdk/src/project_id_utils.dart';
 import 'package:firebase_dart_admin_auth_sdk/src/service_account.dart';
 import 'package:firebase_dart_admin_auth_sdk/src/server_credentials_token_provider.dart';
 import 'package:firebase_dart_admin_auth_sdk/src/user.dart';
@@ -53,8 +54,8 @@ class FirebaseApp {
   final Object? _accessTokenProvider;
 
   FirebaseApp._(
-    this._apiKey,
-    this._projectId,
+    String? apiKey,
+    String? projectId,
     this._authdomain,
     this._messagingSenderId,
     this._bucketName,
@@ -62,7 +63,8 @@ class FirebaseApp {
     this._serviceAccount,
     this.accessToken,
     this._accessTokenProvider,
-  );
+  ) : _apiKey = apiKey,
+      _projectId = normalizeOptionalProjectId(projectId);
 
   // --- token refresh concurrency control ---
   static Completer<void>? _refreshCompleter;
@@ -547,6 +549,7 @@ class FirebaseApp {
     String? targetServiceAccount,
     String? bucketName,
   }) async {
+    final normalizedProjectId = normalizeProjectId(firebaseProjectId);
     final provider = ServerCredentialsTokenProvider(
       targetServiceAccount: targetServiceAccount,
       client: httpClient,
@@ -556,10 +559,10 @@ class FirebaseApp {
 
     _instance = FirebaseApp._(
       null,
-      firebaseProjectId,
-      '$firebaseProjectId.firebaseapp.com',
+      normalizedProjectId,
+      '$normalizedProjectId.firebaseapp.com',
       '',
-      bucketName ?? '$firebaseProjectId.appspot.com',
+      bucketName ?? '$normalizedProjectId.appspot.com',
       '',
       null,
       tokenInfo.accessToken,
@@ -567,7 +570,7 @@ class FirebaseApp {
     )..tokenExpiryTime = tokenInfo.expiry;
 
     log(
-      'Firebase initialized with server credentials for $firebaseProjectId'
+      'Firebase initialized with server credentials for $normalizedProjectId'
       '${targetServiceAccount == null ? '' : ' via $targetServiceAccount'}',
     );
     return _instance!;
@@ -578,9 +581,10 @@ class FirebaseApp {
     required String targetServiceAccount,
     required String firebaseProjectId,
   }) async {
+    final normalizedProjectId = normalizeProjectId(firebaseProjectId);
     final provider = WorkloadIdentityTokenProvider(
       targetServiceAccount: targetServiceAccount,
-      firebaseProjectId: firebaseProjectId,
+      firebaseProjectId: normalizedProjectId,
       client: httpClient,
     );
 
@@ -588,10 +592,10 @@ class FirebaseApp {
 
     _instance = FirebaseApp._(
       null, // No API key needed for Workload Identity
-      firebaseProjectId,
-      '$firebaseProjectId.firebaseapp.com',
+      normalizedProjectId,
+      '$normalizedProjectId.firebaseapp.com',
       '',
-      '$firebaseProjectId.appspot.com',
+      '$normalizedProjectId.appspot.com',
       '',
       null, // No service account JSON needed
       tokenInfo.accessToken,
@@ -619,6 +623,7 @@ class FirebaseApp {
     }
     if (providerId.isEmpty) throw ArgumentError('providerId required');
 
+    final normalizedProjectId = normalizeProjectId(firebaseProjectId);
     final accessToken = await _exchangeExternalToken(
       externalToken,
       targetServiceAccount,
@@ -629,7 +634,7 @@ class FirebaseApp {
     return _initializeWithAccessToken(
       accessToken,
       targetServiceAccount,
-      firebaseProjectId,
+      normalizedProjectId,
     );
   }
 
@@ -744,15 +749,16 @@ class FirebaseApp {
     String targetServiceAccount,
     String firebaseProjectId,
   ) async {
+    final normalizedProjectId = normalizeProjectId(firebaseProjectId);
     // Extract projectId from service account email (firebase-admin@<project-id>.iam.gserviceaccount.com)
     final projectId = targetServiceAccount.split('@')[1].split('.')[0];
 
     _instance = FirebaseApp._(
       null,
-      firebaseProjectId, // projectId dynamically resolved
-      '$firebaseProjectId.firebaseapp.com', // auth domain
+      normalizedProjectId, // projectId dynamically resolved
+      '$normalizedProjectId.firebaseapp.com', // auth domain
       '', // messaging sender ID (can be set if needed)
-      '$firebaseProjectId.appspot.com', // bucket name
+      '$normalizedProjectId.appspot.com', // bucket name
       '', // app ID (optional, can be set)
       null,
       accessToken,

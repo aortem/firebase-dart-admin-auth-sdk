@@ -1,3 +1,7 @@
+## [0.1.2]
+### Fixed
+- Normalized Firebase project IDs during backend/server initialization and token verification so BOM or trailing whitespace in config values cannot trigger false `invalid-issuer` or `invalid-audience` failures.
+
 ## [0.1.1]
 ### Changed
 - Refreshed the publishable package dependencies to newer compatible releases, including `googleapis_auth` and `jwt_generator`.

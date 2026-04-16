@@ -42,6 +42,35 @@ void main() {
       expect(app.tokenExpiryTime, isNotNull);
     });
 
+    test(
+      'normalizes contaminated firebase project IDs during initialization',
+      () async {
+        http.overrideResponses({
+          'http://metadata.google.internal': http.MockResponse(200, 'OK'),
+          'http://metadata.google.internal/computeMetadata/v1/instance/service-accounts/default/token':
+              http.MockResponse(
+                200,
+                jsonEncode({
+                  "access_token": "mock_adc_token",
+                  "expires_in": 3600,
+                }),
+              ),
+          'https://iamcredentials.googleapis.com/v1/projects/-/serviceAccounts/test-sa@myproj.iam.gserviceaccount.com:generateAccessToken':
+              http.MockResponse(
+                200,
+                jsonEncode({"accessToken": "impersonated_token"}),
+              ),
+        });
+
+        final app = await FirebaseApp.initializeAppWithWorkloadIdentity(
+          firebaseProjectId: '\uFEFFmyproj\r\n',
+          targetServiceAccount: 'test-sa@myproj.iam.gserviceaccount.com',
+        );
+
+        expect(app.getAuth().projectId, equals('myproj'));
+      },
+    );
+
     test('throws if not running on GCP', () async {
       http.overrideResponses({
         'http://metadata.google.internal': http.MockResponse(404, 'Not Found'),
