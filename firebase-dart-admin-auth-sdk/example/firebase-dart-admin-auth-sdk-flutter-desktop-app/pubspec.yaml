@@ -31,7 +31,7 @@ dependencies:
   flutter:
     sdk: flutter
 
-  cupertino_icons: ^1.0.8
+  cupertino_icons: ^1.0.9
   firebase_dart_admin_auth_sdk:
     path: ../..
 
