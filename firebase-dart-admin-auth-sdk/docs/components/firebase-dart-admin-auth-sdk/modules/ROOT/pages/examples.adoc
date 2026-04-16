@@ -16,6 +16,9 @@ credentials directly in the UI.
 
 * `example/poc_workload_identity.dart`
   Backend/admin example for workload-identity initialization.
+* `example/firebase-dart-admin-auth-sdk-flutter-desktop-app`
+  Desktop admin tool sample that uses
+  `initializeAppWithServiceAccount(...)` for local development workflows.
 * `example/firebase-dart-admin-auth-sdk-flutter-web-app`
   Maintained Flutter Web sample that uses
   `initializeAppWithEnvironmentVariables(...)` for client-style auth flows.
@@ -25,13 +28,8 @@ credentials directly in the UI.
 The following directories currently exist only as reserved names and status
 notes. They are not runnable sample apps in this repository revision.
 
-* `example/firebase-dart-admin-auth-sdk-compose-app`
-* `example/firebase-dart-admin-auth-sdk-flutter-desktop-app`
 * `example/firebase-dart-admin-auth-sdk-flutter-games-app`
 * `example/firebase-dart-admin-auth-sdk-flutter-mobile-app`
-* `example/firebase-dart-admin-auth-sdk-react-app`
-* `example/firebase-dart-admin-auth-sdk-svelte-app`
-* `example/firebase-dart-admin-auth-sdk-vue-app`
 
 == Notes
 

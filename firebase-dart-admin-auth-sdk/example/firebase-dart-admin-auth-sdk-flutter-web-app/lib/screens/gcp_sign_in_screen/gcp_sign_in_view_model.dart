@@ -54,10 +54,8 @@ class GCPSignInViewModel extends ChangeNotifier {
   Future<void> signOut() async {
     try {
       setLoading(true);
-      await Future.wait([
-        _googleSignIn.signOut(),
-        FirebaseApp.firebaseAuth?.signOut() ?? Future.value(),
-      ]);
+      await _googleSignIn.signOut();
+      await (FirebaseApp.firebaseAuth?.signOut() ?? Future<void>.value());
     } catch (e) {
       BotToast.showText(text: e.toString());
     } finally {
