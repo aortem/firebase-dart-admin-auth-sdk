@@ -1,6 +1,6 @@
 name: firebase_dart_admin_auth_sdk
 description: A Dart SDK for backend Firebase authentication and admin flows with keyless server credentials and optional service account impersonation.
-version: 0.1.1
+version: 0.1.2
 repository: https://github.com/aortem/firebase-dart-admin-auth-sdk
 license: BSD-3
 

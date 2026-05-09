@@ -60,6 +60,7 @@ import 'auth/parse_action_code_url.dart';
 
 import 'firebase_user/set_language_code.dart';
 import 'id_token_result_model.dart';
+import 'project_id_utils.dart';
 import 'auth/verify_id_token.dart';
 
 ///Base Firebase auth class that contains all the methods provided by the sdk
@@ -223,7 +224,7 @@ class FirebaseAuth {
   /// Firebae Auth constructor class
   FirebaseAuth({
     this.apiKey,
-    this.projectId,
+    String? projectId,
     this.authDomain,
     this.messagingSenderId,
     http.Client? httpClient, // Add this parameter
@@ -233,7 +234,7 @@ class FirebaseAuth {
     this.serviceAccount,
     this.generateCustomToken,
     this.firebaseApp,
-  }) {
+  }) : projectId = normalizeOptionalProjectId(projectId) {
     log(apiKey ?? 'api key');
     this.httpClient =
         httpClient ??
