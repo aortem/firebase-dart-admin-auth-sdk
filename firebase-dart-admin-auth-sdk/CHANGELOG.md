@@ -1,3 +1,10 @@
+## [0.1.3]
+### Fixed
+- Updated the Flutter web example lockfile to resolve patched `protobufjs` and `@protobufjs/utf8` transitive versions for the current GitHub Dependabot advisory.
+
+### Documentation
+- Aligned package and docs version references for the next release.
+
 ## [0.1.2]
 ### Fixed
 - Normalized Firebase project IDs during backend/server initialization and token verification so BOM or trailing whitespace in config values cannot trigger false `invalid-issuer` or `invalid-audience` failures.
