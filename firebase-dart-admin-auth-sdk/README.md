@@ -10,7 +10,7 @@ It is not the recommended place to carry privileged credentials inside browser o
 
 ```yaml
 dependencies:
-  firebase_dart_admin_auth_sdk: ^0.1.1
+  firebase_dart_admin_auth_sdk: ^0.1.3
 ```
 
 ## Recommended Initialization Model
