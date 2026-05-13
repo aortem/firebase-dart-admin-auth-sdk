@@ -6,6 +6,36 @@
 This page summarizes the stable package release history for Firebase Dart Admin Auth SDK and keeps the public docs aligned with the published SDK versions.
 '''
 
+== v0.1.3
+
+=== Overview
+This release prepares the package for the next publish with a patched Flutter web example dependency lockfile and refreshed public version references.
+
+=== Highlights
+* Patched the Flutter web example's transitive `protobufjs` dependency chain
+* Cleared the current GitHub Dependabot advisory for the example `package-lock.json`
+* Aligned package and docs version references for `0.1.3`
+
+=== Fixes
+* Updated `protobufjs` to `7.5.8` in the Flutter web example lockfile.
+* Updated `@protobufjs/utf8` to `1.1.1` through the same lockfile refresh.
+
+=== Documentation
+* Updated the README installation snippet and docs version references to `0.1.3`.
+
+== v0.1.2
+
+=== Overview
+This release fixes backend/server token verification edge cases caused by Firebase project IDs that contain a BOM or trailing whitespace.
+
+=== Highlights
+* Normalized Firebase project IDs during backend/server initialization
+* Prevented false `invalid-issuer` and `invalid-audience` failures during token verification
+
+=== Fixes
+* Trimmed and normalized project IDs used by server auth flows.
+* Kept token verification behavior stable when config values contain hidden whitespace.
+
 == v0.1.1
 
 === Overview
