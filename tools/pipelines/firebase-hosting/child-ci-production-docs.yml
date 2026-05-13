@@ -7,16 +7,16 @@ stages:
 debug_merge_request:
   stage: validate
   script:
-    - echo "Basic Merge Request Variables..." 
+    - echo "Basic Merge Request Variables..."
     - echo "CI_MERGE_REQUEST_IID is '$CI_MERGE_REQUEST_IID'"
     - echo "CI_MERGE_REQUEST_SOURCE_BRANCH_NAME is $CI_MERGE_REQUEST_SOURCE_BRANCH_NAME"
     - echo "CI_MERGE_REQUEST_TARGET_BRANCH_NAME is $CI_MERGE_REQUEST_TARGET_BRANCH_NAME"
     - echo "CI_MERGE_REQUEST_EVENT_TYPE is $CI_MERGE_REQUEST_EVENT_TYPE"
-    
+
     - echo "Commit Information Variables..."
     - echo "CI_COMMIT_REF_NAME is $CI_COMMIT_REF_NAME"
     - echo "CI_COMMIT_BRANCH is $CI_COMMIT_BRANCH"
-    - echo "CI_COMMIT_MESSAGE is $CI_COMMIT_MESSAGE" 
+    - echo "CI_COMMIT_MESSAGE is $CI_COMMIT_MESSAGE"
 
     - echo "Determining branch name..."
     - BRANCH_NAME=${CI_COMMIT_BRANCH:-${CI_MERGE_REQUEST_SOURCE_BRANCH_NAME:-$CI_COMMIT_REF_NAME}}
@@ -37,11 +37,11 @@ validate_branch_name:
       echo "Branch name: $BRANCH_NAME"
 
       if echo "$BRANCH_NAME" | grep -Eq "^(development|qa|main)$"; then
-        echo "âœ… Valid branch name for protected branches: $BRANCH_NAME."
+        echo "OK Valid branch name for protected branches: $BRANCH_NAME."
       elif echo "$BRANCH_NAME" | grep -Eq "^(feat|fix|hotfix|chore|test|refactor|release|admin|docs)/[a-z0-9_-]+$"; then
-        echo "âœ… Branch name follows naming convention: $BRANCH_NAME."
+        echo "OK Branch name follows naming convention: $BRANCH_NAME."
       else
-        echo "âŒ Invalid branch name: $BRANCH_NAME."
+        echo "ERROR Invalid branch name: $BRANCH_NAME."
         echo "Expected format: <type>/<branch-name>. Valid types: feat, fix, hotfix, chore, test, refactor, release, admin, docs, development, qa, main."
         exit 1
       fi
@@ -72,7 +72,7 @@ validate_commit_messages:
       INVALID_COMMITS=$(git log -1 --format=%s | grep -vE "$COMBINED_REGEX" || true)
 
       if [ -n "$INVALID_COMMITS" ]; then
-        echo "âŒ Commit message does not follow convention:"
+        echo "ERROR Commit message does not follow convention:"
         echo "$INVALID_COMMITS"
         echo "Expected formats:"
         echo "  Merge branch 'source-branch' into 'target-branch' (for merge requests)"
@@ -82,7 +82,7 @@ validate_commit_messages:
         echo "  fix(payment): resolve rounding error in total calculation"
         exit 1
       else
-        echo "âœ… Commit message follows the convention."
+        echo "OK Commit message follows the convention."
       fi
   rules:
     - when: always
