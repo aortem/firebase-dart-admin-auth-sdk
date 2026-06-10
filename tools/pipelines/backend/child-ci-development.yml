@@ -4,7 +4,7 @@ stages:
 # Analyze Main Project
 analyze_main:
   stage: analyze
-  image: dart:stable
+  image: dart:3.12.2
   rules:
     - when: always
   script:
