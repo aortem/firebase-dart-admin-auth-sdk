@@ -1,3 +1,9 @@
+## 0.1.4
+
+- Bumped package metadata for the Dart 3.12.2 upgrade pass.
+- Updated the Dart SDK constraint to `^3.12.1` for the Dart 3.12 release line.
+- Refreshed dependency resolution with the current Dart/Flutter tooling where applicable.
+
 ## [0.1.3]
 ### Fixed
 - Updated the Flutter web example lockfile to resolve patched `protobufjs` and `@protobufjs/utf8` transitive versions for the current GitHub Dependabot advisory.
