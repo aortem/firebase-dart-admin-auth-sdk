@@ -4,7 +4,7 @@ stages:
 # Firebase SDK Unit Tests
 unit_tests:
   stage: unit_tests
-  image: dart:3.12.2
+  image: dart:stable
   script:
     - echo "Running Unit Tests..."
     - cd firebase-dart-admin-auth-sdk/test/unit/

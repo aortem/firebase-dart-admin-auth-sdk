@@ -139,7 +139,7 @@ validate_dart_sdk_version:
 
 validate_format:
   stage: validate
-  image: dart:3.12.2
+  image: dart:stable
   script:
     - echo "🔍 Fetching Dart deps…"
     - cd firebase-dart-admin-auth-sdk
@@ -171,7 +171,7 @@ validate_format:
 
 analyze_main:
   stage: analyze
-  image: dart:3.12.2
+  image: dart:stable
   needs: 
     - validate_commit_messages
   script:
