@@ -143,10 +143,11 @@ class ServerCredentialsTokenProvider implements AccessTokenProvider {
   }
 
   Future<AccessTokenInfo> _getAccessTokenFromGcloud() async {
-    final result = await Process.run(
-      'gcloud',
-      <String>['auth', 'application-default', 'print-access-token'],
-    );
+    final result = await Process.run('gcloud', <String>[
+      'auth',
+      'application-default',
+      'print-access-token',
+    ]);
 
     if (result.exitCode != 0) {
       throw Exception(
