@@ -12,7 +12,7 @@ This page summarizes the stable package release history for Firebase Dart Admin 
 This compatibility release aligns firebase_dart_admin_auth_sdk with the Dart 3.12 release line and the current Flutter stable tooling where applicable.
 
 === Highlights
-* Dart SDK constraint updated to `^3.12.1`
+* Dart SDK constraint updated to `^3.12.2`
 * Package version bumped for the Dart 3.12.2 upgrade pass
 * Maintained examples refreshed for current Dart and Flutter dependency resolution
 

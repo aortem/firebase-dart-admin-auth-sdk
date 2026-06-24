@@ -60,7 +60,9 @@ class WorkloadIdentityTokenProvider implements AccessTokenProvider {
         .timeout(const Duration(seconds: 3));
 
     if (metadataRoot.statusCode != 200) {
-      throw Exception('Workload Identity unavailable: metadata server not reachable.');
+      throw Exception(
+        'Workload Identity unavailable: metadata server not reachable.',
+      );
     }
 
     final tokenResponse = await _client
@@ -96,7 +98,9 @@ class WorkloadIdentityTokenProvider implements AccessTokenProvider {
     return _impersonateServiceAccount(sourceToken.accessToken);
   }
 
-  Future<AccessTokenInfo> _impersonateServiceAccount(String sourceAccessToken) async {
+  Future<AccessTokenInfo> _impersonateServiceAccount(
+    String sourceAccessToken,
+  ) async {
     final response = await _client.post(
       Uri.parse(
         'https://iamcredentials.googleapis.com/v1/projects/-/serviceAccounts/'

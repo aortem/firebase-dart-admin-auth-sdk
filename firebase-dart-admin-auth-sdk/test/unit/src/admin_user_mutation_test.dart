@@ -37,10 +37,10 @@ void main() {
       await auth.updateUserPasswordByUid('user-123', 'new-password');
 
       expect(auth.lastEndpoint, equals('update'));
-      expect(auth.lastBody, equals({
-        'localId': 'user-123',
-        'password': 'new-password',
-      }));
+      expect(
+        auth.lastBody,
+        equals({'localId': 'user-123', 'password': 'new-password'}),
+      );
     });
 
     test('deleteUserByUid validates uid', () async {
@@ -80,9 +80,12 @@ void main() {
       final user = await auth.getUserByUid('user-123');
 
       expect(auth.lastEndpoint, equals('lookup'));
-      expect(auth.lastBody, equals({
-        'localId': ['user-123'],
-      }));
+      expect(
+        auth.lastBody,
+        equals({
+          'localId': ['user-123'],
+        }),
+      );
       expect(user, isNotNull);
       expect(user!.uid, equals('user-123'));
       expect(user.email, equals('user@example.com'));
@@ -90,10 +93,7 @@ void main() {
     });
 
     test('getUserByUid returns null when Firebase returns no users', () async {
-      final auth = _RecordingAuth()
-        ..responseBody = {
-          'users': [],
-        };
+      final auth = _RecordingAuth()..responseBody = {'users': []};
 
       final user = await auth.getUserByUid('missing-user');
 

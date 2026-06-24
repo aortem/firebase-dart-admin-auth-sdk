@@ -9,46 +9,49 @@ void main() {
   setUp(() => overrideResponses({}));
 
   group('MFA sign-in flow', () {
-    test('email/password sign-in throws a structured MFA challenge error', () async {
-      overrideResponses({
-        'https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key=test-api-key':
-            MockResponse(
-              200,
-              jsonEncode({
-                'mfaPendingCredential': 'pending-credential-123',
-                'mfaInfo': [
-                  {
-                    'mfaEnrollmentId': 'phone-enroll-1',
-                    'displayName': 'Personal phone',
-                    'phoneInfo': '+1555******67',
-                  },
-                ],
-              }),
-            ),
-      });
-
-      final auth = FirebaseAuth(
-        apiKey: 'test-api-key',
-        httpClient: MockHttpClient(),
-      );
-
-      await expectLater(
-        auth.signInWithEmailAndPassword('user@example.com', 'super-secret'),
-        throwsA(
-          isA<MultiFactorError>()
-              .having(
-                (error) => error.session.pendingCredential,
-                'pendingCredential',
-                equals('pending-credential-123'),
-              )
-              .having(
-                (error) => error.hints.first.enrollmentId,
-                'enrollmentId',
-                equals('phone-enroll-1'),
+    test(
+      'email/password sign-in throws a structured MFA challenge error',
+      () async {
+        overrideResponses({
+          'https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key=test-api-key':
+              MockResponse(
+                200,
+                jsonEncode({
+                  'mfaPendingCredential': 'pending-credential-123',
+                  'mfaInfo': [
+                    {
+                      'mfaEnrollmentId': 'phone-enroll-1',
+                      'displayName': 'Personal phone',
+                      'phoneInfo': '+1555******67',
+                    },
+                  ],
+                }),
               ),
-        ),
-      );
-    });
+        });
+
+        final auth = FirebaseAuth(
+          apiKey: 'test-api-key',
+          httpClient: MockHttpClient(),
+        );
+
+        await expectLater(
+          auth.signInWithEmailAndPassword('user@example.com', 'super-secret'),
+          throwsA(
+            isA<MultiFactorError>()
+                .having(
+                  (error) => error.session.pendingCredential,
+                  'pendingCredential',
+                  equals('pending-credential-123'),
+                )
+                .having(
+                  (error) => error.hints.first.enrollmentId,
+                  'enrollmentId',
+                  equals('phone-enroll-1'),
+                ),
+          ),
+        );
+      },
+    );
 
     test('resolver starts phone challenge and finalizes TOTP sign-in', () async {
       overrideResponses({
