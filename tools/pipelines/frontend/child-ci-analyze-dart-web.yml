@@ -6,8 +6,8 @@ analyze_flutter_web:
   image: ghcr.io/cirruslabs/flutter:stable
   before_script:
     - |
-      # Temporary until ghcr.io/cirruslabs/flutter:stable includes Flutter 3.44.1 or later.
-      FLUTTER_TARGET_VERSION=3.44.1
+      # Temporary until ghcr.io/cirruslabs/flutter:stable includes Flutter 3.44.3 or later.
+      FLUTTER_TARGET_VERSION=3.44.3
       export FLUTTER_ROOT="${FLUTTER_ROOT:-${FLUTTER_HOME:-$HOME/sdks/flutter}}"
       if ! flutter --version | grep -q "Flutter ${FLUTTER_TARGET_VERSION}"; then
         git -C "$FLUTTER_ROOT" fetch --depth 1 origin "refs/tags/${FLUTTER_TARGET_VERSION}:refs/tags/${FLUTTER_TARGET_VERSION}"
