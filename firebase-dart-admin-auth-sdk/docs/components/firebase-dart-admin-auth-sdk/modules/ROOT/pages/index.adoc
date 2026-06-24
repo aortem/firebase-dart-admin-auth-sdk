@@ -1,4 +1,4 @@
-﻿= Firebase Dart Admin Auth SDK Documentation
+= Firebase Dart Admin Auth SDK Documentation
 :page-layout: default
 :sectanchors:
 :toc: macro
@@ -21,7 +21,7 @@ toc::[]
 == Current Public Package
 
 * Package: firebase_dart_admin_auth_sdk
-* Version: v0.1.3
+* Version: v0.1.4
 * Repository root: apps/sdks/firebase-dart-admin-auth-sdk
 * Package root: apps/sdks/firebase-dart-admin-auth-sdk/firebase-dart-admin-auth-sdk
 * Docs root: apps/sdks/firebase-dart-admin-auth-sdk/firebase-dart-admin-auth-sdk/docs
