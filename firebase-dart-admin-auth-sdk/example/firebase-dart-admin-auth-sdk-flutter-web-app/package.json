@@ -1,5 +1,10 @@
 {
   "dependencies": {
     "firebase": "^11.2.0"
+  },
+  "overrides": {
+    "@grpc/grpc-js": "~1.9.16",
+    "protobufjs": "~7.6.3",
+    "websocket-driver": "~0.7.5"
   }
 }
