@@ -10,10 +10,19 @@ It is not the recommended place to carry privileged credentials inside browser o
 
 ```yaml
 dependencies:
-  firebase_dart_admin_auth_sdk: ^0.1.4
+  firebase_dart_admin_auth_sdk: ^0.1.5
 ```
 
 ## Recommended Initialization Model
+
+ID-token verification checks RS256 signatures against Google's signing
+certificates before returning identity or MFA claims. Unsigned test tokens are
+rejected. Keys are cached per auth instance using bounded HTTP cache lifetimes;
+an unknown key or unavailable expired key set fails verification. This does not
+perform a remote disabled-account or token-revocation lookup. Applications must
+also enforce their own membership, suspension and authorization rules.
+
+Requirements: https://firebase.google.com/docs/auth/admin/verify-id-tokens
 
 Use one of these paths:
 

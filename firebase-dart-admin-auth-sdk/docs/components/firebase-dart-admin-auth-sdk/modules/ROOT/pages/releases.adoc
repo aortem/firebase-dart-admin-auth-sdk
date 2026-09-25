@@ -6,6 +6,17 @@
 This page summarizes the stable package release history for Firebase Dart Admin Auth SDK and keeps the public docs aligned with the published SDK versions.
 '''
 
+== v0.1.5 (candidate)
+
+* Verify ID-token RS256 signatures using Google's signing certificates before
+  returning identity and MFA claims.
+* Reject unsigned/tampered tokens, token-provided keys, invalid issuer/audience,
+  invalid subjects and invalid timestamps.
+* Cache certificates within their HTTP lifetime and fail closed on unavailable
+  expired keys. Account revocation checks remain separate.
+* Positive tests now use synthetic signed tokens. Existing unsigned fixtures
+  must be replaced; they are not valid Firebase authentication credentials.
+
 == v0.1.4
 
 === Overview
