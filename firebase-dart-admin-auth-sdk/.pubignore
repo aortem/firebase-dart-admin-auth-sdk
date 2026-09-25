@@ -3,6 +3,9 @@
 build/
 coverage/
 
+# Offline tests are source-only; signing keys are generated in test memory.
+test/
+
 # Deployment and docs tooling not needed in the package archive
 doc/
 docs/
