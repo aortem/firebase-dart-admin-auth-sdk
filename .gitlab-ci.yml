@@ -54,15 +54,13 @@ validation_trigger_docs:
       when: always
     - when: never
 
-# # Unit Test Conditional Triggers
-# unit_test_trigger:
-#   stage: unit_testing
-#   trigger:
-#     include: tools/pipelines/backend/child-ci-unit-tests.yml
-#   needs:
-#     - job: validation_trigger
-#   rules:
-#     # Always runs after validation trigger
+unit_test_trigger:
+  stage: validation
+  trigger:
+    include: tools/pipelines/backend/child-ci-unit-tests.yml
+    strategy: depend
+  rules:
+    - when: always
 #     - when: always
     
 # Sample App Conditional Triggers
