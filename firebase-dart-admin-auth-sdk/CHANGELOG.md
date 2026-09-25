@@ -1,3 +1,15 @@
+## 0.1.5
+
+- Verify Firebase ID-token RS256 signatures using Google's published signing
+  certificates before trusting identity or MFA claims.
+- Reject unsigned/tampered tokens, unsupported algorithms, unknown keys and
+  token-provided trust sources. Enforce issuer, audience, subject and timestamps.
+- Cache signing certificates according to bounded HTTP cache lifetime and share
+  concurrent fetches per FirebaseAuth instance. Expired keys fail closed during
+  outages. Error messages do not include tokens or untrusted upstream content.
+- Replace unsigned positive test fixtures with synthetic signed RSA tokens.
+  This verifies signatures; remote account revocation checks remain separate.
+
 ## 0.1.4
 
 - Bumped package metadata for the Dart 3.12.2 upgrade pass.

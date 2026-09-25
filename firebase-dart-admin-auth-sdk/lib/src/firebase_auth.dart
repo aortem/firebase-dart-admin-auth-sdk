@@ -1312,9 +1312,6 @@ class FirebaseAuth {
   /// Throws [FirebaseAuthException] if verification fails
   Future<Map<String, dynamic>> verifyIdToken(String idToken) async {
     try {
-      // Initialize verification service if not already created
-      verifyTokenService = VerifyIdTokenService(auth: this);
-
       // Use direct token verification without additional parameters
       // since service account context is handled in VerifyIdTokenService
       return await verifyTokenService.verifyIdToken(idToken);
