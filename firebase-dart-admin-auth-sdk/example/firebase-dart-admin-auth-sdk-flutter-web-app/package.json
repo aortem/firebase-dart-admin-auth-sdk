@@ -3,7 +3,7 @@
     "firebase": "^11.2.0"
   },
   "overrides": {
-    "@grpc/grpc-js": "~1.9.16",
+    "@grpc/grpc-js": "~1.13.6",
     "protobufjs": "~7.6.3",
     "websocket-driver": "~0.7.5"
   }
