@@ -1,0 +1,11 @@
+{
+  "name": "@aortem/bounded-brace-patterns",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Bounded string pattern compile/expand operations for the pinned documentation consumers",
+  "main": "index.cjs",
+  "license": "ISC",
+  "dependencies": {
+    "fill-range": "7.1.1"
+  }
+}

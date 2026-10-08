@@ -40,6 +40,9 @@ rm -rf node_modules dist build/site
 echo "Installing dependencies"
 npm ci
 
+echo "Testing owned bounded pattern implementation"
+npm test
+
 echo "Building the documentation site"
 npm run build
 
